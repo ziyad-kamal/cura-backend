@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import { body, validationResult } from "express-validator";
+import { NextFunction, Request, RequestHandler, Response } from "express";
+import { body, ValidationChain, validationResult } from "express-validator";
 import { returnError } from "../utils/returnJson.ts";
 
-export const postValidator = [
+export const postValidator: (ValidationChain | RequestHandler)[] = [
     body("title")
         .trim()
         .notEmpty()
@@ -23,12 +23,7 @@ export const postValidator = [
             // req.flash("errors", errors.mapped());
             // req.flash("old", req.body);
 
-            return returnError(
-                res,
-                "correct errors under each input",
-                422,
-                errors,
-            );
+            return returnError(res, "correct errors under each input", 422, errors);
         }
         next();
     },

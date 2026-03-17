@@ -1,7 +1,6 @@
 import cookieParser from "cookie-parser";
 import express from "express";
-import errorHandler from "./app/middlewares/errorHandler.ts";
-import { attachHelpers } from "./app/middlewares/helpers.ts";
+import { attachHelpers, errorHandler } from "./app/middlewares/index.ts";
 import { appConfig, connectDB } from "./config/index.ts";
 import authRoutes from "./routes/authRoutes.ts";
 import postRoutes from "./routes/postRoutes.ts";
@@ -19,6 +18,6 @@ app.use(`${appConfig.apiPrefix}`, authRoutes);
 
 app.use(`${appConfig.apiPrefix}`, postRoutes);
 
-app.use(errorHandler);
-
 app.listen(appConfig.port);
+
+app.use(errorHandler);

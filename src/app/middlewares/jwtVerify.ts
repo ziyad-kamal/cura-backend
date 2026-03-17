@@ -1,15 +1,9 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 import { jwtConfig } from "../../config/jwt.ts";
-import { JwtRequestInterface } from "../../interfaces/requests/JwtRequestInterface.ts";
-import { CookieResponseInterface } from "../../interfaces/response/CookieResponseInterface.ts";
 import { returnError } from "../utils/returnJson.ts";
 
-export const jwtVerify = async (
-    req: JwtRequestInterface,
-    res: CookieResponseInterface,
-    next: NextFunction,
-): Promise<Response | void> => {
+export const jwtVerify = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     const accessToken = req.cookies?.accessToken;
     const refreshToken = req.cookies?.refreshToken;
 
@@ -18,7 +12,7 @@ export const jwtVerify = async (
     }
 
     try {
-        const user = jwt.verify(accessToken, jwtConfig.accessTokenSecret as string) as JwtPayload;
+        const user = jwt.verify(accessToken as string, jwtConfig.accessTokenSecret as string) as JwtPayload;
         req.user = user;
 
         return next();
