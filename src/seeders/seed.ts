@@ -1,8 +1,6 @@
 /* eslint-disable no-console */
 import { connectDB } from "../config/index.ts";
-import seedComments from "./commentSeeder.ts";
-import seedPosts from "./postsSeeder.ts";
-import seedUsers from "./userSeeder.ts";
+import { seedComments, seedPosts, seedUsers } from "./index.ts";
 
 const seedAll = async () => {
     try {

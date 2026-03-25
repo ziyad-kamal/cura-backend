@@ -1,8 +1,8 @@
 {
-  "postman.settings.dotenv-detection-notification-visibility": false,
-  "editor.codeActionsOnSave": {
-    "source.removeUnusedImports": "explicit",
-    "source.organizeImports": "explicit"
-  },
-  "prettier.printWidth": 140
+    "postman.settings.dotenv-detection-notification-visibility": false,
+    "editor.codeActionsOnSave": {
+        "source.removeUnusedImports": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    "prettier.printWidth": 120
 }

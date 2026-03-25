@@ -1,13 +1,13 @@
 import Post from "../models/Post.ts";
 
-const getAllPosts = (
+const getPostsRepo = (
     query: {
         [key: string]: unknown;
     },
     limit: number,
 ) => {
     return Post.find(query)
-        .select("author title content filePath")
+        .select("author title content filePath createdAt")
         .populate({
             path: "comments",
             populate: {
@@ -25,4 +25,4 @@ const getAllPosts = (
         .lean();
 };
 
-export { getAllPosts };
+export { getPostsRepo };
