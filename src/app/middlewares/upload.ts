@@ -1,4 +1,5 @@
 import multer, { Multer } from "multer";
+import { fileConfig } from "../../config/file.ts";
 
 const storage = multer.memoryStorage();
 
@@ -11,8 +12,8 @@ const createUploader = (maxBytes: number): Multer =>
         },
     });
 
-const uploadImage = createUploader(5 * 1024 * 1024); // 5 MB
-const uploadDocument = createUploader(10 * 1024 * 1024); // 10 MB
-const uploadVideo = createUploader(50 * 1024 * 1024); // 50 MB
+const uploadImage = createUploader(fileConfig.maxImageSize);
+const uploadDocument = createUploader(fileConfig.maxDocumentSize);
+const uploadVideo = createUploader(fileConfig.maxVideoSize);
 
-export { uploadImage, uploadDocument, uploadVideo };
+export { uploadDocument, uploadImage, uploadVideo };

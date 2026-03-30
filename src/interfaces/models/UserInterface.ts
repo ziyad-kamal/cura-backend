@@ -8,4 +8,6 @@ export interface UserInterface {
     role: "user" | "admin";
     createdAt: Date;
     updatedAt: Date;
+    // eslint-disable-next-line no-unused-vars
+    comparePassword(password: string): Promise<boolean>;
 }

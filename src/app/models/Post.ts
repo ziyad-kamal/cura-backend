@@ -42,13 +42,14 @@ const postSchema = new Schema<PostInterface>(
     {
         timestamps: true,
         versionKey: false,
-        toJSON: {
-            virtuals: true,
-            transform: (doc, ret) => {
-                delete ret.id;
-                return ret;
-            },
-        },
+        id: false,
+        // toJSON: {
+        //     virtuals: true,
+        //     transform: (doc, ret) => {
+        //         delete ret.id;
+        //         return ret;
+        //     },
+        // },
     },
 );
 
@@ -68,9 +69,6 @@ postSchema.virtual("commentsCount", {
 postSchema.index({ title: "text", content: "text" });
 postSchema.index({ createdAt: -1 });
 
-const Post: Model<PostInterface> = mongoose.model<PostInterface>(
-    "Post",
-    postSchema,
-);
+const Post: Model<PostInterface> = mongoose.model<PostInterface>("Post", postSchema);
 
 export default Post;

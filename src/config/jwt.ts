@@ -1,9 +1,9 @@
 import "dotenv/config";
-import { JwtInterface } from "../interfaces/config/JwtInterface.ts";
+import { StringValue } from "ms";
 
-export const jwtConfig: JwtInterface = {
-    accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
-    refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
-    accessExpireTime: process.env.ACCESS_EXPIRE_TIME,
-    refreshExpireTime: process.env.REFRESH_EXPIRE_TIME,
+export const jwtConfig = {
+    accessTokenSecret: process.env.ACCESS_TOKEN_SECRET as string,
+    refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET as string,
+    accessExpireTime: process.env.ACCESS_EXPIRE_TIME as StringValue,
+    refreshExpireTime: process.env.REFRESH_EXPIRE_TIME as StringValue,
 };

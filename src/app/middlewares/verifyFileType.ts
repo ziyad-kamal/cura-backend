@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { fileTypeFromBuffer } from "file-type";
 import { FileTypeRequestInterface } from "../../interfaces/requests/FileTypeRequestInterface.ts";
+import { returnError } from "../utils/returnJson.ts";
 
 export const verifyFileType = async (
     req: FileTypeRequestInterface,
@@ -8,22 +9,24 @@ export const verifyFileType = async (
     next: NextFunction,
 ): Promise<Response | void> => {
     if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
+        return returnError(res, "no file uploaded", 400);
     }
 
     try {
         const detected = await fileTypeFromBuffer(req.file.buffer);
 
         if (!detected) {
-            return res.status(400).json({ error: "Unable to detect file type" });
+            return returnError(res, "Unable to detect file type", 400);
         }
 
         const allowed = new Set(["jpg", "jpeg", "png", "webp", "gif"]);
 
         if (!allowed.has(detected.ext)) {
-            return res.status(400).json({
-                error: `Invalid file content. Detected: ${detected.mime} (${detected.ext}), allowed: images only`,
-            });
+            return returnError(
+                res,
+                `Invalid file content. Detected: ${detected.mime} (${detected.ext}), allowed: images only`,
+                422,
+            );
         }
 
         req.realFileType = detected;
@@ -31,6 +34,6 @@ export const verifyFileType = async (
         next();
         // eslint-disable-next-line no-unused-vars
     } catch (err) {
-        return res.status(500).json({ error: "File processing failed" });
+        return returnError(res, "File processing failed", 500);
     }
 };

@@ -16,24 +16,16 @@ const returnSuccess = <T>(
     return res.status(code).json(resObject);
 };
 
-const returnError = (
-    res: Response,
-    msg: string = "",
-    code: number,
-    errors?: Result<ValidationError>,
-): Response => {
+const returnError = (res: Response, msg: string = "", code: number, errors?: Result<ValidationError>): Response => {
     let errorArray: Array<Record<string, string>> = [];
 
-    // Only process errors if they were provided
     if (errors) {
-        const firstErrors = errors
-            .array()
-            .reduce<Record<string, string>>((acc, err) => {
-                if (err.type === "field" && !(err.path in acc)) {
-                    acc[err.path] = err.msg;
-                }
-                return acc;
-            }, {});
+        const firstErrors = errors.array().reduce<Record<string, string>>((acc, err) => {
+            if (err.type === "field" && !(err.path in acc)) {
+                acc[err.path] = err.msg;
+            }
+            return acc;
+        }, {});
 
         errorArray = Object.entries(firstErrors).map(([path, message]) => ({
             [path]: message,
@@ -42,7 +34,7 @@ const returnError = (
 
     const resObject: Record<string, unknown> = {
         success: false,
-        ...(msg === "" && { msg }),
+        ...(msg !== "" && { msg }),
         ...(errorArray.length > 0 && { errors: errorArray }),
     };
 

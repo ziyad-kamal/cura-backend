@@ -1,4 +1,4 @@
-import errorHandler from "./errorHandler.ts";
+import errorHandler from "../errors/errorHandler.ts";
 import { attachHelpers } from "./helpers.ts";
 import { jwtVerify } from "./jwtVerify.ts";
 import { uploadImage } from "./upload.ts";

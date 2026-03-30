@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import express from "express";
-import { attachHelpers } from "./app/middlewares/index.ts";
+import errorHandler from "./app/errors/errorHandler.ts";
+import { attachHelpers } from "./app/middlewares/helpers.ts";
 import { appConfig, connectDB, connectRedis } from "./config/index.ts";
 import authRoutes from "./routes/authRoutes.ts";
 import postRoutes from "./routes/postRoutes.ts";
@@ -8,6 +9,7 @@ import postRoutes from "./routes/postRoutes.ts";
 connectDB();
 
 const app = express();
+
 app.listen(appConfig.port);
 
 connectRedis();
@@ -22,4 +24,4 @@ app.use(`${appConfig.apiPrefix}`, authRoutes);
 
 app.use(`${appConfig.apiPrefix}`, postRoutes);
 
-// app.use(errorHandler);
+app.use(errorHandler);

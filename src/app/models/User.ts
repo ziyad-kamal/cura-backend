@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import mongoose, { Model, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { UserInterface } from "../../interfaces/models/UserInterface.ts";
 
 const userSchema = new Schema<UserInterface>(
@@ -42,9 +42,7 @@ const userSchema = new Schema<UserInterface>(
             default: "user",
         },
     },
-    {
-        timestamps: true,
-    },
+    { timestamps: true },
 );
 
 userSchema.pre("save", async function () {
@@ -53,15 +51,10 @@ userSchema.pre("save", async function () {
     this.password = await bcrypt.hash(this.password, saltRounds);
 });
 
-userSchema.methods.comparePassword = function (
-    password: string,
-): Promise<boolean> {
+userSchema.methods.comparePassword = function (password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
 };
 
-const User: Model<UserInterface> = mongoose.model<UserInterface>(
-    "User",
-    userSchema,
-);
+const User = mongoose.model<UserInterface>("User", userSchema);
 
 export default User;
