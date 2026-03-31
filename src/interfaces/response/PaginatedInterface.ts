@@ -1,4 +1,4 @@
-export type PaginatedResponseInterface<T, K extends string = "data"> = {
+export type PaginatedInterface<T, K extends string = "data"> = {
     metaData: {
         hasMore: boolean;
         nextCursor: string | null;

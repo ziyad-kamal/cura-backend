@@ -4,11 +4,7 @@ import path from "path";
 import sharp from "sharp";
 import { PostRequestInterface } from "../../interfaces/requests/PostRequestInterface.ts";
 
-const uploadImage = async (
-    req: PostRequestInterface,
-    dir: string,
-    width: number,
-): Promise<string> => {
+const uploadImage = async (req: PostRequestInterface, dir: string, width: number): Promise<string> => {
     const fileName = `${crypto.randomBytes(16).toString("hex")}.webp`;
     const dirName = process.cwd();
 
@@ -27,11 +23,7 @@ const uploadImage = async (
         .webp({ quality: 85 })
         .toFile(fileLocation);
 
-    const filePath =
-        `${process.env.APP_URL}/${dir.replace(/^public[/\\]?/, "")}/${fileName}`.replace(
-            /\/+/g,
-            "/",
-        );
+    const filePath = `${process.env.APP_URL}/${dir.replace(/^public[/\\]?/, "")}/${fileName}`.replace(/\/+/g, "/");
 
     return filePath;
 };

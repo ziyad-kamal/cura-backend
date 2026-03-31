@@ -1,10 +1,10 @@
 import { Request } from "express";
 import { PostInterface } from "../../interfaces/models/PostInterface.ts";
-import { PaginatedResponseInterface } from "../../interfaces/response/PaginatedResponseInterface.ts";
+import { PaginatedInterface } from "../../interfaces/response/PaginatedInterface.ts";
 import { getPostsRepo } from "../repositories/postRepository.ts";
 import { getNextCursor, getQueryCursor } from "../utils/cursorPagination.ts";
 
-const getPostsService = async (req: Request): Promise<PaginatedResponseInterface<PostInterface, "posts">> => {
+const getPostsService = async (req: Request): Promise<PaginatedInterface<PostInterface, "posts">> => {
     const limit = 10;
     const { query, sortField } = getQueryCursor<PostInterface>(req, "createdAt");
 
