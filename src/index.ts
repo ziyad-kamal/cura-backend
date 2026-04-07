@@ -1,8 +1,9 @@
 import cookieParser from "cookie-parser";
 import express from "express";
-import errorHandler from "./app/errors/errorHandler.ts";
 import { attachHelpers } from "./app/middlewares/helpers.ts";
+import { rateLimiter } from "./app/middlewares/rateLimiter.ts";
 import { appConfig, connectDB, connectRedis } from "./config/index.ts";
+import { httpLogger } from "./config/logger.ts";
 import authRoutes from "./routes/authRoutes.ts";
 import postRoutes from "./routes/postRoutes.ts";
 
@@ -10,18 +11,26 @@ connectDB();
 
 const app = express();
 
-app.listen(appConfig.port);
+async function bootstrap() {
+    app.listen(appConfig.port);
 
-connectRedis();
+    app.use(httpLogger);
 
-app.use(express.json());
+    await connectRedis();
 
-app.use(cookieParser());
+    app.use(rateLimiter());
 
-app.use(attachHelpers);
+    app.use(express.json());
 
-app.use(`${appConfig.apiPrefix}`, authRoutes);
+    app.use(cookieParser());
 
-app.use(`${appConfig.apiPrefix}`, postRoutes);
+    app.use(attachHelpers);
 
-app.use(errorHandler);
+    app.use(`${appConfig.apiPrefix}`, authRoutes);
+
+    app.use(`${appConfig.apiPrefix}`, postRoutes);
+
+    // app.use(errorHandler);
+}
+
+bootstrap();

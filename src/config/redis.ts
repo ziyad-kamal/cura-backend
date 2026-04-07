@@ -1,27 +1,21 @@
 /* eslint-disable no-console */
-import "dotenv/config";
 import { createClient, RedisClientType } from "redis";
 
-const redisClient: RedisClientType = createClient({
-    url: process.env.REDIS_URL,
-    // password: process.env.REDIS_PASSWORD,
-});
+export let redisClient: RedisClientType;
 
-redisClient.on("error", (err) => {
-    console.error("Redis Client Error:", err);
-});
+export const connectRedis = async (): Promise<void> => {
+    if (redisClient?.isReady) return;
 
-redisClient.on("connect", () => {
-    console.log("✅ Connected to Redis");
-});
+    redisClient = createClient({
+        url: process.env.REDIS_URL,
+    });
 
-const connectRedis = async () => {
+    redisClient.on("reconnecting", () => console.log("Redis reconnecting..."));
+
     try {
         await redisClient.connect();
+        console.log("✅ Redis connected");
     } catch (error) {
-        console.error("Failed to connect to Redis:", error);
-        process.exit(1);
+        console.warn(`⚠️ Failed to connect to Redis at. Rate limiting will not work.`, error);
     }
 };
-
-export { connectRedis, redisClient };

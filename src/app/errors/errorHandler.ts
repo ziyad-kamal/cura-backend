@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import { fileConfig } from "../../config/file.ts";
-import { ErrorInterface } from "../../interfaces/ErrorInterface.ts";
+import { ErrorInterface } from "../../interfaces/errors/ErrorInterface.ts";
 import { returnError } from "../utils/returnJson.ts";
 import NotFoundError from "./NotFoundError.ts";
 
