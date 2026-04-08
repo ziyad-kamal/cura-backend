@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { NextFunction, Request, Response } from "express";
-import pino from "pino";
 import { Log } from "../app/models/Log.ts";
 
 export const httpLogger = (req: Request, res: Response, next: NextFunction) => {
@@ -24,17 +23,50 @@ export const httpLogger = (req: Request, res: Response, next: NextFunction) => {
     next();
 };
 
-export const logger = pino({
-    level: process.env.NODE_ENV === "production" ? "info" : "debug",
-    transport:
-        process.env.NODE_ENV !== "production"
-            ? {
-                  target: "pino-pretty",
-                  options: {
-                      colorize: true,
-                      translateTime: "SYS:standard",
-                      ignore: "pid,hostname",
-                  },
-              }
-            : undefined,
-});
+// export const logger = pino({
+//     level: process.env.NODE_ENV === "production" ? "info" : "debug",
+//     transport:
+//         process.env.NODE_ENV !== "production"
+//             ? {
+//                   target: "pino-pretty",
+//                   options: {
+//                       colorize: true,
+//                       translateTime: "SYS:standard",
+//                       ignore: "pid,hostname",
+//                   },
+//               }
+//             : undefined,
+// });
+// Helper to save log to database (non-blocking)
+const saveLogToDB = async (level: string, msg: string, data: any = {}) => {
+    try {
+        await Log.create({
+            level,
+            message: msg,
+            userId: data.userId,
+        });
+    } catch (err) {
+        console.error("Failed to save log to database:", err);
+    }
+};
+
+// Wrap logger with DB saving
+export const log = {
+    info: (msg: string, data: any = {}) => {
+        saveLogToDB("info", msg, data);
+    },
+
+    error: (msg: string, err?: any, data: any = {}) => {
+        saveLogToDB("error", msg, { ...data, error: err?.message || err });
+    },
+
+    warn: (msg: string, data: any = {}) => {
+        saveLogToDB("warn", msg, data);
+    },
+
+    debug: (msg: string, data: any = {}) => {
+        if (process.env.NODE_ENV !== "production") {
+            saveLogToDB("debug", msg, data);
+        }
+    },
+};

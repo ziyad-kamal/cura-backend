@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
+import { log } from "../../config/logger.ts";
 import { redisClient } from "../../config/redis.ts";
 import { PostRequestInterface } from "../../interfaces/requests/PostRequestInterface.ts";
 import NotFoundError from "../errors/NotFoundError.ts";
@@ -32,6 +33,10 @@ const storePosts = asyncHandler(async (req: PostRequestInterface, res: Response)
     await redisClient.set("test", "test", { EX: 2 * 60 * 60 });
     await redisClient.get("test");
 
+    log.info("User logged in", {
+        userId: req.user?._id,
+        ip: req.ip,
+    });
     // await sendEmail({
     //     to: "test@example.com",
     //     subject: "Test Email from Express + TS",
