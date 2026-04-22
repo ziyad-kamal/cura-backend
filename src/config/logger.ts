@@ -16,57 +16,42 @@ export const httpLogger = (req: Request, res: Response, next: NextFunction) => {
             responseTime: responseTimeMs,
             ip: req.ip,
             userId: req.user?._id ?? null,
-            // eslint-disable-next-line no-console
-        }).catch((err) => console.error("Failed to save log:", err));
+        });
     });
 
     next();
 };
 
-// export const logger = pino({
-//     level: process.env.NODE_ENV === "production" ? "info" : "debug",
-//     transport:
-//         process.env.NODE_ENV !== "production"
-//             ? {
-//                   target: "pino-pretty",
-//                   options: {
-//                       colorize: true,
-//                       translateTime: "SYS:standard",
-//                       ignore: "pid,hostname",
-//                   },
-//               }
-//             : undefined,
-// });
-// Helper to save log to database (non-blocking)
-const saveLogToDB = async (level: string, msg: string, data: any = {}) => {
-    try {
-        await Log.create({
-            level,
-            message: msg,
-            userId: data.userId,
-        });
-    } catch (err) {
-        console.error("Failed to save log to database:", err);
-    }
+const saveLogToDB = async (level: string, req: Request, res: Response, message: string) => {
+    await Log.create({
+        level,
+        message,
+        method: req.method,
+        url: req.url,
+        ...(level === "error" && { statusCode: res.statusCode }),
+        ip: req.ip,
+        userId: req.user?._id ?? null,
+    });
 };
 
-// Wrap logger with DB saving
 export const log = {
-    info: (msg: string, data: any = {}) => {
-        saveLogToDB("info", msg, data);
+    info: (req: Request, res: Response, msg: string) => {
+        saveLogToDB("info", req, res, msg);
     },
 
-    error: (msg: string, err?: any, data: any = {}) => {
-        saveLogToDB("error", msg, { ...data, error: err?.message || err });
+    error: (req: Request, res: Response, msg: string = "", err?: unknown) => {
+        const errorMessage = err instanceof Error ? err.message : typeof err === "string" ? err : msg;
+
+        saveLogToDB("error", req, res, errorMessage);
     },
 
-    warn: (msg: string, data: any = {}) => {
-        saveLogToDB("warn", msg, data);
+    warn: (req: Request, res: Response, msg: string) => {
+        saveLogToDB("warn", req, res, msg);
     },
 
-    debug: (msg: string, data: any = {}) => {
+    debug: (req: Request, res: Response, msg: string) => {
         if (process.env.NODE_ENV !== "production") {
-            saveLogToDB("debug", msg, data);
+            saveLogToDB("debug", req, res, msg);
         }
     },
 };
