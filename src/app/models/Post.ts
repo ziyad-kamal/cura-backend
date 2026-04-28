@@ -5,51 +5,40 @@ import "../models/User.ts";
 
 const postSchema = new Schema<PostInterface>(
     {
-        title: {
-            type: String,
-            required: [true, "Post title is required"],
-            trim: true,
-            maxlength: [200, "Title cannot exceed 200 characters"],
-        },
         content: {
             type: String,
-            required: [true, "Post content is required"],
+            required: true,
             trim: true,
         },
-        author: {
+        userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
         },
-        filePath: {
+        adminId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+        files: {
             type: String,
+            enum: ["video", "document", "image"],
         },
         tags: {
             type: [String],
             default: [],
+            required: true,
         },
-        likes: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-            },
-        ],
-        likeCount: {
-            type: Number,
-            default: 0,
+        visibility: {
+            type: String,
+            enum: ["public", "private"],
+            default: "public",
         },
     },
     {
         timestamps: true,
         versionKey: false,
-        id: false,
-        // toJSON: {
-        //     virtuals: true,
-        //     transform: (doc, ret) => {
-        //         delete ret.id;
-        //         return ret;
-        //     },
-        // },
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

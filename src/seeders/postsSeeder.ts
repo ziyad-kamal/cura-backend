@@ -54,7 +54,6 @@ const seedPosts = async (
             "Posts seeding failed:",
             err instanceof Error ? err.message : String(err),
         );
-        throw err;
     }
 };
 

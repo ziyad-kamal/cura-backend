@@ -4,45 +4,127 @@ import { UserInterface } from "../../interfaces/models/UserInterface.ts";
 
 const userSchema = new Schema<UserInterface>(
     {
-        username: {
-            type: String,
-            required: [true, "Username is required"],
-            unique: true,
-            minlength: [3, "Username must be at least 3 characters"],
-            maxlength: [30, "Username cannot exceed 30 characters"],
-            trim: true,
+        name: {
+            first: {
+                type: String,
+                required: true,
+                minlength: 3,
+                maxLength: 30,
+                trim: true,
+            },
+            last: {
+                type: String,
+                required: true,
+                minlength: 3,
+                maxLength: 30,
+                trim: true,
+            },
         },
-        email: {
-            type: String,
-            required: [true, "Email is required"],
-            unique: true,
-            lowercase: true,
-            trim: true,
+
+        contact: {
+            email: {
+                type: String,
+                required: true,
+                unique: true,
+                maxLength: 60,
+            },
+            phone: {
+                type: Number,
+                required: true,
+                equal: 11,
+                trim: true,
+            },
+            address: {
+                city: {
+                    type: String,
+                    required: true,
+                    minlength: 3,
+                    maxLength: 30,
+                    trim: true,
+                },
+                street: {
+                    type: String,
+                    required: true,
+                    minlength: 3,
+                    maxLength: 30,
+                    trim: true,
+                },
+            },
         },
         password: {
             type: String,
-            required: [true, "Password is required"],
-            minlength: [8, "Password must be at least 8 characters"],
+            required: true,
+            minlength: 8,
+            maxLength: 40,
             select: false,
         },
-        fullName: {
-            type: String,
-            maxlength: [60, "Password must not be more then 60"],
+        image: String,
+        isVerified: {
+            type: Boolean,
+            default: false,
         },
-        imagePath: {
-            type: String,
+        isActive: {
+            type: Boolean,
+            default: true,
         },
-        bio: {
-            type: String,
-            maxlength: 280,
+
+        doctorInfo: {
+            specialization: {
+                type: String,
+                required: true,
+                minlength: 3,
+                maxLength: 30,
+                trim: true,
+            },
+            isCertified: {
+                type: Boolean,
+                default: false,
+            },
+            frontIdImage: String,
+            backIdImage: String,
+            certImage: String,
         },
+
+        userInfo: {
+            age: {
+                type: Number,
+                required: true,
+                maxLength: 3,
+                trim: true,
+            },
+            weight: Number,
+            gender: {
+                type: String,
+                enum: ["male", "female"],
+            },
+            diseases: [String],
+        },
+
+        cardPayment: {
+            number: {
+                type: Number,
+                maxLength: 16,
+            },
+            name: {
+                type: String,
+                maxLength: 50,
+            },
+            csv: {
+                type: Number,
+                maxLength: 3,
+            },
+            expDate: {
+                type: String,
+                maxLength: 5,
+            },
+        },
+
         role: {
             type: String,
-            enum: ["user", "admin"],
-            default: "user",
+            enum: ["user", "doctor"],
         },
     },
-    { timestamps: true },
+    { timestamps: true, versionKey: false },
 );
 
 userSchema.pre("save", async function () {
