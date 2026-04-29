@@ -15,12 +15,9 @@ const login = async (req: CustomRequest, res: Response): Promise<Response | void
     const { email, password } = req.body;
 
     const user = await User.findOne({ email }).select("+password");
-    if (!user) {
-        return returnError(res, "password or email is incorrect", 404);
-    }
 
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
+    const isMatch = await user?.comparePassword(password);
+    if (!isMatch || !user) {
         return returnError(res, "password or email is incorrect", 404);
     }
 

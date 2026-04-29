@@ -1,17 +1,13 @@
 import mongoose from "mongoose";
-import { CommentInterface } from "./CommentInterface.ts";
 
-export interface PostInterface extends Document {
-    title: string;
+export interface PostInterface {
     content: string;
-    author: mongoose.Types.ObjectId;
-    filePath?: string;
+    userId: mongoose.Types.ObjectId;
+    adminId: mongoose.Types.ObjectId;
+    files?: string;
     tags: string[];
-    likes: mongoose.Types.ObjectId[];
-    likeCount: number;
     createdAt: Date;
     updatedAt: Date;
-    comments?: CommentInterface[];
-    commentsCount?: number;
+    visibility: string;
     id?: number;
 }

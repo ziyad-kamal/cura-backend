@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
-export interface CommentInterface extends Document {
+export interface CommentInterface {
     content: string;
-    author: mongoose.Types.ObjectId;
-    post: mongoose.Types.ObjectId;
-    likes: mongoose.Types.ObjectId[];
+    userId: mongoose.Types.ObjectId;
+    postId: mongoose.Types.ObjectId;
+    parentId: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
