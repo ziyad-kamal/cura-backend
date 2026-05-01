@@ -21,7 +21,7 @@ const login = async (req: CustomRequest, res: Response): Promise<Response | void
         return returnError(res, "password or email is incorrect", 404);
     }
 
-    const userData = { _id: user._id, email: user.email };
+    const userData = { _id: user._id, email: user.contact.email };
 
     const accessToken = jwt.sign(userData, jwtConfig.accessTokenSecret, {
         expiresIn: jwtConfig.accessExpireTime,

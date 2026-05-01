@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { connectDB } from "../config/index.ts";
+import { UserInterface } from "../interfaces/models/UserInterface.ts";
 import { seedComments, seedPosts, seedUsers } from "./index.ts";
 
 const seedAll = async () => {
@@ -9,7 +10,7 @@ const seedAll = async () => {
         console.log("🌱 Starting database seeding...");
 
         const createdUsers = await seedUsers(20);
-        const userIds = createdUsers.map((user) => user._id);
+        const userIds = createdUsers.map((user:UserInterface) => user._id);
         const createdPosts = await seedPosts(20, userIds);
         const postIds = createdPosts.map((post) => post._id);
 

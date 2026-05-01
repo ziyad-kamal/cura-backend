@@ -18,7 +18,7 @@ const treatmentPlanSchema = new Schema<TreatmentPlanInterface>(
         diagnosis: {
             type: String,
             required: true,
-            maxLength: 50,
+            maxLength: 100,
         },
         description: {
             type: String,
@@ -31,7 +31,7 @@ const treatmentPlanSchema = new Schema<TreatmentPlanInterface>(
 
         status: {
             type:String,
-            enum:['active','inActive']
+            enum:['لم تبدأ','قيد التنفيذ','تم الانتهاء']
         },
         startDate: String,
         endDate: String,

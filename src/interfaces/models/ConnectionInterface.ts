@@ -1,10 +1,10 @@
 import mongoose, { Types } from "mongoose";
 
-export interface MessageInterface {
+export interface ConnectionInterface {
     _id?: Types.ObjectId;
     senderId: mongoose.Types.ObjectId;
     receiverId: mongoose.Types.ObjectId;
-    content: string;
-    files: {url:string,type:string}[];
-    createdAt: Date;
+    status: "معلق"|'تم التجاهل'|'تم الموافقة'
+    createdAt?: Date;
+    updatedAt?: Date;
 }

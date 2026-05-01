@@ -7,6 +7,10 @@ const generateFakeUser = (role: "user" | "doctor" = "user"): Partial<UserInterfa
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const isDoctor = role === "doctor";
+    const image = faker.image.urlPicsumPhotos({
+        width: 800,
+        height: 600,
+    });
 
     return {
         name: {
@@ -22,16 +26,15 @@ const generateFakeUser = (role: "user" | "doctor" = "user"): Partial<UserInterfa
             },
         },
         password: "13131313",
-        isVerified: faker.datatype.boolean({ probability: 0.8 }),
-        isActive: true,
+        isVerified: faker.datatype.boolean({ probability: 0.6 }),
+        isActive: faker.datatype.boolean({ probability: 0.9 }),
 
         ...(isDoctor && {
             doctorInfo: {
-                specialization: faker.helpers.arrayElement(["Cardiology", "Neurology", "Pediatrics", "Dermatology"]),
                 isCertified: faker.datatype.boolean({ probability: 0.9 }),
-                frontIdImage: `https://picsum.photos/id/${faker.number.int({ min: 1, max: 1000 })}/600/400`,
-                backIdImage: `https://picsum.photos/id/${faker.number.int({ min: 1, max: 1000 })}/600/400`,
-                certificationImage: `https://picsum.photos/id/${faker.number.int({ min: 1, max: 1000 })}/800/600`,
+                frontIdImage: image,
+                backIdImage: image,
+                certImage: image,
             },
         }),
 
@@ -39,9 +42,9 @@ const generateFakeUser = (role: "user" | "doctor" = "user"): Partial<UserInterfa
             age: faker.number.int({ min: 18, max: 65 }).toString(),
             weight: Number(faker.string.numeric(2)),
             height: Number(faker.string.numeric(2)),
-            gender: faker.helpers.arrayElement(["male", "female"]),
+            gender: faker.helpers.arrayElement(["رجل", "انثى"]),
             diseases: faker.helpers.arrayElements(
-                ["Diabetes", "Hypertension", "Asthma"],
+                ["سكر", "ارتفاع ضغط الدم", "انخغاض ضغظ الدم"],
                 faker.number.int({ min: 0, max: 3 }),
             ),
         },
@@ -54,11 +57,11 @@ const generateFakeUser = (role: "user" | "doctor" = "user"): Partial<UserInterfa
         },
 
         role: role,
-        image: `https://picsum.photos/id/${faker.number.int({ min: 1, max: 200 })}/300/300`,
+        image: image,
     };
 };
 
-export const seedUsers = async (count: number = 20): Promise<void> => {
+export const seedUsers = async (count: number = 20): Promise<Partial<UserInterface>[]> => {
     try {
         await User.deleteMany({});
         console.log("🗑️  Cleared existing users");
@@ -76,7 +79,10 @@ export const seedUsers = async (count: number = 20): Promise<void> => {
         const createdUsers = await User.insertMany(users);
 
         console.log(`✅ Successfully seeded ${createdUsers.length} users!`);
+
+        return createdUsers;
     } catch (err: unknown) {
         console.error("Posts seeding failed:", err instanceof Error ? err.message : String(err));
+        throw err;
     }
 };

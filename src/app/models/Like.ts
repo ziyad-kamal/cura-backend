@@ -12,13 +12,17 @@ const likeSchema = new Schema<LikeInterface>(
         },
         postId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "Post",
             required: true,
         },
-        type: {
-            enum: ["like", "comment"],
-            required: true,
+        commentId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Comment",
         },
+        type:{
+            type:String,
+            enum:['post','comment']
+        }
     },
     {
         versionKey: false,

@@ -7,6 +7,7 @@ const seedComments = async (
     countPerPost: number = 8,
     postIds: Array<Types.ObjectId> = [],
     userIds: Array<Types.ObjectId> = [],
+    commentIds: Array<Types.ObjectId> = [],
 ) => {
     try {
         await Comment.deleteMany({});
@@ -24,23 +25,35 @@ const seedComments = async (
             for (let i = 0; i < countPerPost; i++) {
                 comments.push({
                     content: faker.lorem.paragraph({ min: 1, max: 3 }),
-                    author: faker.helpers.arrayElement(userIds),
-                    post: postId,
+                    userId: faker.helpers.arrayElement(userIds),
+                    postId: postId,
                     createdAt: randomDate,
                     updatedAt: randomDate,
                 });
             }
         }
 
-        const created = await Comment.insertMany(comments);
-        console.log(`✅ Created ${created.length} comments`);
+        for (const postId of postIds) {
+            const randomDate = faker.date.past({ years: 1 });
 
-        return created;
+            for (let i = 0; i < countPerPost; i++) {
+                comments.push({
+                    content: faker.lorem.paragraph({ min: 1, max: 3 }),
+                    userId: faker.helpers.arrayElement(userIds),
+                    postId: postId,
+                    parentId: faker.helpers.arrayElement(commentIds),
+                    createdAt: randomDate,
+                    updatedAt: randomDate,
+                });
+            }
+        }
+
+        const createdComments = await Comment.insertMany(comments);
+        console.log(`✅ Created ${createdComments.length} comments`);
+
+        return createdComments;
     } catch (err: unknown) {
-        console.error(
-            "Posts seeding failed:",
-            err instanceof Error ? err.message : String(err),
-        );
+        console.error("Posts seeding failed:", err instanceof Error ? err.message : String(err));
         throw err;
     }
 };

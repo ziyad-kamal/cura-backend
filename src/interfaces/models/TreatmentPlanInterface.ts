@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 export interface TreatmentPlanInterface {
+    _id?: Types.ObjectId;
     userId: mongoose.Types.ObjectId;
     doctorId: mongoose.Types.ObjectId;
     diagnosis: string;

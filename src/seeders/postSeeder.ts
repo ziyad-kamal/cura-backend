@@ -2,11 +2,12 @@
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
 import Post from "../app/models/Post.ts";
+import { PostInterface } from "../interfaces/models/PostInterface.ts";
 
 const seedPosts = async (
     count: number = 30,
     userIds: Array<Types.ObjectId> = [],
-) => {
+):Promise<PostInterface[]> => {
     try {
         await Post.deleteMany({});
         console.log("🗑️  Cleared existing posts");
@@ -16,30 +17,19 @@ const seedPosts = async (
         }
 
         const posts = [];
+        const image = faker.image.urlPicsumPhotos({
+            width: 800,
+            height: 600,
+        });
 
         for (let i = 0; i < count; i++) {
             const randomDate = faker.date.past({ years: 1 });
             posts.push({
-                title: faker.lorem.sentence({ min: 4, max: 10 }),
+                visibility: faker.helpers.arrayElement(['public','private']),
                 content: faker.lorem.paragraphs({ min: 2, max: 5 }),
-                author: faker.helpers.arrayElement(userIds),
-                filePath: faker.image.urlPicsumPhotos({
-                    width: 800,
-                    height: 600,
-                }),
-                tags: faker.helpers.arrayElements(
-                    [
-                        "javascript",
-                        "nodejs",
-                        "react",
-                        "mongodb",
-                        "express",
-                        "typescript",
-                        "programming",
-                    ],
-                    { min: 1, max: 4 },
-                ),
-                likeCount: faker.number.int({ min: 0, max: 120 }),
+                userId: faker.helpers.arrayElement(userIds),
+                files: [{url:image,type:'image'},{url:image,type:'image'}],
+                tags: faker.helpers.arrayElements([ "ارتفاع ضغط الدم", "انخفاض ضغظ الدم", "زيادة الوزن"], { min: 1, max: 3 }),
                 createdAt: randomDate,
                 updatedAt: randomDate,
             });
@@ -54,6 +44,8 @@ const seedPosts = async (
             "Posts seeding failed:",
             err instanceof Error ? err.message : String(err),
         );
+
+        throw err;
     }
 };
 
