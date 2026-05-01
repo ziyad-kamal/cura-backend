@@ -35,10 +35,7 @@ export default [
             "@typescript-eslint/explicit-function-return-type": "off",
 
             // ── General ────────────────────────────────
-            "no-unused-vars": [
-                "warn",
-                { argsIgnorePattern: "^(req|res|next|unused)$" },
-            ],
+            "no-unused-vars": ["warn", { argsIgnorePattern: "^(req|res|next|unused)$" }],
             "no-console": "warn",
         },
     },

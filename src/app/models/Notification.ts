@@ -1,0 +1,43 @@
+import mongoose, { Schema } from "mongoose";
+import { NotificationInterface } from "../../interfaces/models/NotificationsInterface.ts";
+
+const notificationSchema = new Schema<NotificationInterface>(
+    {
+        receiverId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+            index: true,
+        },
+        senderId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+        type: {
+            type: String,
+            enum: ["like", "comment", "connection", "message"],
+            required: true,
+        },
+        message: {
+            type: String,
+            required: true,
+        },
+        postId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Post",
+        },
+        isRead: {
+            type: Boolean,
+            default: false,
+        },
+        createdAt:Date
+    },
+    {
+        versionKey: false,
+    },
+);
+
+notificationSchema.index({ recipient: 1, isRead: 1 });
+notificationSchema.index({ createdAt: -1 });
+
+export default mongoose.model("Notification", notificationSchema);

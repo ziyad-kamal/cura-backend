@@ -30,21 +30,18 @@ const userSchema = new Schema<UserInterface>(
             },
             phone: {
                 type: Number,
-                required: true,
-                equal: 11,
+                match: /^\d{11}$/,
                 trim: true,
             },
             address: {
                 city: {
                     type: String,
-                    required: true,
                     minlength: 3,
                     maxLength: 30,
                     trim: true,
                 },
                 street: {
                     type: String,
-                    required: true,
                     minlength: 3,
                     maxLength: 30,
                     trim: true,
@@ -69,13 +66,6 @@ const userSchema = new Schema<UserInterface>(
         },
 
         doctorInfo: {
-            specialization: {
-                type: String,
-                required: true,
-                minlength: 3,
-                maxLength: 30,
-                trim: true,
-            },
             isCertified: {
                 type: Boolean,
                 default: false,
@@ -88,35 +78,23 @@ const userSchema = new Schema<UserInterface>(
         userInfo: {
             age: {
                 type: Number,
-                required: true,
                 maxLength: 3,
                 trim: true,
             },
             weight: Number,
+            height: Number,
             gender: {
                 type: String,
-                enum: ["male", "female"],
+                enum: ["رجل", "انثى"],
             },
             diseases: [String],
         },
 
         cardPayment: {
-            number: {
-                type: Number,
-                maxLength: 16,
-            },
-            name: {
-                type: String,
-                maxLength: 50,
-            },
-            csv: {
-                type: Number,
-                maxLength: 3,
-            },
-            expDate: {
-                type: String,
-                maxLength: 5,
-            },
+            number:String,
+            name: String,
+            csv: String,
+            expDate: String,
         },
 
         role: {

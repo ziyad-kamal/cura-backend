@@ -11,8 +11,7 @@ const adminSchema = new Schema<AdminInterface>(
         },
         phone: {
             type: Number,
-            required: true,
-            equal: 11,
+            match: /^\d{11}$/,
             trim: true,
         },
         email: {
@@ -28,9 +27,13 @@ const adminSchema = new Schema<AdminInterface>(
             minlength: 8,
             select: false,
         },
-        versionKey: false,
+        role:{
+            type:String,
+            enum:['admin','super admin','company admin'],
+            required:true
+        }
     },
-    { timestamps: true },
+    { timestamps: true, versionKey: false },
 );
 
 adminSchema.pre("save", async function () {

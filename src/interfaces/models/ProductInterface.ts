@@ -1,11 +1,13 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 export interface ProductInterface {
-    adminId: mongoose.Types.ObjectId;
-    companyId: mongoose.Types.ObjectId;
-    price:number;
+    _id?: Types.ObjectId;
+    adminId?: mongoose.Types.ObjectId;
+    companyId?: mongoose.Types.ObjectId;
+    price: number;
     name: string;
-    tags:string[]
+    isActive?: boolean;
+    tags: string[];
     description: string;
     images: string[];
     createdAt: Date;

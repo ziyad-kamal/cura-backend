@@ -5,9 +5,9 @@ const commentSchema = new Schema<CommentInterface>(
     {
         content: {
             type: String,
-            required: [true, "Comment cannot be empty"],
+            required: true,
             trim: true,
-            maxLength: [500, "Comment cannot exceed 500 characters"],
+            maxLength: 250,
         },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -21,8 +21,7 @@ const commentSchema = new Schema<CommentInterface>(
         },
         parentId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Post",
-            required: true,
+            ref: "Comment",
         },
     },
     {

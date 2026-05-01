@@ -14,7 +14,7 @@ const companySchema = new Schema<CompanyInterface>(
             type: String,
             ref: "User",
             required: true,
-        },
+        },    
 
         image: String,
         createdAt: Date,

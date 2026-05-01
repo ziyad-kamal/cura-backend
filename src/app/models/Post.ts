@@ -16,15 +16,19 @@ const postSchema = new Schema<PostInterface>(
         },
         adminId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "Admin",
         },
-        files: {
-            type: String,
-            enum: ["video", "document", "image"],
-        },
+        files: [
+            {
+                url: String,
+                type: {
+                    type: String,
+                    enum: ["video", "document", "image"],
+                },
+            },
+        ],
         tags: {
             type: [String],
-            default: [],
             required: true,
         },
         visibility: {

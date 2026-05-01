@@ -1,4 +1,8 @@
+import { Types } from "mongoose";
+
 export interface UserInterface {
+    _id?: Types.ObjectId;
+
     name: {
         first: string;
         last: string;
@@ -6,8 +10,8 @@ export interface UserInterface {
 
     contact: {
         email: string;
-        phone: number;
-        address: {
+        phone?: number;
+        address?: {
             city: string;
             street: string;
         };
@@ -17,30 +21,29 @@ export interface UserInterface {
 
     image?: string;
 
-    isVerified: boolean;
-    isActive: boolean;
+    isVerified?: boolean;
+    isActive?: boolean;
 
     doctorInfo?: {
-        specialization: string;
         isCertified: boolean;
-        frontIdImage?: string;
-        backIdImage?: string;
-        certificationImage?: string;
+        frontIdImage: string;
+        backIdImage: string;
+        certImage: string;
     };
 
     userInfo?: {
         age: string;
         weight: number;
         height: number;
-        gender?: "male" | "female";
+        gender: "رجل" | "انثى";
         diseases: string[];
     };
 
     cardPayment?: {
-        number?: number;
-        name?: string;
-        csv?: number;
-        expDate?: string;
+        number: number;
+        name: string;
+        csv: number;
+        expDate: string;
     };
 
     role: "user" | "doctor";

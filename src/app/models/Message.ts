@@ -21,10 +21,15 @@ const messageSchema = new Schema<MessageInterface>(
             maxLength: 500,
         },
 
-        files: {
-            type: [String],
-            enum: ["video", "image", "document"],
-        },
+        files: [
+            {
+                url: String,
+                type: {
+                    type:String,
+                    enum:['video','image','document']
+                },
+            },
+        ],
         createdAt: Date,
     },
     {

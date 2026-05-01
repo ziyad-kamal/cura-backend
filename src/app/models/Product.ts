@@ -8,12 +8,10 @@ const productSchema = new Schema<ProductInterface>(
         adminId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
         },
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Company",
-            required: true,
         },
         name: {
             type: String,
@@ -35,7 +33,14 @@ const productSchema = new Schema<ProductInterface>(
             required: true,
         },
 
-        images: [String],
+        images: {
+            type: [String],
+            required:true
+        },
+        isActive: {
+            type:Boolean,
+            default:false
+        },
     },
     {
         versionKey: false,
