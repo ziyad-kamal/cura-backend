@@ -3,6 +3,11 @@ import { ConnectionInterface } from "../../interfaces/models/ConnectionInterface
 
 const connectionSchema = new Schema<ConnectionInterface>(
     {
+        status: {
+            type: String,
+            enum: ["معلق", "تم التجاهل", "تم الموافقة"],
+            default: "معلق",
+        },
         senderId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -12,11 +17,6 @@ const connectionSchema = new Schema<ConnectionInterface>(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
-        },
-        status: {
-            type: String,
-            enum: ["معلق", "تم التجاهل", "تم الموافقة"],
-            default: "معلق",
         },
     },
     { timestamps: true },

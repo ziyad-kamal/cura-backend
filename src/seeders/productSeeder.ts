@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import Product from "../app/models/Product.ts";
 import { Types } from "mongoose";
 import { ProductInterface } from "../interfaces/models/ProductInterface.ts";
+import { Product } from "../app/models/Product.ts";
 
 const seedProducts = async (
     count: number = 30,
@@ -23,6 +23,7 @@ const seedProducts = async (
             const randomDate = faker.date.past({ years: 1 });
 
             products.push({
+                price:faker.number.int({min:100,max:5000}),
                 description: faker.lorem.paragraph({ min: 2, max: 5 }),
                 name: faker.lorem.word(8),
                 images: [image, image],

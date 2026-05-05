@@ -5,18 +5,17 @@ import "./User.ts";
 
 const companySchema = new Schema<CompanyInterface>(
     {
-        adminId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        },
         name: {
             type: String,
-            ref: "User",
             required: true,
-        },    
-
+            trim: true,
+        },
         image: String,
+        adminId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Admin",
+            required: true,
+        },
         createdAt: Date,
     },
     {

@@ -5,7 +5,10 @@ import "./User.ts";
 
 const repostSchema = new Schema<RepostInterface>(
     {
-        content:String,
+        content:{
+            type:String,
+            trim:true
+        },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

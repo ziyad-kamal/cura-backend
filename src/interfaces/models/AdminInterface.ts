@@ -1,15 +1,12 @@
 import { Types } from "mongoose";
 
 export interface AdminInterface {
-        _id?: Types.ObjectId;
-    
+    _id?: Types.ObjectId;
     name: String;
     email: string;
-    phone: Number;
-
     password: string;
-    role:string
-
+    phone: Number;
+    role: string;
     createdAt?: Date;
     updatedAt?: Date;
 

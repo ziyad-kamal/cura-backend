@@ -31,6 +31,9 @@ const generateFakeUser = (role: "user" | "doctor" = "user"): Partial<UserInterfa
 
         ...(isDoctor && {
             doctorInfo: {
+                shortConsultPrice: faker.number.int({ min: 300, max: 700 }),
+                normalConsultPrice: faker.number.int({ min: 700, max: 1000 }),
+                LongConsultPrice: faker.number.int({ min: 1000, max: 1500 }),
                 isCertified: faker.datatype.boolean({ probability: 0.9 }),
                 frontIdImage: image,
                 backIdImage: image,
@@ -39,20 +42,17 @@ const generateFakeUser = (role: "user" | "doctor" = "user"): Partial<UserInterfa
         }),
 
         userInfo: {
-            age: faker.number.int({ min: 18, max: 65 }).toString(),
+            age: faker.number.int({ min: 18, max: 65 }),
             weight: Number(faker.string.numeric(2)),
             height: Number(faker.string.numeric(2)),
             gender: faker.helpers.arrayElement(["رجل", "انثى"]),
-            diseases: faker.helpers.arrayElements(
-                ["سكر", "ارتفاع ضغط الدم", "انخغاض ضغظ الدم"],
-                faker.number.int({ min: 0, max: 3 }),
-            ),
+            diseases:"سكر وارتفاع ضغط الدم",
         },
 
         cardPayment: {
-            number: parseInt(faker.finance.creditCardNumber("visa").replace(/\D/g, ""), 10),
+            number: faker.finance.creditCardNumber("visa").replace(/\D/g, ""),
             name: `${firstName} ${lastName}`,
-            csv: parseInt(faker.finance.creditCardCVV(), 10),
+            cvv: faker.finance.creditCardCVV(),
             expDate: faker.date.future({ years: 5 }).toLocaleDateString("en", { month: "2-digit", year: "2-digit" }),
         },
 
@@ -75,6 +75,30 @@ export const seedUsers = async (count: number = 20): Promise<Partial<UserInterfa
         for (let i = 0; i < Math.floor(count * 0.3); i++) {
             users.push(generateFakeUser("doctor"));
         }
+
+        await User.create({
+            name: {
+                first: faker.person.firstName(),
+                last: faker.person.lastName(),
+            },
+            contact:{
+                email:'user@gmail.com'
+            },
+            password:'12121212',
+            role:'user'
+        });
+
+        await User.create({
+            name: {
+                first: faker.person.firstName(),
+                last: faker.person.lastName(),
+            },
+            contact:{
+                email:'doctor@gmail.com'
+            },
+            password:'12121212',
+            role:'doctor'
+        });
 
         const createdUsers = await User.insertMany(users);
 

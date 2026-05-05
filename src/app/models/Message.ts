@@ -5,6 +5,21 @@ import "./User.ts";
 
 const messageSchema = new Schema<MessageInterface>(
     {
+        content: {
+            type: String,
+            required: true,
+            maxLength: 500,
+            trim: true,
+        },
+        files: [
+            {
+                url: String,
+                type: {
+                    type: String,
+                    enum: ["video", "image", "document"],
+                },
+            },
+        ],
         senderId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -15,21 +30,6 @@ const messageSchema = new Schema<MessageInterface>(
             ref: "User",
             required: true,
         },
-        content: {
-            type: String,
-            required: true,
-            maxLength: 500,
-        },
-
-        files: [
-            {
-                url: String,
-                type: {
-                    type:String,
-                    enum:['video','image','document']
-                },
-            },
-        ],
         createdAt: Date,
     },
     {
