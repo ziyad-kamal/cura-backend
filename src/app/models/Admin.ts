@@ -8,10 +8,6 @@ const adminSchema = new Schema<AdminInterface>(
             type: String,
             required: true,
             maxLength: 50,
-        },
-        phone: {
-            type: Number,
-            match: /^\d{11}$/,
             trim: true,
         },
         email: {
@@ -19,19 +15,23 @@ const adminSchema = new Schema<AdminInterface>(
             required: true,
             unique: true,
             maxLength: 80,
+            trim: true,
         },
-
         password: {
             type: String,
             required: true,
             minlength: 8,
             select: false,
         },
-        role:{
-            type:String,
-            enum:['admin','super admin','company admin'],
-            required:true
-        }
+        phone: {
+            type: Number,
+            trim: true,
+        },
+        role: {
+            type: String,
+            enum: ["admin", "super admin", "company admin"],
+            required: true,
+        },
     },
     { timestamps: true, versionKey: false },
 );

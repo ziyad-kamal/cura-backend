@@ -1,5 +1,4 @@
 import express, { Router } from "express";
-import { welcome } from "../app/controllers/loginController.ts";
 import { getPosts, showPost, storePosts } from "../app/controllers/postController.ts";
 import { jwtVerify, uploadImage, verifyFileType } from "../app/middlewares/index.ts";
 import { validateObjectId } from "../app/middlewares/validateObjectId.ts";
@@ -14,7 +13,5 @@ protectedRouter.get("/post/show/:postId", validateObjectId, showPost);
 protectedRouter.get("/post", getPosts);
 
 protectedRouter.post("/post/store", [uploadImage.single("image"), verifyFileType, ...postValidator], storePosts);
-
-protectedRouter.get("/welcome", welcome);
 
 export default protectedRouter;

@@ -5,7 +5,6 @@ import Post from "../app/models/Post.ts";
 import { PostInterface } from "../interfaces/models/PostInterface.ts";
 
 const seedPosts = async (
-    count: number = 30,
     userIds: Array<Types.ObjectId> = [],
 ):Promise<PostInterface[]> => {
     try {
@@ -22,14 +21,20 @@ const seedPosts = async (
             height: 600,
         });
 
-        for (let i = 0; i < count; i++) {
+        for (let userId of userIds) {
             const randomDate = faker.date.past({ years: 1 });
             posts.push({
-                visibility: faker.helpers.arrayElement(['public','private']),
+                visibility: faker.helpers.arrayElement(["public", "private"]),
                 content: faker.lorem.paragraphs({ min: 2, max: 5 }),
-                userId: faker.helpers.arrayElement(userIds),
-                files: [{url:image,type:'image'},{url:image,type:'image'}],
-                tags: faker.helpers.arrayElements([ "ارتفاع ضغط الدم", "انخفاض ضغظ الدم", "زيادة الوزن"], { min: 1, max: 3 }),
+                userId: userId,
+                files: [
+                    { url: image, type: "image" },
+                    { url: image, type: "image" },
+                ],
+                tags: faker.helpers.arrayElements(["ارتفاع ضغط الدم", "انخفاض ضغظ الدم", "زيادة الوزن"], {
+                    min: 1,
+                    max: 3,
+                }),
                 createdAt: randomDate,
                 updatedAt: randomDate,
             });

@@ -5,6 +5,36 @@ import "./User.ts";
 
 const productSchema = new Schema<ProductInterface>(
     {
+        name: {
+            type: String,
+            required: true,
+            maxLength: 40,
+            trim: true,
+        },
+        description: {
+            type: String,
+            required: true,
+            maxLength: 500,
+            trim: true,
+        },
+        price: {
+            type: Number,
+            required: true,
+            maxLength: 5,
+            trim: true,
+        },
+        tags: {
+            type: [String],
+            required: true,
+        },
+        images: {
+            type: [String],
+            required: true,
+        },
+        isActive: {
+            type: Boolean,
+            default: false,
+        },
         adminId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -13,41 +43,13 @@ const productSchema = new Schema<ProductInterface>(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Company",
         },
-        name: {
-            type: String,
-            required: true,
-            maxLength: 40,
-        },
-        description: {
-            type: String,
-            required: true,
-            maxLength: 500,
-        },
-        price: {
-            type: Number,
-            required: true,
-            maxLength: 5,
-        },
-        tags: {
-            type: [String],
-            required: true,
-        },
-
-        images: {
-            type: [String],
-            required:true
-        },
-        isActive: {
-            type:Boolean,
-            default:false
-        },
+        createdAt: Date,
     },
     {
         versionKey: false,
-        timestamps: true,
     },
 );
 
 const Product: Model<ProductInterface> = mongoose.model<ProductInterface>("Product", productSchema);
 
-export default Product;
+export { Product, productSchema };

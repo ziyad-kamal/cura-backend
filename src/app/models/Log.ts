@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const logSchema = new mongoose.Schema(
+const logSchema = new Schema(
     {
         level: {
             type: String,

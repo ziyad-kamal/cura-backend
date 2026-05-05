@@ -25,6 +25,9 @@ export interface UserInterface {
     isActive?: boolean;
 
     doctorInfo?: {
+        shortConsultPrice: number;
+        normalConsultPrice: number;
+        LongConsultPrice: number;
         isCertified: boolean;
         frontIdImage: string;
         backIdImage: string;
@@ -32,17 +35,17 @@ export interface UserInterface {
     };
 
     userInfo?: {
-        age: string;
+        age: number;
         weight: number;
         height: number;
         gender: "رجل" | "انثى";
-        diseases: string[];
+        diseases: string;
     };
 
     cardPayment?: {
-        number: number;
+        number: string;
         name: string;
-        csv: number;
+        cvv: string;
         expDate: string;
     };
 

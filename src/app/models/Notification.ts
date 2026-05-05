@@ -3,6 +3,23 @@ import { NotificationInterface } from "../../interfaces/models/NotificationsInte
 
 const notificationSchema = new Schema<NotificationInterface>(
     {
+        type: {
+            type: String,
+            enum: ["like", "comment", "connection", "message"],
+            required: true,
+        },
+        message: {
+            type: String,
+            required: true,
+        },
+        isRead: {
+            type: Boolean,
+            default: false,
+        },
+        postId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Post",
+        },
         receiverId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -13,24 +30,7 @@ const notificationSchema = new Schema<NotificationInterface>(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         },
-        type: {
-            type: String,
-            enum: ["like", "comment", "connection", "message"],
-            required: true,
-        },
-        message: {
-            type: String,
-            required: true,
-        },
-        postId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Post",
-        },
-        isRead: {
-            type: Boolean,
-            default: false,
-        },
-        createdAt:Date
+        createdAt: Date,
     },
     {
         versionKey: false,

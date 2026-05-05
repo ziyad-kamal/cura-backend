@@ -9,8 +9,8 @@ const errorHandler = (err: ErrorInterface, req: Request, res: Response, next: Ne
     let statusCode = err.statusCode || 500;
     let message = err.message || "Internal Server Error";
 
-    if (err instanceof NotFoundError) {
-        return returnError(res, err.message, err.statusCode);
+    if (err.name === "NotFoundError" || err instanceof NotFoundError) {
+        return returnError(res, err.message, err.statusCode || 404);
     }
 
     if (err instanceof multer.MulterError) {

@@ -4,8 +4,9 @@ import { attachHelpers } from "./app/middlewares/helpers.ts";
 import { rateLimiter } from "./app/middlewares/rateLimiter.ts";
 import { appConfig, connectDB, connectRedis } from "./config/index.ts";
 import { httpLogger } from "./config/logger.ts";
-import authRoutes from "./routes/authRoutes.ts";
 import postRoutes from "./routes/postRoutes.ts";
+import errorHandler from "./app/errors/errorHandler.ts";
+import authRouter from "./routes/users/authRoutes.ts";
 
 connectDB();
 
@@ -26,11 +27,11 @@ async function bootstrap() {
 
     app.use(attachHelpers);
 
-    app.use(`${appConfig.apiPrefix}`, authRoutes);
+    app.use(`${appConfig.apiPrefix}`, authRouter);
 
     app.use(`${appConfig.apiPrefix}`, postRoutes);
 
-    // app.use(errorHandler);
+    app.use(errorHandler);
 }
 
 bootstrap();

@@ -27,6 +27,7 @@ const userSchema = new Schema<UserInterface>(
                 required: true,
                 unique: true,
                 maxLength: 60,
+                trim: true,
             },
             phone: {
                 type: Number,
@@ -43,7 +44,7 @@ const userSchema = new Schema<UserInterface>(
                 street: {
                     type: String,
                     minlength: 3,
-                    maxLength: 30,
+                    maxLength: 60,
                     trim: true,
                 },
             },
@@ -66,6 +67,10 @@ const userSchema = new Schema<UserInterface>(
         },
 
         doctorInfo: {
+            shortConsultPrice: Number,
+            normalConsultPrice: Number,
+            LongConsultPrice: Number,
+
             isCertified: {
                 type: Boolean,
                 default: false,
@@ -87,13 +92,13 @@ const userSchema = new Schema<UserInterface>(
                 type: String,
                 enum: ["رجل", "انثى"],
             },
-            diseases: [String],
+            diseases: String,
         },
 
         cardPayment: {
-            number:String,
+            number: String,
             name: String,
-            csv: String,
+            cvv: String,
             expDate: String,
         },
 

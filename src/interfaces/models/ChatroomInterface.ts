@@ -1,10 +1,10 @@
 import mongoose, { Types } from "mongoose";
 
-export interface MessageInterface {
+export interface ChatroomInterface {
     _id?: Types.ObjectId;
-    content: string;
-    files: { url: string; type: string }[];
+    isActive: boolean;
     senderId: mongoose.Types.ObjectId;
     receiverId: mongoose.Types.ObjectId;
+    consultationId: mongoose.Types.ObjectId;
     createdAt: Date;
 }

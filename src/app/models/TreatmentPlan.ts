@@ -5,6 +5,29 @@ import { TreatmentPlanInterface } from "../../interfaces/models/TreatmentPlanInt
 
 const treatmentPlanSchema = new Schema<TreatmentPlanInterface>(
     {
+        diagnosis: {
+            type: String,
+            required: true,
+            maxLength: 100,
+            trim: true,
+        },
+        description: {
+            type: String,
+            required: true,
+            maxLength: 500,
+            trim: true,
+        },
+
+        medications: [String],
+        procedures: [String],
+
+        status: {
+            type: String,
+            enum: ["لم تبدأ", "قيد التنفيذ", "تم الانتهاء"],
+        },
+        startDate: String,
+        endDate: String,
+
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -15,26 +38,11 @@ const treatmentPlanSchema = new Schema<TreatmentPlanInterface>(
             ref: "User",
             required: true,
         },
-        diagnosis: {
-            type: String,
+        consultationId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Consultation",
             required: true,
-            maxLength: 100,
         },
-        description: {
-            type: String,
-            required: true,
-            maxLength: 500,
-        },
-
-        medications: [String],
-        procedures:  [String],
-
-        status: {
-            type:String,
-            enum:['لم تبدأ','قيد التنفيذ','تم الانتهاء']
-        },
-        startDate: String,
-        endDate: String,
         createdAt: String,
         updatedAt: String,
     },

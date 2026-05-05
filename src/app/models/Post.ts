@@ -10,14 +10,6 @@ const postSchema = new Schema<PostInterface>(
             required: true,
             trim: true,
         },
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-        adminId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Admin",
-        },
         files: [
             {
                 url: String,
@@ -35,6 +27,14 @@ const postSchema = new Schema<PostInterface>(
             type: String,
             enum: ["public", "private"],
             default: "public",
+        },
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+        adminId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Admin",
         },
     },
     {

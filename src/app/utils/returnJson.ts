@@ -17,18 +17,21 @@ const returnSuccess = <T>(
 };
 
 const returnError = (res: Response, msg: string = "", code: number, errors?: Result<ValidationError>): Response => {
-    let errorArray: Array<Record<string, string>> = [];
+    let errorArray: Record<string, string[]>[] = [];
 
     if (errors) {
-        const firstErrors = errors.array().reduce<Record<string, string>>((acc, err) => {
-            if (err.type === "field" && !(err.path in acc)) {
-                acc[err.path] = err.msg;
+        const groupedErrors = errors.array().reduce<Record<string, string[]>>((acc, err) => {
+            if (err.type === "field") {
+                if (!acc[err.path]) {
+                    acc[err.path] = [];
+                }
+                acc[err.path].push(err.msg);
             }
             return acc;
         }, {});
 
-        errorArray = Object.entries(firstErrors).map(([path, message]) => ({
-            [path]: message,
+        errorArray = Object.entries(groupedErrors).map(([path, messages]) => ({
+            [path]: messages,
         }));
     }
 
