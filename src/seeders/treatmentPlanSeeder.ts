@@ -21,14 +21,8 @@ const seedTreatmentPlans= async (
             treatmentPlans.push({
                 description: faker.lorem.paragraph({ min: 2, max: 5 }),
                 diagnosis: faker.lorem.word(8),
-                medications: faker.helpers.arrayElements(["بنادول", "اوجمنتين", "ريفو"], {
-                    min: 1,
-                    max: 3,
-                }),
-                procedures: faker.helpers.arrayElements(["عمليه ازالة معدة", "عمليه غسيل معدة", "عمليه شفط دهون"], {
-                    min: 1,
-                    max: 3,
-                }),
+                medications: "بنادول و اوجمنتين ",
+                procedures: "عمليه ازالة معدة و عمليه غسيل معدة و عمليه شفط دهون",
                 userId: faker.helpers.arrayElement(adminIds),
                 doctorId: faker.helpers.arrayElement(doctorsIds),
                 tags: faker.helpers.arrayElements(["يزيد الوزن", " ينقص الوزن", " يحسن المناعة"], {
