@@ -22,7 +22,12 @@ export const httpLogger = (req: Request, res: Response, next: NextFunction) => {
     next();
 };
 
-const saveLogToDB = async (level: string, req: Request, res: Response, message: string) => {
+const saveLogToDB = async (
+    level: "info" | "warn" | "error" | "debug",
+    req: Request,
+    res: Response,
+    message: string,
+) => {
     await Log.create({
         level,
         message,

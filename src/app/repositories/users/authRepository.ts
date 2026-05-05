@@ -14,7 +14,7 @@ export const userSignupRepo = (
     lastName: string,
     email: string,
     password: string,
-    role:string
+    role: "user" | "doctor",
 ): Promise<UserInterface> => {
     return User.create({
         name: {
@@ -25,6 +25,6 @@ export const userSignupRepo = (
         contact: {
             email,
         },
-        role
+        role,
     });
 };
