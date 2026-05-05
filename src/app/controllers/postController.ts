@@ -15,7 +15,7 @@ const showPost = asyncHandler(async (req: Request, res: Response): Promise<Respo
     const post = await Post.findById(req.params.postId);
 
     if (!post) {
-        throw new NotFoundError("not found post", 404);
+        throw new NotFoundError("not found post");
     }
 
     return returnSuccess(res, "", 200, post);

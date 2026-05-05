@@ -18,8 +18,8 @@ const treatmentPlanSchema = new Schema<TreatmentPlanInterface>(
             trim: true,
         },
 
-        medications: [String],
-        procedures: [String],
+        medications: String,
+        procedures: String,
 
         status: {
             type: String,
