@@ -6,6 +6,6 @@ export interface UserSignupRequestInterface extends Request {
         lastName: string;
         email: string;
         password: string;
-        role:string
+        role:"user"|'doctor'
     };
 }
