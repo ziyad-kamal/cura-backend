@@ -12,5 +12,5 @@ export const login = asyncHandler(async(req: LoginRequestInterface, res: Respons
 
 export const userSignup = asyncHandler(async (req: UserSignupRequestInterface, res: Response): Promise<Response> => {
     await userSignupService(req, res);
-    return returnSuccess(res, "you login successfully", 200);
+    return returnSuccess(res, "you signup successfully", 200);
 });

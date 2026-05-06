@@ -19,10 +19,6 @@ const commentSchema = new Schema<CommentInterface>(
             ref: "Post",
             required: true,
         },
-        parentId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Comment",
-        },
     },
     {
         timestamps: true,
