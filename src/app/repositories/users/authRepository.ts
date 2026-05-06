@@ -1,3 +1,4 @@
+import { UserRoles } from "../../../enums/UserRoles.ts";
 import { UserInterface } from "../../../interfaces/models/UserInterface.ts";
 import User from "../../models/User.ts";
 
@@ -14,7 +15,7 @@ export const userSignupRepo = (
     lastName: string,
     email: string,
     password: string,
-    role: "user" | "doctor",
+    role: UserRoles,
 ): Promise<UserInterface> => {
     return User.create({
         name: {

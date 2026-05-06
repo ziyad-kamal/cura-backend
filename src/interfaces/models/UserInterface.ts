@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { UserRoles } from "../../enums/UserRoles.ts";
 
 export interface UserInterface {
     _id?: Types.ObjectId;
@@ -49,7 +50,7 @@ export interface UserInterface {
         expDate: string;
     };
 
-    role: "user" | "doctor";
+    role: UserRoles;
 
     createdAt?: Date;
     updatedAt?: Date;
