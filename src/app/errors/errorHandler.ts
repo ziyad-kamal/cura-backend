@@ -4,13 +4,18 @@ import { fileConfig } from "../../config/file.ts";
 import { ErrorInterface } from "../../interfaces/errors/ErrorInterface.ts";
 import { returnError } from "../utils/returnJson.ts";
 import NotFoundError from "./NotFoundError.ts";
+import RecordExistError from "./RecordExistError.ts";
 
 const errorHandler = (err: ErrorInterface, req: Request, res: Response, next: NextFunction): Response | void => {
     let statusCode = err.statusCode || 500;
     let message = err.message || "Internal Server Error";
 
-    if (err.name === "NotFoundError" || err instanceof NotFoundError) {
-        return returnError(res, err.message, err.statusCode || 404);
+    if (err instanceof NotFoundError) {
+        return returnError(res, err.message, err.statusCode);
+    }
+
+    if (err instanceof RecordExistError) {
+        return returnError(res, err.message, err.statusCode);
     }
 
     if (err instanceof multer.MulterError) {

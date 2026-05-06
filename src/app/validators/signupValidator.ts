@@ -21,11 +21,9 @@ export const signupValidator: (ValidationChain | RequestHandler)[] = [
     body("role")
         .trim()
         .notEmpty()
-        .isEmail()
-        .isIn(Object.values(UserRoles))
         .withMessage("role is required")
-        .isLength({ min: 10, max: 60 })
-        .withMessage("email must be between 3 and 60 characters"),
+        .isIn(Object.values(UserRoles))
+        .withMessage("role is user or doctor"),
 
     body("email")
         .trim()
@@ -40,7 +38,7 @@ export const signupValidator: (ValidationChain | RequestHandler)[] = [
         .notEmpty()
         .withMessage("password is required")
         .isLength({ min: 8, max: 40 })
-        .withMessage("lastName must be between 8 and 40 characters"),
+        .withMessage("password must be between 8 and 40 characters"),
 
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
