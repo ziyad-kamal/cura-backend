@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import mongoose, { Schema } from "mongoose";
 import { UserInterface } from "../../interfaces/models/UserInterface.ts";
+import { UserRoles } from "../../enums/UserRoles.ts";
 
 const userSchema = new Schema<UserInterface>(
     {
@@ -104,7 +105,7 @@ const userSchema = new Schema<UserInterface>(
 
         role: {
             type: String,
-            enum: ["user", "doctor"],
+            enum: Object.values(UserRoles),
         },
     },
     { timestamps: true, versionKey: false },

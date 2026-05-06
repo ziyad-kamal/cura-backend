@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { UserRoles } from "../../enums/UserRoles.ts";
 
 export interface UserSignupRequestInterface extends Request {
     body: {
@@ -6,6 +7,6 @@ export interface UserSignupRequestInterface extends Request {
         lastName: string;
         email: string;
         password: string;
-        role:"user"|'doctor'
+        role: UserRoles;
     };
 }
