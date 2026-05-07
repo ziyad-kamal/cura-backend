@@ -4,9 +4,7 @@ import { Types } from "mongoose";
 import Post from "../app/models/Post.ts";
 import { PostInterface } from "../interfaces/models/PostInterface.ts";
 
-const seedPosts = async (
-    userIds: Array<Types.ObjectId> = [],
-):Promise<PostInterface[]> => {
+const seedPosts = async (userIds: Array<Types.ObjectId> = []): Promise<PostInterface[]> => {
     try {
         await Post.deleteMany({});
         console.log("🗑️  Cleared existing posts");
@@ -31,7 +29,7 @@ const seedPosts = async (
                     { url: image, type: "image" },
                     { url: image, type: "image" },
                 ],
-                tags: faker.helpers.arrayElements(["ارتفاع ضغط الدم", "انخفاض ضغظ الدم", "زيادة الوزن"], {
+                tags: faker.helpers.arrayElements(["High Blood Pressure", "Low Blood Pressure", "Weight Gain"], {
                     min: 1,
                     max: 3,
                 }),
@@ -45,10 +43,7 @@ const seedPosts = async (
 
         return createdPosts;
     } catch (err: unknown) {
-        console.error(
-            "Posts seeding failed:",
-            err instanceof Error ? err.message : String(err),
-        );
+        console.error("Posts seeding failed:", err instanceof Error ? err.message : String(err));
 
         throw err;
     }

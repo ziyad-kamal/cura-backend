@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import mongoose, { Schema } from "mongoose";
-import { UserInterface } from "../../interfaces/models/UserInterface.ts";
 import { UserRoles } from "../../enums/UserRoles.ts";
+import { UserInterface } from "../../interfaces/models/UserInterface.ts";
 
 const userSchema = new Schema<UserInterface>(
     {
@@ -27,7 +27,8 @@ const userSchema = new Schema<UserInterface>(
                 type: String,
                 required: true,
                 unique: true,
-                maxLength: 60,
+                minlength: 10,
+                maxLength: 150,
                 trim: true,
             },
             phone: {
@@ -54,7 +55,7 @@ const userSchema = new Schema<UserInterface>(
             type: String,
             required: true,
             minlength: 8,
-            maxLength: 40,
+            maxLength: 80,
             select: false,
         },
         image: String,
@@ -91,7 +92,7 @@ const userSchema = new Schema<UserInterface>(
             height: Number,
             gender: {
                 type: String,
-                enum: ["رجل", "انثى"],
+                enum: ["male", "female"],
             },
             diseases: String,
         },

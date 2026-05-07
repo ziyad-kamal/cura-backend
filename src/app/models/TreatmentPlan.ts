@@ -1,7 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
+import { TreatmentPlanInterface } from "../../interfaces/models/TreatmentPlanInterface.ts";
 import "./Comment.ts";
 import "./User.ts";
-import { TreatmentPlanInterface } from "../../interfaces/models/TreatmentPlanInterface.ts";
 
 const treatmentPlanSchema = new Schema<TreatmentPlanInterface>(
     {
@@ -23,7 +23,7 @@ const treatmentPlanSchema = new Schema<TreatmentPlanInterface>(
 
         status: {
             type: String,
-            enum: ["لم تبدأ", "قيد التنفيذ", "تم الانتهاء"],
+            enum: ["not started", "in progress", "completed"],
         },
         startDate: String,
         endDate: String,

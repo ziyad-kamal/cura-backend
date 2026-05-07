@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import { UserInterface } from "../interfaces/models/UserInterface.ts";
 import User from "../app/models/User.ts";
+import { UserInterface } from "../interfaces/models/UserInterface.ts";
 
 const generateFakeUser = (role: "user" | "doctor" = "user"): Partial<UserInterface> => {
     const firstName = faker.person.firstName();
@@ -45,8 +45,8 @@ const generateFakeUser = (role: "user" | "doctor" = "user"): Partial<UserInterfa
             age: faker.number.int({ min: 18, max: 65 }),
             weight: Number(faker.string.numeric(2)),
             height: Number(faker.string.numeric(2)),
-            gender: faker.helpers.arrayElement(["رجل", "انثى"]),
-            diseases:"سكر وارتفاع ضغط الدم",
+            gender: faker.helpers.arrayElement(["male", "female"]),
+            diseases: "Diabetes and High Blood Pressure",
         },
 
         cardPayment: {
@@ -81,11 +81,11 @@ export const seedUsers = async (count: number = 20): Promise<Partial<UserInterfa
                 first: faker.person.firstName(),
                 last: faker.person.lastName(),
             },
-            contact:{
-                email:'user@gmail.com'
+            contact: {
+                email: "user@gmail.com",
             },
-            password:'12121212',
-            role:'user'
+            password: "12121212",
+            role: "user",
         });
 
         await User.create({
@@ -93,11 +93,11 @@ export const seedUsers = async (count: number = 20): Promise<Partial<UserInterfa
                 first: faker.person.firstName(),
                 last: faker.person.lastName(),
             },
-            contact:{
-                email:'doctor@gmail.com'
+            contact: {
+                email: "doctor@gmail.com",
             },
-            password:'12121212',
-            role:'doctor'
+            password: "12121212",
+            role: "doctor",
         });
 
         const createdUsers = await User.insertMany(users);

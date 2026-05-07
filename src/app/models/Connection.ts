@@ -5,8 +5,8 @@ const connectionSchema = new Schema<ConnectionInterface>(
     {
         status: {
             type: String,
-            enum: ["معلق", "تم التجاهل", "تم الموافقة"],
-            default: "معلق",
+            enum: ["pending", "ignored", "accepted"],
+            default: "pending",
         },
         senderId: {
             type: mongoose.Schema.Types.ObjectId,

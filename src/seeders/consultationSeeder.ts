@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import Consultation from "../app/models/Consultation.ts";
 import { Types } from "mongoose";
+import Consultation from "../app/models/Consultation.ts";
 import { ConsultationInterface } from "../interfaces/models/ConsultationInterface.ts";
 
 const seedConsultations = async (
@@ -13,13 +13,13 @@ const seedConsultations = async (
         console.log("🗑️  Cleared existing consultations");
 
         const consultations = [];
-        
+
         for (let i = 0; i < count; i++) {
             const randomDate = faker.date.past({ years: 1 });
 
             consultations.push({
                 price: faker.number.int({ min: 300, max: 1000 }),
-                status: faker.helpers.arrayElement(["معلق", "تم البدء", "في مرحلة التنفيذ", "تم الانتهاء"]),
+                status: faker.helpers.arrayElement(["pending", "started", "in progress", "completed"]),
                 userId: faker.helpers.arrayElement(userIds),
                 doctorId: faker.helpers.arrayElement(userIds),
                 createdAt: randomDate,

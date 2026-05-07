@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import TreatmentPlan from "../app/models/TreatmentPlan.ts";
 import { Types } from "mongoose";
+import TreatmentPlan from "../app/models/TreatmentPlan.ts";
 import { TreatmentPlanInterface } from "../interfaces/models/TreatmentPlanInterface.ts";
 
-const seedTreatmentPlans= async (
+const seedTreatmentPlans = async (
     count: number = 30,
     adminIds: Array<Types.ObjectId> = [],
     doctorsIds: Array<Types.ObjectId> = [],
@@ -21,11 +21,11 @@ const seedTreatmentPlans= async (
             treatmentPlans.push({
                 description: faker.lorem.paragraph({ min: 2, max: 5 }),
                 diagnosis: faker.lorem.word(8),
-                medications: "بنادول و اوجمنتين ",
-                procedures: "عمليه ازالة معدة و عمليه غسيل معدة و عمليه شفط دهون",
+                medications: "Paracetamol and Augmentin",
+                procedures: "Stomach removal surgery and stomach wash surgery and liposuction",
                 userId: faker.helpers.arrayElement(adminIds),
                 doctorId: faker.helpers.arrayElement(doctorsIds),
-                tags: faker.helpers.arrayElements(["يزيد الوزن", " ينقص الوزن", " يحسن المناعة"], {
+                tags: faker.helpers.arrayElements(["Increases Weight", " Decreases Weight", " Boosts Immunity"], {
                     min: 1,
                     max: 3,
                 }),

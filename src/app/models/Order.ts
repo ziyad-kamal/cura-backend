@@ -1,8 +1,8 @@
 import mongoose, { Model, Schema } from "mongoose";
-import "./Comment.ts";
-import "./User.ts";
 import { OrderInterface } from "../../interfaces/models/OrderInterface.ts";
 import { OrderItemInterface } from "../../interfaces/models/OrderItemInterface.ts";
+import "./Comment.ts";
+import "./User.ts";
 
 const orderItemSchema = new Schema<OrderItemInterface>(
     {
@@ -29,8 +29,8 @@ const orderSchema = new Schema<OrderInterface>(
         },
         status: {
             type: String,
-            enum: ["معلق", "تم الشحن", "في الطريق", "تم التوصيل", "تم الالغاء"],
-            default: "معلق",
+            enum: ["pending", "shipped", "in transit", "delivered", "cancelled"],
+            default: "pending",
         },
         city: {
             type: String,

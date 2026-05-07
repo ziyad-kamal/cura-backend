@@ -5,6 +5,8 @@ import { ErrorInterface } from "../../interfaces/errors/ErrorInterface.ts";
 import { returnError } from "../utils/returnJson.ts";
 import NotFoundError from "./NotFoundError.ts";
 import RecordExistError from "./RecordExistError.ts";
+import UnknownError from "./UnknownError.ts";
+import CustomError from "./CustomError.ts";
 
 const errorHandler = (err: ErrorInterface, req: Request, res: Response, next: NextFunction): Response | void => {
     let statusCode = err.statusCode || 500;
@@ -15,6 +17,14 @@ const errorHandler = (err: ErrorInterface, req: Request, res: Response, next: Ne
     }
 
     if (err instanceof RecordExistError) {
+        return returnError(res, err.message, err.statusCode);
+    }
+
+    if (err instanceof UnknownError) {
+        return returnError(res, err.message, err.statusCode);
+    }
+
+    if (err instanceof CustomError) {
         return returnError(res, err.message, err.statusCode);
     }
 

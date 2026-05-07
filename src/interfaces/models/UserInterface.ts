@@ -39,7 +39,7 @@ export interface UserInterface {
         age: number;
         weight: number;
         height: number;
-        gender: "رجل" | "انثى";
+        gender: "male" | "female";
         diseases: string;
     };
 

@@ -11,21 +11,21 @@ export const loginRepo = (email: string): Promise<UserInterface | null> => {
     }).select("+password");
 };
 
-export const userSignupRepo = async(
+export const signupRepo = async (
     firstName: string,
     lastName: string,
     email: string,
     password: string,
     role: UserRoles,
 ): Promise<UserInterface> => {
-    const user=await User.findOne({
+    const user = await User.findOne({
         contact: {
             email,
         },
     });
 
     if (user) {
-        throw new RecordExistError('this email is used')
+        throw new RecordExistError("this email is used");
     }
 
     return User.create({

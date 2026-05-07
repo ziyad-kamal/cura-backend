@@ -12,13 +12,13 @@ const consultationSchema = new Schema<ConsultationInterface>(
         },
         type: {
             type: String,
-            enum: ["قصيرة المدى", "متوسطة المدى", "طويلة المدى"],
+            enum: ["short term", "medium term", "long term"],
             required: true,
         },
         status: {
             type: String,
-            enum: ["معلق", "تم البدء", "في مرحلة التنفيذ", "تم الانتهاء"],
-            default: "معلق",
+            enum: ["pending", "started", "in progress", "completed"],
+            default: "pending",
         },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -38,6 +38,9 @@ const consultationSchema = new Schema<ConsultationInterface>(
     },
 );
 
-const Consultation: Model<ConsultationInterface> = mongoose.model<ConsultationInterface>("Consultation", consultationSchema);
+const Consultation: Model<ConsultationInterface> = mongoose.model<ConsultationInterface>(
+    "Consultation",
+    consultationSchema,
+);
 
 export default Consultation;

@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import Order from "../app/models/Order.ts";
 import { Types } from "mongoose";
-import { ProductInterface } from "../interfaces/models/ProductInterface.ts";
+import Order from "../app/models/Order.ts";
 import { OrderInterface } from "../interfaces/models/OrderInterface.ts";
+import { ProductInterface } from "../interfaces/models/ProductInterface.ts";
 
 const seedOrders = async (
     count: number = 30,
@@ -29,7 +29,7 @@ const seedOrders = async (
                 totalPrice: faker.number.int({ min: 1000, max: 5000 }),
                 city: faker.location.city(),
                 street: faker.location.street(),
-                status: faker.helpers.arrayElement(["معلق", "تم الشحن", "في الطريق", "تم التوصيل", "تم الالغاء"]),
+                status: faker.helpers.arrayElement(["pending", "shipped", "in transit", "delivered", "cancelled"]),
                 userId: faker.helpers.arrayElement(userIds),
                 products: orderItems,
                 createdAt: randomDate,

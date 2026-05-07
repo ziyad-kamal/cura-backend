@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import { ConnectionInterface } from "../interfaces/models/ConnectionInterface.ts";
 import Connection from "../app/models/Connection.ts";
+import { ConnectionInterface } from "../interfaces/models/ConnectionInterface.ts";
 
 const seedConnections = async (
     count: number = 30,
@@ -18,7 +18,7 @@ const seedConnections = async (
             const randomDate = faker.date.past({ years: 1 });
 
             connections.push({
-                status: faker.helpers.arrayElement(["معلق", "تم التجاهل", "تم الموافقة"]),
+                status: faker.helpers.arrayElement(["pending", "ignored", "accepted"]),
                 receiverId: faker.helpers.arrayElement(usersIds),
                 senderId: faker.helpers.arrayElement(usersIds),
                 createdAt: randomDate,

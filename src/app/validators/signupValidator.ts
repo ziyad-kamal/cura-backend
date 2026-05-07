@@ -28,10 +28,11 @@ export const signupValidator: (ValidationChain | RequestHandler)[] = [
     body("email")
         .trim()
         .notEmpty()
-        .isEmail()
         .withMessage("email is required")
-        .isLength({ min: 10, max: 60 })
-        .withMessage("email must be between 3 and 60 characters"),
+        .isEmail()
+        .withMessage("invalid email")
+        .isLength({ min: 10, max: 150 })
+        .withMessage("email must be between 10 and 150 characters"),
 
     body("password")
         .trim()

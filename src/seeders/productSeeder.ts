@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import { ProductInterface } from "../interfaces/models/ProductInterface.ts";
 import { Product } from "../app/models/Product.ts";
+import { ProductInterface } from "../interfaces/models/ProductInterface.ts";
 
 const seedProducts = async (
     count: number = 30,
@@ -23,13 +23,16 @@ const seedProducts = async (
             const randomDate = faker.date.past({ years: 1 });
 
             products.push({
-                price:faker.number.int({min:100,max:5000}),
+                price: faker.number.int({ min: 100, max: 5000 }),
                 description: faker.lorem.paragraph({ min: 2, max: 5 }),
                 name: faker.lorem.word(8),
                 images: [image, image],
                 adminId: faker.helpers.arrayElement(adminIds),
                 companyId: faker.helpers.arrayElement(companiesIds),
-                tags: faker.helpers.arrayElements([" يزيد الوزن", " ينقص الوزن", "يحسن المناعة"],{min:1,max:3}),
+                tags: faker.helpers.arrayElements([" Increases Weight", " Decreases Weight", "Boosts Immunity"], {
+                    min: 1,
+                    max: 3,
+                }),
                 createdAt: randomDate,
             });
         }
