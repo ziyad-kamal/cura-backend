@@ -8,6 +8,7 @@ import postRoutes from "./routes/postRoutes.ts";
 import errorHandler from "./app/errors/errorHandler.ts";
 import authRouter from "./routes/users/authRoutes.ts";
 import { connectRedis } from "./config/redis.ts";
+import { applyCors } from "./config/cors.ts";
 
 connectDB();
 
@@ -15,6 +16,8 @@ const app = express();
 
 async function bootstrap() {
     app.listen(appConfig.port);
+
+    app.use(applyCors)
 
     app.use(httpLogger);
 

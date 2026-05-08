@@ -2,16 +2,12 @@ import { Request, Response } from "express";
 import { SignupRequestInterface } from "../../../interfaces/requests/SignupRequestInterface.ts";
 import NotFoundError from "../../errors/NotFoundError.ts";
 import { loginRepo, signupRepo } from "../../repositories/users/authRepository.ts";
-import { findRecord } from "../../utils/findRecord.ts";
 import User from "../../models/User.ts";
-import sendEmail from "../../../config/email.ts";
 import bcrypt from "bcryptjs";
-import { appConfig } from "../../../config/app.ts";
 import { ResetPasswordRequestInterface } from "../../../interfaces/requests/ResetPasswordRequestInterface.ts";
 import { ForgetPasswordRequestInterface } from "../../../interfaces/requests/ForgetPasswordRequestInterface copy.ts";
-import { verifyToken } from "../../utils/verifyToken.ts";
-import { sendToken } from "../../utils/sendToken.ts";
 import {redis} from "../../../config/redis.ts";
+import { sendToken,verifyToken ,findRecord} from "../../utils/index.ts";
 
 export const loginService = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
@@ -37,16 +33,16 @@ export const signupService = async (req: SignupRequestInterface, res: Response):
 
     await redis.set(`verifyToken${userEmail}`, token, "EX", 5 * 60);
 
-    await sendEmail({
-        to: user.contact.email,
-        subject: "verify your email",
-        templateName: "verifyEmail",
-        context: {
-            name: user.name.first,
-            verificationLink: `${appConfig.appUrl}/api/verify/email?email=${userEmail}&token=${token}`,
-            app: appConfig.appName,
-        },
-    });
+    // await emailQueue.add("verify-email", {
+    //     to: user.contact.email,
+    //     subject: "verify your email",
+    //     templateName: "verifyEmail",
+    //     context: {
+    //         name: user.name.first,
+    //         verificationLink: `${appConfig.appUrl}/api/verify/email?email=${userEmail}&token=${token}`,
+    //         app: appConfig.appName,
+    //     },
+    // });
 
     const userData = { _id: user._id, email };
 
@@ -60,16 +56,17 @@ export const forgetPasswordService = async (req: ForgetPasswordRequestInterface)
     const token = await bcrypt.hash(userEmail, 12);
 
     await redis.set(`resetToken${userEmail}`, token, "EX", 5 * 60);
-    await sendEmail({
-        to: user.contact.email,
-        subject: "forget password",
-        templateName: "forgetPassword",
-        context: {
-            name: user.name.first,
-            resetPasswordLink: `${appConfig.frontendUrl}/reset/password?email=${userEmail}&token=${token}`,
-            app: appConfig.appName,
-        },
-    });
+
+    // await emailQueue.add("forget-password", {
+    //     to: user.contact.email,
+    //     subject: "forget password",
+    //     templateName: "forgetPassword",
+    //     context: {
+    //         name: user.name.first,
+    //         resetPasswordLink: `${appConfig.frontendUrl}/reset/password?email=${userEmail}&token=${token}`,
+    //         app: appConfig.appName,
+    //     },
+    // });
 };
 
 export const resetPasswordService = async (req: ResetPasswordRequestInterface): Promise<void> => {
