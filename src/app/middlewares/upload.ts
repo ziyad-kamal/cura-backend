@@ -16,4 +16,4 @@ const uploadImage = createUploader(fileConfig.maxImageSize);
 const uploadDocument = createUploader(fileConfig.maxDocumentSize);
 const uploadVideo = createUploader(fileConfig.maxVideoSize);
 
-export { uploadDocument, uploadImage, uploadVideo };
+export { uploadDocument, uploadImage, uploadVideo ,createUploader};
