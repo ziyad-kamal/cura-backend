@@ -1,12 +1,13 @@
 import cookieParser from "cookie-parser";
 import express from "express";
 import { attachHelpers } from "./app/middlewares/helpers.ts";
-import { rateLimiter } from "./app/middlewares/rateLimiter.ts";
-import { appConfig, connectDB, connectRedis } from "./config/index.ts";
+import { globalLimiter } from "./app/middlewares/rateLimiter.ts";
+import { appConfig, connectDB } from "./config/index.ts";
 import { httpLogger } from "./config/logger.ts";
 import postRoutes from "./routes/postRoutes.ts";
 import errorHandler from "./app/errors/errorHandler.ts";
 import authRouter from "./routes/users/authRoutes.ts";
+import { connectRedis } from "./config/redis.ts";
 
 connectDB();
 
@@ -19,7 +20,7 @@ async function bootstrap() {
 
     await connectRedis();
 
-    app.use(rateLimiter());
+    app.use(globalLimiter);
 
     app.use(express.json());
 

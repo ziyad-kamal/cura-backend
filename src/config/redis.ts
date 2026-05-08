@@ -1,21 +1,17 @@
 /* eslint-disable no-console */
-import { createClient, RedisClientType } from "redis";
+import {Redis} from "ioredis";
 
-export let redisClient: RedisClientType;
+export const redis = new Redis({
+    host: "127.0.0.1",
+    port: 6379,
+});
 
-export const connectRedis = async (): Promise<void> => {
-    if (redisClient?.isReady) return;
-
-    redisClient = createClient({
-        url: process.env.REDIS_URL,
-    });
-
-    redisClient.on("reconnecting", () => console.log("Redis reconnecting..."));
-
+export const connectRedis = async () => {
     try {
-        await redisClient.connect();
+        await redis.ping();
+
         console.log("✅ Redis connected");
     } catch (error) {
-        console.warn(`⚠️ Failed to connect to Redis at. Rate limiting will not work.`, error);
+        console.error("❌ Redis failed", error);
     }
 };
