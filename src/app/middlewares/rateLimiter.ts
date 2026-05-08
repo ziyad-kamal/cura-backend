@@ -1,37 +1,41 @@
-import { Request } from "express";
-import rateLimit, { ipKeyGenerator } from "express-rate-limit";
-import { RedisReply, RedisStore } from "rate-limit-redis";
-import { redisClient } from "../../config/redis.ts";
+import { NextFunction, Request, Response } from "express";
+import { RateLimiterRedis } from "rate-limiter-flexible";
+import {redis} from "../../config/redis.ts";
 
-let redisStore: RedisStore | null = null;
-
-const getRedisStore = (): RedisStore | null => {
-    if (!redisStore && redisClient?.isReady) {
-        const sendCommand = async (...args: string[]): Promise<RedisReply> => {
-            return redisClient.sendCommand(args);
-        };
-        redisStore = new RedisStore({ sendCommand });
-    }
-    return redisStore;
+const createLimiter = (points: number, duration: number) => {
+    return new RateLimiterRedis({
+        storeClient: redis,
+        points,
+        duration,
+        keyPrefix: `rate-limit:${points}:${duration}`,
+    });
 };
 
-export const rateLimiter = ({ windowMs = 60 * 1000, limit = 45 } = {}) => {
-    const store = getRedisStore();
+// ─── Global Limiter ───────────────────────────────────────────
+const globalLimiterInstance = createLimiter(45, 60); 
 
-    if (!store) {
-        // eslint-disable-next-line no-console
-        console.warn("⚠️ Redis not available. Rate limiting will use memory store.");
+export const globalLimiter = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await globalLimiterInstance.consume(req.ip ?? "anonymous");
+        next();
+    } catch {
+        res.status(429).json({
+            success: false,
+            msg: "Too many login attempts. Try again later.",
+        });
     }
+};
 
-    return rateLimit({
-        ...(store && { store }),
+const routeLimiterInstance = createLimiter(3, 60); 
 
-        windowMs,
-        limit,
-        standardHeaders: "draft-8",
-        legacyHeaders: false,
-        message: { success: false, msg: "Too many requests" },
-
-        keyGenerator: (req: Request) => ipKeyGenerator(req.ip ?? "anonymous"),
-    });
+export const routeLimiter = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await routeLimiterInstance.consume(req.ip ?? "anonymous");
+        next();
+    } catch {
+        res.status(429).json({
+            success: false,
+            msg: "Too many login attempts. Try again later.",
+        });
+    }
 };

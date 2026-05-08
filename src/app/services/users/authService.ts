@@ -6,12 +6,12 @@ import { findRecord } from "../../utils/findRecord.ts";
 import User from "../../models/User.ts";
 import sendEmail from "../../../config/email.ts";
 import bcrypt from "bcryptjs";
-import { redisClient } from "../../../config/redis.ts";
 import { appConfig } from "../../../config/app.ts";
 import { ResetPasswordRequestInterface } from "../../../interfaces/requests/ResetPasswordRequestInterface.ts";
 import { ForgetPasswordRequestInterface } from "../../../interfaces/requests/ForgetPasswordRequestInterface copy.ts";
 import { verifyToken } from "../../utils/verifyToken.ts";
 import { sendToken } from "../../utils/sendToken.ts";
+import {redis} from "../../../config/redis.ts";
 
 export const loginService = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
@@ -35,7 +35,7 @@ export const signupService = async (req: SignupRequestInterface, res: Response):
     const userEmail = user.contact.email;
     const token = await bcrypt.hash(userEmail, 12);
 
-    await redisClient.set(`verifyToken${userEmail}`, token, { EX: 15 * 60 });
+    await redis.set(`verifyToken${userEmail}`, token, "EX", 5 * 60);
 
     await sendEmail({
         to: user.contact.email,
@@ -59,7 +59,7 @@ export const forgetPasswordService = async (req: ForgetPasswordRequestInterface)
     const userEmail = user.contact.email;
     const token = await bcrypt.hash(userEmail, 12);
 
-    await redisClient.set(`resetToken${userEmail}`, token, { EX: 5 * 60 });
+    await redis.set(`resetToken${userEmail}`, token, "EX", 5 * 60);
     await sendEmail({
         to: user.contact.email,
         subject: "forget password",
@@ -89,5 +89,5 @@ export const verifyEmailService = async (req: ResetPasswordRequestInterface): Pr
 
     verifyToken(email, token,'verifyToken');
 
-    user.updateOne({ isVerified: true });
+    await user.updateOne({ isVerified: true });
 };

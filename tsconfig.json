@@ -12,7 +12,7 @@
         "allowImportingTsExtensions": true,
         "noEmit": true,
         "resolveJsonModule": true,
-        "incremental": true
+        "incremental": true,
     },
     "include": ["src/**/*", "src/types/**/*.d.ts"],
     "exclude": ["node_modules", "dist"]
