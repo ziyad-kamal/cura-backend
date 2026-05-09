@@ -1,7 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { MessageInterface } from '../../interfaces/models/MessageInterface.js';
-import "./Comment.ts";
-import "./User.ts";
+import { MessageInterface } from "../../interfaces/models/MessageInterface.js";
+import "./Comment.js";
+import "./User.js";
 
 const messageSchema = new Schema<MessageInterface>(
     {
@@ -20,12 +20,12 @@ const messageSchema = new Schema<MessageInterface>(
                 },
             },
         ],
-        senderId: {
+        sender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        receiverId: {
+        receiver: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,

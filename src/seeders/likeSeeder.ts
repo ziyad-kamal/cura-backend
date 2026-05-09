@@ -24,8 +24,8 @@ const seedLikes = async (
         for (const postId of postIds) {
             for (let i = 0; i < countPerPost; i++) {
                 likes.push({
-                    userId: faker.helpers.arrayElement(userIds),
-                    postId,
+                    user: faker.helpers.arrayElement(userIds),
+                    post:postId,
                     type:'post',
                 });
             }
@@ -34,8 +34,8 @@ const seedLikes = async (
         for (const commentId of commentIds) {
             for (let i = 0; i < countPerComment; i++) {
                 likes.push({
-                    userId: faker.helpers.arrayElement(userIds),
-                    postId: faker.helpers.arrayElement(postIds),
+                    user: faker.helpers.arrayElement(userIds),
+                    post: faker.helpers.arrayElement(postIds),
                     commentId,
                     type: "post",
                 });

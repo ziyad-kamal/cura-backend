@@ -1,12 +1,12 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { OrderInterface } from '../../interfaces/models/OrderInterface.js';
-import { OrderItemInterface } from '../../interfaces/models/OrderItemInterface.js';
-import "./Comment.ts";
-import "./User.ts";
+import { OrderInterface } from "../../interfaces/models/OrderInterface.js";
+import { OrderItemInterface } from "../../interfaces/models/OrderItemInterface.js";
+import "./Comment.js";
+import "./User.js";
 
 const orderItemSchema = new Schema<OrderItemInterface>(
     {
-        productId: {
+        product: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Product",
             required: true,
@@ -46,7 +46,7 @@ const orderSchema = new Schema<OrderInterface>(
             type: [orderItemSchema],
             required: true,
         },
-        userId: {
+        user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,

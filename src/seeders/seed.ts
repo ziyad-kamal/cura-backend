@@ -1,6 +1,11 @@
 /* eslint-disable no-console */
-import { connectDB } from '../config/index.js';
-import { seedUsers } from './index.js';
+import { Types } from "mongoose";
+import { connectDB } from "../config/index.js";
+import { UserInterface } from "../interfaces/models/UserInterface.js";
+import { seedComments, seedPosts, seedUsers } from "./index.js";
+import seedLikes from "./likeSeeder.js";
+import { CommentInterface } from "../interfaces/models/CommentInterface.js";
+import seedReposts from "./repostSeeder.js";
 
 const seedAll = async () => {
     try {
@@ -9,11 +14,20 @@ const seedAll = async () => {
         console.log("🌱 Starting database seeding...");
 
         const createdUsers = await seedUsers(20);
-        // const userIds = createdUsers.map((user:UserInterface) => user._id);
-        // const createdPosts = await seedPosts(userIds);
-        // const postIds = createdPosts.map((post) => post._id);
+        const userIds = createdUsers
+            .map((user: UserInterface) => user._id)
+            .filter((id): id is Types.ObjectId => id !== undefined);
 
-        // await seedComments(60, postIds, userIds);
+        const createdPosts = await seedPosts(userIds);
+        const postIds = createdPosts.map((post) => post._id).filter((id): id is Types.ObjectId => id !== undefined);
+        
+        const createdComments = await seedComments(30, postIds, userIds);
+        const commentIds = createdComments
+            .map((comment: CommentInterface) => comment._id)
+            .filter((id): id is Types.ObjectId => id !== undefined);
+
+        await seedLikes(10, 10, postIds, commentIds, userIds);
+        await seedReposts(10, postIds, userIds);
 
         console.log("🎉 Database seeding completed successfully!");
         process.exit(0);

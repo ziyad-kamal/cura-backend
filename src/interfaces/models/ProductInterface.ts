@@ -8,7 +8,7 @@ export interface ProductInterface {
     tags: string[];
     images: string[];
     isActive?: boolean;
-    adminId: mongoose.Types.ObjectId;
-    companyId: mongoose.Types.ObjectId;
+    admin: mongoose.Types.ObjectId;
+    company: mongoose.Types.ObjectId;
     createdAt: Date;
 }

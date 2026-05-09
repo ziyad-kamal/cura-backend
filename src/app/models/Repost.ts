@@ -1,20 +1,20 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { RepostInterface } from '../../interfaces/models/RepostInterface.js';
-import "./Comment.ts";
-import "./User.ts";
+import { RepostInterface } from "../../interfaces/models/RepostInterface.js";
+import "./Comment.js";
+import "./User.js";
 
 const repostSchema = new Schema<RepostInterface>(
     {
-        content:{
-            type:String,
-            trim:true
+        content: {
+            type: String,
+            trim: true,
         },
-        userId: {
+        user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        postId: {
+        post: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Post",
             required: true,

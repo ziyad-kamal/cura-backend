@@ -5,7 +5,7 @@ export interface ConsultationInterface {
     price: number;
     type: string;
     status: string;
-    userId: mongoose.Types.ObjectId;
-    doctorId: mongoose.Types.ObjectId;
+    user: mongoose.Types.ObjectId;
+    doctor: mongoose.Types.ObjectId;
     createdAt: Date;
 }

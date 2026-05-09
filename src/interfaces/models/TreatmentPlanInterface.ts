@@ -9,9 +9,9 @@ export interface TreatmentPlanInterface {
     status: string;
     startDate: Date;
     endDate: Date;
-    userId: mongoose.Types.ObjectId;
-    doctorId: mongoose.Types.ObjectId;
-    consultationId: mongoose.Types.ObjectId;
+    user: mongoose.Types.ObjectId;
+    doctor: mongoose.Types.ObjectId;
+    consultation: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }

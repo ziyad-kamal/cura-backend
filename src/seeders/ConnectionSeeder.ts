@@ -19,8 +19,8 @@ const seedConnections = async (
 
             connections.push({
                 status: faker.helpers.arrayElement(["pending", "ignored", "accepted"]),
-                receiverId: faker.helpers.arrayElement(usersIds),
-                senderId: faker.helpers.arrayElement(usersIds),
+                receiver: faker.helpers.arrayElement(usersIds),
+                sender: faker.helpers.arrayElement(usersIds),
                 createdAt: randomDate,
                 updatedAt: randomDate,
             });
@@ -29,7 +29,7 @@ const seedConnections = async (
         const createdConnections = await Connection.insertMany(connections);
         console.log(`✅ Created ${createdConnections.length} connections`);
 
-        return createdConnections;
+        return createdConnections as unknown as ConnectionInterface[];
     } catch (err: unknown) {
         console.error("Posts seeding failed:", err instanceof Error ? err.message : String(err));
         throw err;

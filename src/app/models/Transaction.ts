@@ -1,15 +1,15 @@
 import mongoose, { Model, Schema } from "mongoose";
-import "./Comment.ts";
-import "./User.ts";
-import { TransactionInterface } from '../../interfaces/models/TransactionInterface.js';
+import { TransactionInterface } from "../../interfaces/models/TransactionInterface.js";
+import "./Comment.js";
+import "./User.js";
 
 const transactionSchema = new Schema<TransactionInterface>(
     {
-        orderId: {
+        order: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Order",
         },
-        consultationId: {
+        consultation: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Consultation",
         },

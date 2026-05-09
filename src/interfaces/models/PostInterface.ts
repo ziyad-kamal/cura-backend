@@ -6,8 +6,8 @@ export interface PostInterface {
     files?: { url: string; type: string }[];
     tags: string[];
     visibility?: string;
-    userId: mongoose.Types.ObjectId;
-    adminId: mongoose.Types.ObjectId;
+    user: mongoose.Types.ObjectId;
+    admin: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }

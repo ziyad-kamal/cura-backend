@@ -20,9 +20,9 @@ const seedChatrooms = async (
 
             chatrooms.push({
                 isActive: faker.datatype.boolean({ probability: 0.7 }),
-                consultationId: faker.helpers.arrayElement(consultationIds),
-                receiverId: faker.helpers.arrayElement(userIds),
-                senderId: faker.helpers.arrayElement(userIds),
+                consultation: faker.helpers.arrayElement(consultationIds),
+                receiver: faker.helpers.arrayElement(userIds),
+                sender: faker.helpers.arrayElement(userIds),
                 createdAt: randomDate,
             });
         }

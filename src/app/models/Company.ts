@@ -1,7 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { CompanyInterface } from '../../interfaces/models/CompanyInterface.js';
-import "./Comment.ts";
-import "./User.ts";
+import "./Comment.js";
+import "./User.js";
 
 const companySchema = new Schema<CompanyInterface>(
     {
@@ -11,7 +11,7 @@ const companySchema = new Schema<CompanyInterface>(
             trim: true,
         },
         image: String,
-        adminId: {
+        admin: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Admin",
             required: true,

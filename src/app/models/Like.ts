@@ -1,21 +1,21 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { LikeInterface } from '../../interfaces/models/LikeInterface.js';
-import "./Comment.ts";
-import "./User.ts";
+import "./Comment.js";
+import "./User.js";
 
 const likeSchema = new Schema<LikeInterface>(
     {
-        userId: {
+        user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        postId: {
+        post: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Post",
             required: true,
         },
-        commentId: {
+        comment: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Comment",
         },
@@ -30,6 +30,6 @@ const likeSchema = new Schema<LikeInterface>(
     },
 );
 
-const Like: Model<LikeInterface> = mongoose.model<LikeInterface>("like", likeSchema);
+const Like: Model<LikeInterface> = mongoose.model<LikeInterface>("Like", likeSchema);
 
 export default Like;

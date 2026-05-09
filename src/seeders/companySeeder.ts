@@ -20,7 +20,7 @@ const seedCompanies = async (count: number = 30, adminIds: Array<Types.ObjectId>
                     width: 800,
                     height: 600,
                 }),
-                adminId: faker.helpers.arrayElement(adminIds),
+                admin: faker.helpers.arrayElement(adminIds),
                 createdAt: randomDate,
             });
         }

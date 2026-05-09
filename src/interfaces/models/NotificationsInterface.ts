@@ -5,8 +5,8 @@ export interface NotificationInterface {
     type: "like" | "comment" | "connection" | "message";
     message: string;
     isRead: boolean;
-    postId?: Types.ObjectId;
-    receiverId: Types.ObjectId;
-    senderId?: Types.ObjectId;
+    post?: Types.ObjectId;
+    receiver: Types.ObjectId;
+    sender?: Types.ObjectId;
     createdAt?: Date;
 }

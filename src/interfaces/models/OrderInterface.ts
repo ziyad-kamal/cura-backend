@@ -8,6 +8,6 @@ export interface OrderInterface {
     city: string;
     street: string;
     products: OrderItemInterface[];
-    userId: mongoose.Types.ObjectId;
+    user: mongoose.Types.ObjectId;
     createdAt: Date;
 }
