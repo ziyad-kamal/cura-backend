@@ -20,8 +20,8 @@ const seedConsultations = async (
             consultations.push({
                 price: faker.number.int({ min: 300, max: 1000 }),
                 status: faker.helpers.arrayElement(["pending", "started", "in progress", "completed"]),
-                userId: faker.helpers.arrayElement(userIds),
-                doctorId: faker.helpers.arrayElement(userIds),
+                user: faker.helpers.arrayElement(userIds),
+                doctor: faker.helpers.arrayElement(userIds),
                 createdAt: randomDate,
             });
         }

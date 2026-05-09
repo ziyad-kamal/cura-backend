@@ -1,7 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { ProductInterface } from '../../interfaces/models/ProductInterface.js';
-import "./Comment.ts";
-import "./User.ts";
+import { ProductInterface } from "../../interfaces/models/ProductInterface.js";
+import "./Comment.js";
+import "./User.js";
 
 const productSchema = new Schema<ProductInterface>(
     {
@@ -35,11 +35,11 @@ const productSchema = new Schema<ProductInterface>(
             type: Boolean,
             default: false,
         },
-        adminId: {
+        admin: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         },
-        companyId: {
+        company: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Company",
         },

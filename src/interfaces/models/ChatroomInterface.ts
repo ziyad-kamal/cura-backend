@@ -3,8 +3,8 @@ import mongoose, { Types } from "mongoose";
 export interface ChatroomInterface {
     _id?: Types.ObjectId;
     isActive: boolean;
-    senderId: mongoose.Types.ObjectId;
-    receiverId: mongoose.Types.ObjectId;
-    consultationId: mongoose.Types.ObjectId;
+    sender: mongoose.Types.ObjectId;
+    receiver: mongoose.Types.ObjectId;
+    consultation: mongoose.Types.ObjectId;
     createdAt: Date;
 }

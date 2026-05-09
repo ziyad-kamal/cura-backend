@@ -17,8 +17,8 @@ const seedCarts = async (
         for (let i = 0; i < count; i++) {
             transactions.push({
                 bankTransactionId: faker.string.uuid,
-                consultationId: faker.helpers.arrayElement(consultationIds),
-                orderId: faker.helpers.arrayElement(orderIds),
+                consultation: faker.helpers.arrayElement(consultationIds),
+                order: faker.helpers.arrayElement(orderIds),
             });
         }
 

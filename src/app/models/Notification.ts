@@ -16,17 +16,17 @@ const notificationSchema = new Schema<NotificationInterface>(
             type: Boolean,
             default: false,
         },
-        postId: {
+        post: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Post",
         },
-        receiverId: {
+        receiver: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
             index: true,
         },
-        senderId: {
+        sender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         },

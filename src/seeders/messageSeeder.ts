@@ -24,8 +24,8 @@ const seedMessages = async (count: number = 30, adminIds: Array<Types.ObjectId> 
                     { url: image, type: "image" },
                     { url: image, type: "image" },
                 ],
-                receiverId: faker.helpers.arrayElement(adminIds),
-                senderId: faker.helpers.arrayElement(adminIds),
+                receiver: faker.helpers.arrayElement(adminIds),
+                sender: faker.helpers.arrayElement(adminIds),
                 createdAt: randomDate,
             });
         }

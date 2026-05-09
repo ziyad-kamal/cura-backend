@@ -1,13 +1,13 @@
 import mongoose, { Model, Schema } from "mongoose";
-import "./Comment.ts";
-import "./User.ts";
+import "./Comment.js";
+import "./User.js";
 import { productSchema } from './Product.js';
 import { CartInterface } from '../../interfaces/models/CartInterface.js';
 
 const cartSchema = new Schema<CartInterface>(
     {
         products: [productSchema],
-        userId: {
+        user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,

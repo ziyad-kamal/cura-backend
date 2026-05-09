@@ -8,12 +8,12 @@ const connectionSchema = new Schema<ConnectionInterface>(
             enum: ["pending", "ignored", "accepted"],
             default: "pending",
         },
-        senderId: {
+        sender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        receiverId: {
+        receiver: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,

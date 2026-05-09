@@ -23,8 +23,8 @@ const seedReposts = async (
             for (let i = 0; i < countPerPost; i++) {
                 reposts.push({
                     content: faker.lorem.paragraphs({ min: 2, max: 5 }),
-                    userId: faker.helpers.arrayElement(userIds),
-                    postId,
+                    user: faker.helpers.arrayElement(userIds),
+                    post:postId,
                 });
             }
         }

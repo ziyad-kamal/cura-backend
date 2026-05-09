@@ -1,7 +1,9 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { PostInterface } from '../../interfaces/models/PostInterface.js';
-import "../models/Comment.ts";
-import "../models/User.ts";
+import "../models/Comment.js";
+import "../models/User.js";
+import "../models/Like.js";
+import "../models/Repost.js";
 
 const postSchema = new Schema<PostInterface>(
     {
@@ -28,15 +30,16 @@ const postSchema = new Schema<PostInterface>(
             enum: ["public", "private"],
             default: "public",
         },
-        userId: {
+        user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         },
-        adminId: {
+        admin: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Admin",
         },
     },
+    
     {
         timestamps: true,
         versionKey: false,
@@ -54,6 +57,20 @@ postSchema.virtual("comments", {
 
 postSchema.virtual("commentsCount", {
     ref: "Comment",
+    localField: "_id",
+    foreignField: "post",
+    count: true,
+});
+
+postSchema.virtual("likesCount", {
+    ref: "Like",
+    localField: "_id",
+    foreignField: "post",
+    count: true,
+});
+
+postSchema.virtual("repostsCount", {
+    ref: "Repost",
     localField: "_id",
     foreignField: "post",
     count: true,

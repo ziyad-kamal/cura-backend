@@ -62,18 +62,18 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
     };
 };
 
-export const seedUsers = async (count: number = 20): Promise<Partial<UserInterface>[]> => {
+export const seedUsers = async (count: number = 30): Promise<UserInterface[]> => {
     try {
         await User.deleteMany({});
         console.log("🗑️  Cleared existing users");
 
         const users: Partial<UserInterface>[] = [];
 
-        for (let i = 0; i < Math.floor(count * 0.7); i++) {
+        for (let i = 0; i < count; i++) {
             users.push(generateFakeUser(UserRoles.USER));
         }
 
-        for (let i = 0; i < Math.floor(count * 0.3); i++) {
+        for (let i = 0; i < 10; i++) {
             users.push(generateFakeUser(UserRoles.DOCTOR));
         }
 
@@ -102,10 +102,10 @@ export const seedUsers = async (count: number = 20): Promise<Partial<UserInterfa
         });
 
         const createdUsers = await User.insertMany(users);
-
+    
         console.log(`✅ Successfully seeded ${createdUsers.length} users!`);
 
-        return createdUsers;
+        return createdUsers as UserInterface[];
     } catch (err: unknown) {
         console.error("Posts seeding failed:", err instanceof Error ? err.message : String(err));
         throw err;

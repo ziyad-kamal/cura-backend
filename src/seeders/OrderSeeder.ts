@@ -21,7 +21,7 @@ const seedOrders = async (
             const selectedProducts = faker.helpers.arrayElements(products, { min: 2, max: 3 });
 
             const orderItems = selectedProducts.map((product) => ({
-                productId: product._id,
+                product: product._id,
                 amount: faker.number.int({ min: 1, max: 3 }),
             }));
 
@@ -30,7 +30,7 @@ const seedOrders = async (
                 city: faker.location.city(),
                 street: faker.location.street(),
                 status: faker.helpers.arrayElement(["pending", "shipped", "in transit", "delivered", "cancelled"]),
-                userId: faker.helpers.arrayElement(userIds),
+                user: faker.helpers.arrayElement(userIds),
                 products: orderItems,
                 createdAt: randomDate,
             });

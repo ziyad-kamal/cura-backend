@@ -1,6 +1,6 @@
 import mongoose, { Model, Schema } from "mongoose";
-import "./Comment.ts";
-import "./User.ts";
+import "./Comment.js";
+import "./User.js";
 import { ChatroomInterface } from '../../interfaces/models/ChatroomInterface.js';
 
 const chatroomSchema = new Schema<ChatroomInterface>(
@@ -9,17 +9,17 @@ const chatroomSchema = new Schema<ChatroomInterface>(
             type: Boolean,
             default: true,
         },
-        senderId: {
+        sender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        receiverId: {
+        receiver: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        consultationId: {
+        consultation: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Consultation",
         },

@@ -1,7 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { ConsultationInterface } from '../../interfaces/models/ConsultationInterface.js';
-import "./Comment.ts";
-import "./User.ts";
+import "./Comment.js";
+import "./User.js";
 
 const consultationSchema = new Schema<ConsultationInterface>(
     {
@@ -20,12 +20,12 @@ const consultationSchema = new Schema<ConsultationInterface>(
             enum: ["pending", "started", "in progress", "completed"],
             default: "pending",
         },
-        userId: {
+        user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        doctorId: {
+        doctor: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,

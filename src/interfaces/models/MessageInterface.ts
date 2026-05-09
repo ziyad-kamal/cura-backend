@@ -4,7 +4,7 @@ export interface MessageInterface {
     _id?: Types.ObjectId;
     content: string;
     files: { url: string; type: string }[];
-    senderId: mongoose.Types.ObjectId;
-    receiverId: mongoose.Types.ObjectId;
+    sender: mongoose.Types.ObjectId;
+    receiver: mongoose.Types.ObjectId;
     createdAt: Date;
 }

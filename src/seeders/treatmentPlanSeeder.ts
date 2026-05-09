@@ -23,8 +23,8 @@ const seedTreatmentPlans = async (
                 diagnosis: faker.lorem.word(8),
                 medications: "Paracetamol and Augmentin",
                 procedures: "Stomach removal surgery and stomach wash surgery and liposuction",
-                userId: faker.helpers.arrayElement(adminIds),
-                doctorId: faker.helpers.arrayElement(doctorsIds),
+                user: faker.helpers.arrayElement(adminIds),
+                doctor: faker.helpers.arrayElement(doctorsIds),
                 tags: faker.helpers.arrayElements(["Increases Weight", " Decreases Weight", " Boosts Immunity"], {
                     min: 1,
                     max: 3,

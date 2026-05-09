@@ -4,6 +4,6 @@ export interface CompanyInterface {
     _id?: Types.ObjectId;
     name: string;
     image?: string;
-    adminId: mongoose.Types.ObjectId;
+    admin: mongoose.Types.ObjectId;
     createdAt?: Date;
 }

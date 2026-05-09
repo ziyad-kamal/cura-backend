@@ -27,8 +27,8 @@ const seedProducts = async (
                 description: faker.lorem.paragraph({ min: 2, max: 5 }),
                 name: faker.lorem.word(8),
                 images: [image, image],
-                adminId: faker.helpers.arrayElement(adminIds),
-                companyId: faker.helpers.arrayElement(companiesIds),
+                admin: faker.helpers.arrayElement(adminIds),
+                company: faker.helpers.arrayElement(companiesIds),
                 tags: faker.helpers.arrayElements([" Increases Weight", " Decreases Weight", "Boosts Immunity"], {
                     min: 1,
                     max: 3,

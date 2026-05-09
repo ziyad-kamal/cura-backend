@@ -1,7 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { TreatmentPlanInterface } from '../../interfaces/models/TreatmentPlanInterface.js';
-import "./Comment.ts";
-import "./User.ts";
+import { TreatmentPlanInterface } from "../../interfaces/models/TreatmentPlanInterface.js";
+import "./Comment.js";
+import "./User.js";
 
 const treatmentPlanSchema = new Schema<TreatmentPlanInterface>(
     {
@@ -28,17 +28,17 @@ const treatmentPlanSchema = new Schema<TreatmentPlanInterface>(
         startDate: String,
         endDate: String,
 
-        userId: {
+        user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        doctorId: {
+        doctor: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        consultationId: {
+        consultation: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Consultation",
             required: true,

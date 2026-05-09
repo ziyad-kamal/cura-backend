@@ -18,7 +18,7 @@ const seedCarts = async (
         for (let i = 0; i < count; i++) {
             carts.push({
                 products: faker.helpers.arrayElements(products, { min: 2, max: 4 }),
-                userId: faker.helpers.arrayElement(userIds),
+                user: faker.helpers.arrayElement(userIds),
             });
         }
 

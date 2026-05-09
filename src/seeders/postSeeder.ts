@@ -24,7 +24,7 @@ const seedPosts = async (userIds: Array<Types.ObjectId> = []): Promise<PostInter
             posts.push({
                 visibility: faker.helpers.arrayElement(["public", "private"]),
                 content: faker.lorem.paragraphs({ min: 2, max: 5 }),
-                userId: userId,
+                user: userId,
                 files: [
                     { url: image, type: "image" },
                     { url: image, type: "image" },

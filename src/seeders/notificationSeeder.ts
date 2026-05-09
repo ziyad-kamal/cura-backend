@@ -21,18 +21,20 @@ const seedNotifications = async (
             const isPostType = type === "like" || type === "comment";
 
             notifications.push({
-                message: faker.lorem.paragraph({ min: 1, max: 1}),
+                message: faker.lorem.paragraph({ min: 1, max: 1 }),
                 ...(isPostType && { postId: faker.helpers.arrayElement(postIds) }),
-                receiverId: faker.helpers.arrayElement(usersIds),
-                senderId: faker.helpers.arrayElement(usersIds),
+                receiver: faker.helpers.arrayElement(usersIds),
+                sender: faker.helpers.arrayElement(usersIds),
                 createdAt: randomDate,
+                isRead: faker.datatype.boolean({ probability: 0.7 }),
+                type,
             });
         }
 
         const createdNotifications = await Notification.insertMany(notifications);
         console.log(`✅ Created ${createdNotifications.length} notifications`);
 
-        return createdNotifications;
+        return createdNotifications as unknown as NotificationInterface[];
     } catch (err: unknown) {
         console.error("Posts seeding failed:", err instanceof Error ? err.message : String(err));
         throw err;
