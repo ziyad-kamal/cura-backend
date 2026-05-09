@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { SignupRequestInterface } from "../../../interfaces/requests/SignupRequestInterface.ts";
-import NotFoundError from "../../errors/NotFoundError.ts";
-import { loginRepo, signupRepo } from "../../repositories/users/authRepository.ts";
-import User from "../../models/User.ts";
+import { SignupRequestInterface } from '../../../interfaces/requests/SignupRequestInterface.js';
+import NotFoundError from '../../errors/NotFoundError.js';
+import { loginRepo, signupRepo } from '../../repositories/users/authRepository.js';
+import User from '../../models/User.js';
 import bcrypt from "bcryptjs";
-import { ResetPasswordRequestInterface } from "../../../interfaces/requests/ResetPasswordRequestInterface.ts";
-import { ForgetPasswordRequestInterface } from "../../../interfaces/requests/ForgetPasswordRequestInterface copy.ts";
-import {redis} from "../../../config/redis.ts";
-import { sendToken,verifyToken ,findRecord} from "../../utils/index.ts";
+import { ResetPasswordRequestInterface } from '../../../interfaces/requests/ResetPasswordRequestInterface.js';
+import { ForgetPasswordRequestInterface } from '../../../interfaces/requests/ForgetPasswordRequestInterface copy.js';
+import {redis} from '../../../config/redis.js';
+import { sendToken,verifyToken ,findRecord} from '../../utils/index.js';
 
 export const loginService = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;

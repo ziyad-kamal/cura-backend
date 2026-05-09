@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import Connection from "../app/models/Connection.ts";
-import { ConnectionInterface } from "../interfaces/models/ConnectionInterface.ts";
+import Connection from '../app/models/Connection.js';
+import { ConnectionInterface } from '../interfaces/models/ConnectionInterface.js';
 
 const seedConnections = async (
     count: number = 30,

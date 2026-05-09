@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { RepostInterface } from "../../interfaces/models/RepostInterface.ts";
+import { RepostInterface } from '../../interfaces/models/RepostInterface.js';
 import "./Comment.ts";
 import "./User.ts";
 

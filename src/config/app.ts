@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { AppInterface } from "../interfaces/config/AppInterface.ts";
+import { AppInterface } from '../interfaces/config/AppInterface.js';
 
 export const appConfig: AppInterface = {
     port: process.env.PORT || 3000,

@@ -1,5 +1,5 @@
 import jwt  from "jsonwebtoken";
-import { jwtConfig } from "../../config/jwt.ts";
+import { jwtConfig } from '../../config/jwt.js';
 import { Response } from "express";
 
 export const sendToken = (userData:object,res:Response):void => {

@@ -1,4 +1,4 @@
-import { FileInterface } from "../interfaces/config/FileInterface.ts";
+import { FileInterface } from '../interfaces/config/FileInterface.js';
 
 export const fileConfig: FileInterface = {
     maxImageSize: 5 * 1024 * 1024, // 5 mg

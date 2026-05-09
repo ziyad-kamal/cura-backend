@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import Admin from "../app/models/Admin.ts";
+import Admin from '../app/models/Admin.js';
 
 const seedAdmins = async (
     count: number = 30,

@@ -1,5 +1,5 @@
 import mongoose, { Types } from "mongoose";
-import { OrderItemInterface } from "./OrderItemInterface.ts";
+import { OrderItemInterface } from './OrderItemInterface.js';
 
 export interface OrderInterface {
     _id?: Types.ObjectId;

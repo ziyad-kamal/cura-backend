@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import mongoose, { Schema } from "mongoose";
-import { AdminInterface } from "../../interfaces/models/AdminInterface.ts";
+import { AdminInterface } from '../../interfaces/models/AdminInterface.js';
 
 const adminSchema = new Schema<AdminInterface>(
     {

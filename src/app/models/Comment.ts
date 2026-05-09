@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { CommentInterface } from "../../interfaces/models/CommentInterface.ts";
+import { CommentInterface } from '../../interfaces/models/CommentInterface.js';
 
 const commentSchema = new Schema<CommentInterface>(
     {

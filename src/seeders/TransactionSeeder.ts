@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import Cart from "../app/models/Cart.ts";
+import Cart from '../app/models/Cart.js';
 import { Types } from "mongoose";
 
 const seedCarts = async (

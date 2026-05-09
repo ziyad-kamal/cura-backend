@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { UserRoles } from "../../enums/UserRoles.ts";
+import { UserRoles } from '../../enums/UserRoles.js';
 
 export interface UserInterface {
     _id?: Types.ObjectId;

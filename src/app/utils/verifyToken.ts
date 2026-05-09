@@ -1,6 +1,6 @@
-import {redis} from "../../config/redis.ts";
-import CustomError from "../errors/CustomError.ts";
-import UnknownError from "../errors/UnknownError.ts";
+import {redis} from '../../config/redis.js';
+import CustomError from '../errors/CustomError.js';
+import UnknownError from '../errors/UnknownError.js';
 
 export const verifyToken = async (email:string,token:string,name:string):Promise<void> => {
     const cachedToken = await redis.get(`${name+email}`);

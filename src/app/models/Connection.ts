@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { ConnectionInterface } from "../../interfaces/models/ConnectionInterface.ts";
+import { ConnectionInterface } from '../../interfaces/models/ConnectionInterface.js';
 
 const connectionSchema = new Schema<ConnectionInterface>(
     {

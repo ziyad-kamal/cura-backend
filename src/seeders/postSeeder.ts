@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import Post from "../app/models/Post.ts";
-import { PostInterface } from "../interfaces/models/PostInterface.ts";
+import Post from '../app/models/Post.js';
+import { PostInterface } from '../interfaces/models/PostInterface.js';
 
 const seedPosts = async (userIds: Array<Types.ObjectId> = []): Promise<PostInterface[]> => {
     try {

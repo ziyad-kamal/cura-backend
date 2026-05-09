@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { Job, Worker } from "bullmq";
 import nodemailer from "nodemailer";
-import { redis } from "../../config/redis.ts";
-import { EmailOptionsInterface } from "../../interfaces/config/EmailOptionsInterface.ts";
+import { redis } from '../../config/redis.js';
+import { EmailOptionsInterface } from '../../interfaces/config/EmailOptionsInterface.js';
 import fs from "fs";
 import path from "path";
 import Handlebars from "handlebars";

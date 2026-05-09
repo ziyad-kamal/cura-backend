@@ -1,6 +1,6 @@
 import { Queue } from "bullmq";
-import { redis } from "../../config/redis.ts";
-import { EmailOptionsInterface } from "../../interfaces/config/EmailOptionsInterface.ts";
+import { redis } from '../../config/redis.js';
+import { EmailOptionsInterface } from '../../interfaces/config/EmailOptionsInterface.js';
 
 export const emailQueue = new Queue<EmailOptionsInterface>("email", {
     connection: redis,

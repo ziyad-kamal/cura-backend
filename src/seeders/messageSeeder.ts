@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import Message from "../app/models/Message.ts";
+import Message from '../app/models/Message.js';
 import { Types } from "mongoose";
-import { MessageInterface } from "../interfaces/models/MessageInterface.ts";
+import { MessageInterface } from '../interfaces/models/MessageInterface.js';
 
 const seedMessages = async (count: number = 30, adminIds: Array<Types.ObjectId> = []): Promise<MessageInterface[]> => {
     try {

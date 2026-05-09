@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import Like from "../app/models/Like.ts";
-import { LikeInterface } from "../interfaces/models/LikeInterface.ts";
+import Like from '../app/models/Like.js';
+import { LikeInterface } from '../interfaces/models/LikeInterface.js';
 
 const seedLikes = async (
     countPerComment: number = 8,

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { PostRequestInterface } from "../../interfaces/requests/PostRequestInterface.ts";
-import NotFoundError from "../errors/NotFoundError.ts";
-import Post from "../models/Post.ts";
-import { getPostsService } from "../services/postService.ts";
-import { asyncHandler, returnSuccess } from "../utils/index.ts";
+import { PostRequestInterface } from '../../interfaces/requests/PostRequestInterface.js';
+import NotFoundError from '../errors/NotFoundError.js';
+import Post from '../models/Post.js';
+import { getPostsService } from '../services/postService.js';
+import { asyncHandler, returnSuccess } from '../utils/index.js';
 
 const getPosts = async (req: Request, res: Response): Promise<Response> => {
     const data = await getPostsService(req);

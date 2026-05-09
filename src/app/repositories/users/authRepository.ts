@@ -1,7 +1,7 @@
-import { UserRoles } from "../../../enums/UserRoles.ts";
-import { UserInterface } from "../../../interfaces/models/UserInterface.ts";
-import RecordExistError from "../../errors/RecordExistError.ts";
-import User from "../../models/User.ts";
+import { UserRoles } from '../../../enums/UserRoles.js';
+import { UserInterface } from '../../../interfaces/models/UserInterface.js';
+import RecordExistError from '../../errors/RecordExistError.js';
+import User from '../../models/User.js';
 
 export const loginRepo = (email: string): Promise<UserInterface | null> => {
     return User.findOne({

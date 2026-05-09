@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import TreatmentPlan from "../app/models/TreatmentPlan.ts";
-import { TreatmentPlanInterface } from "../interfaces/models/TreatmentPlanInterface.ts";
+import TreatmentPlan from '../app/models/TreatmentPlan.js';
+import { TreatmentPlanInterface } from '../interfaces/models/TreatmentPlanInterface.js';
 
 const seedTreatmentPlans = async (
     count: number = 30,

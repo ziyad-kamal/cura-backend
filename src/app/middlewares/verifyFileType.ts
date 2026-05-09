@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { fileTypeFromBuffer } from "file-type";
-import { FileTypeRequestInterface } from "../../interfaces/requests/FileTypeRequestInterface.ts";
-import { returnError } from "../utils/returnJson.ts";
+import { FileTypeRequestInterface } from '../../interfaces/requests/FileTypeRequestInterface.js';
+import { returnError } from '../utils/returnJson.js';
 
 export const verifyFileType = async (
     req: FileTypeRequestInterface,

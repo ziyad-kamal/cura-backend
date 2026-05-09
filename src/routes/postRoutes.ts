@@ -1,8 +1,8 @@
 import express, { Router } from "express";
-import { getPosts, showPost, storePosts } from "../app/controllers/postController.ts";
-import { jwtVerify, uploadImage, verifyFileType } from "../app/middlewares/index.ts";
-import { validateObjectId } from "../app/middlewares/validateObjectId.ts";
-import { postValidator } from "../app/validators/postValidator.ts";
+import { getPosts, showPost, storePosts } from '../app/controllers/postController.js';
+import { jwtVerify, uploadImage, verifyFileType } from '../app/middlewares/index.js';
+import { validateObjectId } from '../app/middlewares/validateObjectId.js';
+import { postValidator } from '../app/validators/postValidator.js';
 
 const protectedRouter: Router = express.Router();
 

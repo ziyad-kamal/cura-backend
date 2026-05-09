@@ -1,14 +1,14 @@
 import cookieParser from "cookie-parser";
 import express from "express";
-import { attachHelpers } from "./app/middlewares/helpers.ts";
-import { globalLimiter } from "./app/middlewares/rateLimiter.ts";
-import { appConfig, connectDB } from "./config/index.ts";
-import { httpLogger } from "./config/logger.ts";
-import postRoutes from "./routes/postRoutes.ts";
-import errorHandler from "./app/errors/errorHandler.ts";
-import authRouter from "./routes/users/authRoutes.ts";
-import { connectRedis } from "./config/redis.ts";
-import { applyCors } from "./config/cors.ts";
+import { attachHelpers } from './app/middlewares/helpers.js';
+import { globalLimiter } from './app/middlewares/rateLimiter.js';
+import { appConfig, connectDB } from './config/index.js';
+import { httpLogger } from './config/logger.js';
+import postRoutes from './routes/postRoutes.js';
+import errorHandler from './app/errors/errorHandler.js';
+import authRouter from './routes/users/authRoutes.js';
+import { connectRedis } from './config/redis.js';
+import { applyCors } from './config/cors.js';
 
 connectDB();
 

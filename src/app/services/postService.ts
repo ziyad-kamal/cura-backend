@@ -1,8 +1,8 @@
 import { Request } from "express";
-import { PostInterface } from "../../interfaces/models/PostInterface.ts";
-import { PaginationType } from "../../types/PaginationType.ts";
-import { getPostsRepo } from "../repositories/postRepository.ts";
-import { getNextCursor, getQueryCursor } from "../utils/cursorPagination.ts";
+import { PostInterface } from '../../interfaces/models/PostInterface.js';
+import { PaginationType } from '../../types/PaginationType.js';
+import { getPostsRepo } from '../repositories/postRepository.js';
+import { getNextCursor, getQueryCursor } from '../utils/cursorPagination.js';
 
 const getPostsService = async (req: Request): Promise<PaginationType<PostInterface, "posts">> => {
     const limit = 10;

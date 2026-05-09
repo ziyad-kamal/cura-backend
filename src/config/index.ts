@@ -1,3 +1,3 @@
-export { appConfig } from "./app.ts";
-export { default as connectDB } from "./database.ts";
-export { connectRedis, redis } from "./redis.ts";
+export { appConfig } from './app.js';
+export { default as connectDB } from './database.js';
+export { connectRedis, redis } from './redis.js';

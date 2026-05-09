@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import multer from "multer";
-import { fileConfig } from "../../config/file.ts";
-import { ErrorInterface } from "../../interfaces/errors/ErrorInterface.ts";
-import { returnError } from "../utils/returnJson.ts";
-import NotFoundError from "./NotFoundError.ts";
-import RecordExistError from "./RecordExistError.ts";
-import UnknownError from "./UnknownError.ts";
-import CustomError from "./CustomError.ts";
+import { fileConfig } from '../../config/file.js';
+import { ErrorInterface } from '../../interfaces/errors/ErrorInterface.js';
+import { returnError } from '../utils/returnJson.js';
+import NotFoundError from './NotFoundError.js';
+import RecordExistError from './RecordExistError.js';
+import UnknownError from './UnknownError.js';
+import CustomError from './CustomError.js';
 
 const errorHandler = (err: ErrorInterface, req: Request, res: Response, next: NextFunction): Response | void => {
     let statusCode = err.statusCode || 500;

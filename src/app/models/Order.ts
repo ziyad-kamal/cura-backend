@@ -1,6 +1,6 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { OrderInterface } from "../../interfaces/models/OrderInterface.ts";
-import { OrderItemInterface } from "../../interfaces/models/OrderItemInterface.ts";
+import { OrderInterface } from '../../interfaces/models/OrderInterface.js';
+import { OrderItemInterface } from '../../interfaces/models/OrderItemInterface.js';
 import "./Comment.ts";
 import "./User.ts";
 

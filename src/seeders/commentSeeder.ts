@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import Comment from "../app/models/Comment.ts";
+import Comment from '../app/models/Comment.js';
 
 const seedComments = async (
     countPerPost: number = 8,

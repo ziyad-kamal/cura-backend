@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { ConsultationInterface } from "../../interfaces/models/ConsultationInterface.ts";
+import { ConsultationInterface } from '../../interfaces/models/ConsultationInterface.js';
 import "./Comment.ts";
 import "./User.ts";
 

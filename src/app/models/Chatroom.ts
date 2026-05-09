@@ -1,7 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
 import "./Comment.ts";
 import "./User.ts";
-import { ChatroomInterface } from "../../interfaces/models/ChatroomInterface.ts";
+import { ChatroomInterface } from '../../interfaces/models/ChatroomInterface.js';
 
 const chatroomSchema = new Schema<ChatroomInterface>(
     {

@@ -1,4 +1,4 @@
-import Post from "../models/Post.ts";
+import Post from '../models/Post.js';
 
 const getPostsRepo = (
     query: {

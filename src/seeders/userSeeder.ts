@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import User from "../app/models/User.ts";
-import { UserRoles } from "../enums/UserRoles.ts";
-import { UserInterface } from "../interfaces/models/UserInterface.ts";
+import User from '../app/models/User.js';
+import { UserRoles } from '../enums/UserRoles.js';
+import { UserInterface } from '../interfaces/models/UserInterface.js';
 
 const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterface> => {
     const firstName = faker.person.firstName();
