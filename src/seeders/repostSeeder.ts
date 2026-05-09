@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import Repost from "../app/models/Repost.ts";
-import { RepostInterface } from "../interfaces/models/RepostInterface.ts";
+import Repost from '../app/models/Repost.js';
+import { RepostInterface } from '../interfaces/models/RepostInterface.js';
 
 const seedReposts = async (
     countPerPost: number = 8,

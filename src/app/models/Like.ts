@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { LikeInterface } from "../../interfaces/models/LikeInterface.ts";
+import { LikeInterface } from '../../interfaces/models/LikeInterface.js';
 import "./Comment.ts";
 import "./User.ts";
 

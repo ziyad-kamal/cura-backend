@@ -1,6 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { body, ValidationChain, validationResult } from "express-validator";
-import { returnError } from "../utils/returnJson.ts";
+import { returnError } from '../utils/returnJson.js';
 
 export const loginValidator: (ValidationChain | RequestHandler)[] = [
     body("email")

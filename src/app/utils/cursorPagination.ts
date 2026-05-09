@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { CursorResult, QueryResult, queryType } from "../../interfaces/utils/CursorPaginationInterface.ts";
+import { CursorResult, QueryResult, queryType } from '../../interfaces/utils/CursorPaginationInterface.js';
 
 const getQueryCursor = <T>(req: Request, sortField: string & keyof T): QueryResult<T> => {
     const cursor = req.query.cursor as string | null;

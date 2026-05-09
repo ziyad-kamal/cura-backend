@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { connectDB } from "../config/index.ts";
-import { seedUsers } from "./index.ts";
+import { connectDB } from '../config/index.js';
+import { seedUsers } from './index.js';
 
 const seedAll = async () => {
     try {

@@ -1,6 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import {  query, ValidationChain, validationResult } from "express-validator";
-import { returnError } from "../utils/returnJson.ts";
+import { returnError } from '../utils/returnJson.js';
 
 export const verifyEmailValidator: (ValidationChain | RequestHandler)[] = [
     query("token").notEmpty().withMessage("something went wrong"),

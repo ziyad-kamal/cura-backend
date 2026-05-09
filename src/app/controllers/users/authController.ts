@@ -1,18 +1,18 @@
 import { Response } from "express";
-import { LoginRequestInterface } from "../../../interfaces/requests/LoginRequestInterface.ts";
-import { SignupRequestInterface } from "../../../interfaces/requests/SignupRequestInterface.ts";
+import { LoginRequestInterface } from '../../../interfaces/requests/LoginRequestInterface.js';
+import { SignupRequestInterface } from '../../../interfaces/requests/SignupRequestInterface.js';
 import {
     forgetPasswordService,
     loginService,
     resetPasswordService,
     signupService,
     verifyEmailService,
-} from "../../services/users/authService.ts";
-import { asyncHandler } from "../../utils/asyncHandler.ts";
-import { returnSuccess } from "../../utils/returnJson.ts";
-import { ResetPasswordRequestInterface } from "../../../interfaces/requests/ResetPasswordRequestInterface.ts";
-import { ForgetPasswordRequestInterface } from "../../../interfaces/requests/ForgetPasswordRequestInterface copy.ts";
-import { VerifyEmailRequestInterface } from "../../../interfaces/requests/VerifyEmailRequestInterface.ts";
+} from '../../services/users/authService.js';
+import { asyncHandler } from '../../utils/asyncHandler.js';
+import { returnSuccess } from '../../utils/returnJson.js';
+import { ResetPasswordRequestInterface } from '../../../interfaces/requests/ResetPasswordRequestInterface.js';
+import { ForgetPasswordRequestInterface } from '../../../interfaces/requests/ForgetPasswordRequestInterface copy.js';
+import { VerifyEmailRequestInterface } from '../../../interfaces/requests/VerifyEmailRequestInterface.js';
 
 export const login = asyncHandler(async (req: LoginRequestInterface, res: Response): Promise<Response> => {
     await loginService(req, res);

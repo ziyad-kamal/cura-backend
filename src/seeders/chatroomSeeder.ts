@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import Chatroom from "../app/models/Chatroom.ts";
+import Chatroom from '../app/models/Chatroom.js';
 import { Types } from "mongoose";
-import { ChatroomInterface } from "../interfaces/models/ChatroomInterface.ts";
+import { ChatroomInterface } from '../interfaces/models/ChatroomInterface.js';
 
 const seedChatrooms = async (
     count: number = 30,

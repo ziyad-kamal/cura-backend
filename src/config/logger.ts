@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { NextFunction, Request, Response } from "express";
-import { Log } from "../app/models/Log.ts";
+import { Log } from '../app/models/Log.js';
 
 export const httpLogger = (req: Request, res: Response, next: NextFunction) => {
     const start = process.hrtime.bigint();

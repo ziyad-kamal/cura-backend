@@ -1,7 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { body, ValidationChain, validationResult } from "express-validator";
-import { returnError } from "../utils/returnJson.ts";
-import { UserRoles } from "../../enums/UserRoles.ts";
+import { returnError } from '../utils/returnJson.js';
+import { UserRoles } from '../../enums/UserRoles.js';
 
 export const signupValidator: (ValidationChain | RequestHandler)[] = [
     body("firstName")

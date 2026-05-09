@@ -1,7 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
 import "./Comment.ts";
 import "./User.ts";
-import { TransactionInterface } from "../../interfaces/models/TransactionInterface.ts";
+import { TransactionInterface } from '../../interfaces/models/TransactionInterface.js';
 
 const transactionSchema = new Schema<TransactionInterface>(
     {

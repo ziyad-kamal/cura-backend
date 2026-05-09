@@ -4,7 +4,7 @@ import fs from "fs";
 import Handlebars from "handlebars";
 import nodemailer from "nodemailer";
 import path from "path";
-import { EmailOptionsInterface } from "../interfaces/config/EmailOptionsInterface.ts";
+import { EmailOptionsInterface } from '../interfaces/config/EmailOptionsInterface.js';
 
 const transporter = nodemailer.createTransport({
     host: "sandbox.smtp.mailtrap.io",

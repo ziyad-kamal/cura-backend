@@ -1,7 +1,7 @@
-import errorHandler from "../errors/errorHandler.ts";
-import { attachHelpers } from "./helpers.ts";
-import { jwtVerify } from "./jwtVerify.ts";
-import { uploadImage } from "./upload.ts";
-import { verifyFileType } from "./verifyFileType.ts";
+import errorHandler from '../errors/errorHandler.js';
+import { attachHelpers } from './helpers.js';
+import { jwtVerify } from './jwtVerify.js';
+import { uploadImage } from './upload.js';
+import { verifyFileType } from './verifyFileType.js';
 
 export { attachHelpers, errorHandler, jwtVerify, uploadImage, verifyFileType };

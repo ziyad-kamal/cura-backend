@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { RateLimiterRedis } from "rate-limiter-flexible";
-import {redis} from "../../config/redis.ts";
+import {redis} from '../../config/redis.js';
 
 const createLimiter = (points: number, duration: number) => {
     return new RateLimiterRedis({

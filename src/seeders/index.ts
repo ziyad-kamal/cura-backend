@@ -1,5 +1,5 @@
-import seedComments from "./commentSeeder.ts";
-import seedPosts from "./postSeeder.ts";
-import {seedUsers} from "./userSeeder.ts";
+import seedComments from './commentSeeder.js';
+import seedPosts from './postSeeder.js';
+import {seedUsers} from './userSeeder.js';
 
 export { seedComments, seedPosts, seedUsers };

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
-import { jwtConfig } from "../../config/jwt.ts";
-import { returnError } from "../utils/returnJson.ts";
+import { jwtConfig } from '../../config/jwt.js';
+import { returnError } from '../utils/returnJson.js';
 
 export const jwtVerify = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     const accessToken = req.cookies?.accessToken;

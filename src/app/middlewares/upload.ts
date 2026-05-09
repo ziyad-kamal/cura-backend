@@ -1,5 +1,5 @@
 import multer, { Multer } from "multer";
-import { fileConfig } from "../../config/file.ts";
+import { fileConfig } from '../../config/file.js';
 
 const storage = multer.memoryStorage();
 

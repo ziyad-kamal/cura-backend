@@ -9,8 +9,7 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "sourceMap": true,
-        "allowImportingTsExtensions": true,
-        "noEmit": true,
+      
         "resolveJsonModule": true,
         "incremental": true,
     },

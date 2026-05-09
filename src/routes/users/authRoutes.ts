@@ -5,12 +5,12 @@ import {
     resetPassword,
     signup,
     verifyEmail,
-} from "../../app/controllers/users/authController.ts";
-import { forgetPasswordValidator } from "../../app/validators/forgetPasswordValidator.ts";
-import { loginValidator } from "../../app/validators/loginValidator.ts";
-import { resetPasswordValidator } from "../../app/validators/resetPasswordValidator.ts";
-import { signupValidator } from "../../app/validators/signupValidator.ts";
-import { verifyEmailValidator } from "../../app/validators/verifyEmailValidator.ts";
+} from '../../app/controllers/users/authController.js';
+import { forgetPasswordValidator } from '../../app/validators/forgetPasswordValidator.js';
+import { loginValidator } from '../../app/validators/loginValidator.js';
+import { resetPasswordValidator } from '../../app/validators/resetPasswordValidator.js';
+import { signupValidator } from '../../app/validators/signupValidator.js';
+import { verifyEmailValidator } from '../../app/validators/verifyEmailValidator.js';
 
 const authRouter = express.Router();
 

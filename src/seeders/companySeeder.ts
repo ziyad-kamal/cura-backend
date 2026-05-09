@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import Company from "../app/models/Company.ts";
+import Company from '../app/models/Company.js';
 import { Types } from "mongoose";
-import { CompanyInterface } from "../interfaces/models/CompanyInterface.ts";
+import { CompanyInterface } from '../interfaces/models/CompanyInterface.js';
 
 const seedCompanies = async (count: number = 30, adminIds: Array<Types.ObjectId> = []):Promise<CompanyInterface[]> => {
     try {

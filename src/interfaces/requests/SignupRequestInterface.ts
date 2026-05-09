@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { UserRoles } from "../../enums/UserRoles.ts";
+import { UserRoles } from '../../enums/UserRoles.js';
 
 export interface SignupRequestInterface extends Request {
     body: {

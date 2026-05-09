@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { CookieInterface } from "../interfaces/config/CookieInterface.ts";
-import { appConfig } from "./app.ts";
+import { CookieInterface } from '../interfaces/config/CookieInterface.js';
+import { appConfig } from './app.js';
 
 export const cookieConfig = (maxAge: number): CookieInterface => {
     return {

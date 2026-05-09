@@ -1,8 +1,8 @@
 import mongoose, { Model, Schema } from "mongoose";
 import "./Comment.ts";
 import "./User.ts";
-import { productSchema } from "./Product.ts";
-import { CartInterface } from "../../interfaces/models/CartInterface.ts";
+import { productSchema } from './Product.js';
+import { CartInterface } from '../../interfaces/models/CartInterface.js';
 
 const cartSchema = new Schema<CartInterface>(
     {

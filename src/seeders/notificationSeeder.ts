@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import Notification from "../app/models/Notification.ts";
-import { NotificationInterface } from "../interfaces/models/NotificationsInterface.ts";
+import Notification from '../app/models/Notification.js';
+import { NotificationInterface } from '../interfaces/models/NotificationsInterface.js';
 
 const seedNotifications = async (
     count: number = 30,

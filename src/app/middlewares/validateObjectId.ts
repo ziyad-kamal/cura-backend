@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Types } from "mongoose";
-import { returnError } from "../utils/returnJson.ts";
+import { returnError } from '../utils/returnJson.js';
 
 export const validateObjectId = (req: Request, res: Response, next: NextFunction) => {
     for (const param in req.params) {

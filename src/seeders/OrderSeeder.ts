@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import Order from "../app/models/Order.ts";
-import { OrderInterface } from "../interfaces/models/OrderInterface.ts";
-import { ProductInterface } from "../interfaces/models/ProductInterface.ts";
+import Order from '../app/models/Order.js';
+import { OrderInterface } from '../interfaces/models/OrderInterface.js';
+import { ProductInterface } from '../interfaces/models/ProductInterface.js';
 
 const seedOrders = async (
     count: number = 30,
