@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import User from "../app/models/User.ts";
+import { UserRoles } from "../enums/UserRoles.ts";
 import { UserInterface } from "../interfaces/models/UserInterface.ts";
 
-const generateFakeUser = (role: "user" | "doctor" = "user"): Partial<UserInterface> => {
+const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterface> => {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const isDoctor = role === "doctor";
@@ -69,11 +70,11 @@ export const seedUsers = async (count: number = 20): Promise<Partial<UserInterfa
         const users: Partial<UserInterface>[] = [];
 
         for (let i = 0; i < Math.floor(count * 0.7); i++) {
-            users.push(generateFakeUser("user"));
+            users.push(generateFakeUser(UserRoles.USER));
         }
 
         for (let i = 0; i < Math.floor(count * 0.3); i++) {
-            users.push(generateFakeUser("doctor"));
+            users.push(generateFakeUser(UserRoles.DOCTOR));
         }
 
         await User.create({
@@ -85,7 +86,7 @@ export const seedUsers = async (count: number = 20): Promise<Partial<UserInterfa
                 email: "user@gmail.com",
             },
             password: "12121212",
-            role: "user",
+            role: UserRoles.USER,
         });
 
         await User.create({
@@ -97,7 +98,7 @@ export const seedUsers = async (count: number = 20): Promise<Partial<UserInterfa
                 email: "doctor@gmail.com",
             },
             password: "12121212",
-            role: "doctor",
+            role: UserRoles.DOCTOR,
         });
 
         const createdUsers = await User.insertMany(users);
