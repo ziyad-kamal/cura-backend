@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+**/node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Build artifacts
+dist/
+build/
+.npm
+.cache
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+# Git metadata
+.git
+.gitignore
+
+# Docker files (Optional)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment secrets
+.env
+.env.local
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
