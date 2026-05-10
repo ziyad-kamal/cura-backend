@@ -1,8 +1,12 @@
 import express from "express";
-import { get } from "../../app/controllers/users/postController.js";
+import { index, store } from "../../app/controllers/users/postController.js";
+import { jwtVerify } from './../../app/middlewares/jwtVerify.js';
 
 const postRoutes = express.Router();
 
-postRoutes.get("/posts", get);
+postRoutes.use(jwtVerify)
+postRoutes.get("/posts", index);
+postRoutes.post("/post/store", store);
+
 
 export default postRoutes;

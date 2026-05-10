@@ -1,6 +1,9 @@
-import Post from '../../models/Post.js';
+import { Request } from "express";
+import { HydratedDocument } from "mongoose";
+import { PostInterface } from "../../../interfaces/models/PostInterface.js";
+import Post from "../../models/Post.js";
 
-export const getPostsRepo = (
+export const indexPostsRepo = (
     query: {
         [key: string]: unknown;
     },
@@ -28,4 +31,11 @@ export const getPostsRepo = (
         .sort({ createdAt: -1 })
         .limit(limit + 1)
         .lean();
+};
+
+export const storePostRepo = async (req: Request): Promise<HydratedDocument<PostInterface>> => {
+    const { content, files } = req.body;
+    const userId = req.user?._id;
+
+    return Post.create({ user: userId, content, files });
 };

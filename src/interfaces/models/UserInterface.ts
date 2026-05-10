@@ -11,7 +11,7 @@ export interface UserInterface {
 
     contact: {
         email: string;
-        phone?: number;
+        phone?: string;
         address?: {
             city: string;
             street: string;

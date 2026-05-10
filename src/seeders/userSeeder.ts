@@ -20,7 +20,7 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
         },
         contact: {
             email: faker.internet.email({ firstName, lastName }).toLowerCase(),
-            phone: Number(faker.string.numeric(11)),
+            phone: faker.string.numeric(11),
             address: {
                 city: faker.location.city(),
                 street: faker.location.streetAddress(),

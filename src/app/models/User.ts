@@ -32,7 +32,7 @@ const userSchema = new Schema<UserInterface>(
                 trim: true,
             },
             phone: {
-                type: Number,
+                type: String,
                 match: /^\d{11}$/,
                 trim: true,
             },

@@ -4,7 +4,7 @@ import path from "path";
 import sharp from "sharp";
 import { PostRequestInterface } from '../../interfaces/requests/PostRequestInterface.js';
 
-const uploadImage = async (req: PostRequestInterface, dir: string, width: number): Promise<string> => {
+export const uploadFile = async (req: PostRequestInterface, dir: string, width?: number): Promise<string> => {
     const fileName = `${crypto.randomBytes(16).toString("hex")}.webp`;
     const dirName = process.cwd();
 
@@ -13,19 +13,18 @@ const uploadImage = async (req: PostRequestInterface, dir: string, width: number
     const uploadDir = path.join(dirName, dir);
     const fileLocation = path.join(uploadDir, fileName);
 
-    // Ensure upload directory exists
     if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    await sharp(req.file!.buffer)
-        .resize(width, null, { withoutEnlargement: true })
-        .webp({ quality: 85 })
-        .toFile(fileLocation);
-
+    if (width) {
+        await sharp(req.file!.buffer)
+            .resize(width, null, { withoutEnlargement: true })
+            .webp({ quality: 85 })
+            .toFile(fileLocation);
+    }
+    
     const filePath = `${process.env.APP_URL}/${dir.replace(/^public[/\\]?/, "")}/${fileName}`.replace(/\/+/g, "/");
 
     return filePath;
 };
-
-export default uploadImage;

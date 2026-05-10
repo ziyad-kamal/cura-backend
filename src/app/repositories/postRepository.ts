@@ -1,6 +1,6 @@
-import Post from '../models/Post.js';
+import Post from "../models/Post.js";
 
-const getPostsRepo = (
+const indexPostsRepo = (
     query: {
         [key: string]: unknown;
     },
@@ -25,4 +25,4 @@ const getPostsRepo = (
         .lean();
 };
 
-export { getPostsRepo };
+export { indexPostsRepo };
