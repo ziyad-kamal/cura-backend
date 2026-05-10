@@ -15,13 +15,13 @@ import { ForgetPasswordRequestInterface } from '../../../interfaces/requests/For
 import { VerifyEmailRequestInterface } from '../../../interfaces/requests/VerifyEmailRequestInterface.js';
 
 export const login = asyncHandler(async (req: LoginRequestInterface, res: Response): Promise<Response> => {
-    await loginService(req, res);
-    return returnSuccess(res, "Login successful", 200);
+    const user=await loginService(req, res);
+    return returnSuccess(res, "Login successful", 200, {user});
 });
 
 export const signup = asyncHandler(async (req: SignupRequestInterface, res: Response): Promise<Response> => {
-    await signupService(req, res);
-    return returnSuccess(res, "Your account has been created successfully", 200);
+    const user=await signupService(req, res);
+    return returnSuccess(res, "Your account has been created successfully", 200, user);
 });
 
 export const forgetPassword = asyncHandler(

@@ -8,8 +8,9 @@ import { ForgetPasswordRequestInterface } from '../../../interfaces/requests/For
 import {redis} from '../../../config/redis.js';
 import { sendToken,verifyToken ,findRecord} from '../../utils/index.js';
 import { loginRepo, signupRepo } from "../../repositories/users/authRepository.js";
+import { UserInterface } from "../../../interfaces/models/UserInterface.js";
 
-export const loginService = async (req: Request, res: Response): Promise<void> => {
+export const loginService = async (req: Request, res: Response): Promise<UserInterface> => {
     const { email, password } = req.body;
 
     const user = await loginRepo(email);
@@ -21,9 +22,11 @@ export const loginService = async (req: Request, res: Response): Promise<void> =
     const userData = { _id: user._id, email: user.contact.email };
 
     sendToken(userData,res);
+
+    return user;
 };
 
-export const signupService = async (req: SignupRequestInterface, res: Response): Promise<void> => {
+export const signupService = async (req: SignupRequestInterface, res: Response): Promise<UserInterface> => {
     const { firstName, lastName, email, password, role } = req.body;
 
     const user = await signupRepo(firstName, lastName, email, password, role);
@@ -47,6 +50,8 @@ export const signupService = async (req: SignupRequestInterface, res: Response):
     const userData = { _id: user._id, email };
 
     sendToken(userData, res);
+
+    return user;
 };
 
 export const forgetPasswordService = async (req: ForgetPasswordRequestInterface): Promise<void> => {

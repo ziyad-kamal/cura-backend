@@ -1,7 +1,20 @@
 import cors from "cors";
 
+const allowedOrigins = ["http://localhost:5173", "http://localhost:3000", process.env.CLIENT_URL].filter(
+    Boolean,
+) as string[];
+
 export const applyCors = cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+        // allow postman and server-to-server requests (no origin)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error(`CORS blocked: ${origin}`));
+        }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],

@@ -6,6 +6,7 @@ import { postValidator } from '../app/validators/postValidator.js';
 
 const protectedRouter: Router = express.Router();
 
+
 protectedRouter.use("/post", jwtVerify);
 
 protectedRouter.get("/post/show/:postId", validateObjectId, showPost);

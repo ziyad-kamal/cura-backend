@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { PostRequestInterface } from '../../interfaces/requests/PostRequestInterface.js';
-import NotFoundError from '../errors/NotFoundError.js';
-import Post from '../models/Post.js';
-import { getPostsService } from '../services/postService.js';
-import { asyncHandler, returnSuccess } from '../utils/index.js';
+import { PostRequestInterface } from "../../interfaces/requests/PostRequestInterface.js";
+import NotFoundError from "../errors/NotFoundError.js";
+import Post from "../models/Post.js";
+import { indexPostsService } from "../services/postService.js";
+import { asyncHandler, returnSuccess } from "../utils/index.js";
 
 const getPosts = async (req: Request, res: Response): Promise<Response> => {
-    const data = await getPostsService(req);
+    const data = await indexPostsService(req);
 
     return returnSuccess(res, "", 200, data);
 };
