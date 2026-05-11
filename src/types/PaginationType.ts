@@ -1,5 +1,5 @@
 export type PaginationType<T, K extends string = "data"> = {
-    metaData: {
+    metadata: {
         hasMore: boolean;
         nextCursor: string | null;
     };

@@ -1,16 +1,25 @@
-import { Request } from "express";
-import {   uploadFile} from '../../utils/index.js';
+import {Request} from "express";
+import {uploadFile} from '../../utils/index.js';
 
 export const uploadFileService = async (req: Request): Promise<string> => {
-    const {type} = req.body;
-    let file;
-    if (type === 'video') {
-        file =await uploadFile(req,'public/videos')
-    }else if (type === "document") {
-        file = await uploadFile(req, "public/documents");
-    }else{
-        file = await uploadFile(req, "public/images",300);
+    const file = req.file;
+
+    if (!file) {
+        throw new Error("No file uploaded");
     }
 
-    return file;
+    const imageTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    const videoTypes = ["video/mp4", "video/mpeg", "video/quicktime"];
+
+    let uploadedUrl: string;
+
+    if (videoTypes.includes(file.mimetype)) {
+        uploadedUrl = await uploadFile(req, "public/videos");
+    } else if (imageTypes.includes(file.mimetype)) {
+        uploadedUrl = await uploadFile(req, "public/images", 300);
+    } else {
+        uploadedUrl = await uploadFile(req, "public/documents");
+    }
+
+    return uploadedUrl;
 };

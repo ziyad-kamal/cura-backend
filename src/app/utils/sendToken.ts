@@ -11,6 +11,7 @@ export const sendToken = (userData:object,res:Response):void => {
         expiresIn: jwtConfig.refreshExpireTime,
     });
 
-    res.cookieHelper("accessToken", accessToken, 15 * 60 * 1000);
-    res.cookieHelper("refreshToken", refreshToken, 24 * 60 * 60 * 1000);
+    const cookieExpire = 24 * 60 * 60 * 1000;
+    res.cookieHelper("accessToken", accessToken, cookieExpire);
+    res.cookieHelper("refreshToken", refreshToken, cookieExpire);
 };

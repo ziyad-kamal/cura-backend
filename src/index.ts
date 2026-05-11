@@ -8,6 +8,7 @@ import { appConfig, connectDB } from "./config/index.js";
 import { httpLogger } from "./config/logger.js";
 import { connectRedis } from "./config/redis.js";
 import { authRoutes, postRoutes } from "./routes/users/index.js";
+import fileRoutes from "./routes/users/fileRoutes.js";
 
 connectDB();
 
@@ -33,6 +34,7 @@ async function bootstrap() {
     app.use(`${appConfig.apiPrefix}`, authRoutes);
 
     app.use(`${appConfig.apiPrefix}`, postRoutes);
+    app.use(`${appConfig.apiPrefix}`, fileRoutes);
 
     app.use(errorHandler);
 }

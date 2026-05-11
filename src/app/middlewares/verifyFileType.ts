@@ -1,39 +1,45 @@
 import { NextFunction, Response } from "express";
 import { fileTypeFromBuffer } from "file-type";
-import { FileTypeRequestInterface } from '../../interfaces/requests/FileTypeRequestInterface.js';
-import { returnError } from '../utils/returnJson.js';
+import { FileTypeRequestInterface } from "../../interfaces/requests/FileTypeRequestInterface.js";
+import { returnError } from "../utils/returnJson.js";
 
-export const verifyFileType = async (
-    req: FileTypeRequestInterface,
-    res: Response,
-    next: NextFunction,
-): Promise<Response | void> => {
-    if (!req.file) {
-        return returnError(res, "no file uploaded", 400);
-    }
+const allowedTypeMap = {
+    image: ["jpg", "jpeg", "png", "webp"],
+    video: ["mp4", "mpeg", "mov"],
+    document: ["pdf", "doc", "docx"],
+} as const;
 
-    try {
-        const detected = await fileTypeFromBuffer(req.file.buffer);
+type FileCategory = keyof typeof allowedTypeMap;
 
-        if (!detected) {
-            return returnError(res, "Unable to detect file type", 400);
+export const verifyFileType = (allowedCategories: FileCategory[]) => {
+    return async (req: FileTypeRequestInterface, res: Response, next: NextFunction): Promise<Response | void> => {
+        if (!req.file) {
+            return returnError(res, "No file uploaded", 400);
         }
 
-        const allowed = new Set(["jpg", "jpeg", "png", "webp", "gif"]);
+        try {
+            const detected = await fileTypeFromBuffer(req.file.buffer);
 
-        if (!allowed.has(detected.ext)) {
-            return returnError(
-                res,
-                `Invalid file content. Detected: ${detected.mime} (${detected.ext}), allowed: images only`,
-                422,
-            );
+            if (!detected) {
+                return returnError(res, "Unable to detect file type", 400);
+            }
+
+            const allowedExts = allowedCategories.flatMap((cat) => allowedTypeMap[cat]) as string[];
+
+            if (!allowedExts.includes(detected.ext)) {
+                return returnError(
+                    res,
+                    `Invalid file type. Detected: ${detected.mime}, allowed: ${allowedExts.join(", ")}`,
+                    422,
+                );
+            }
+
+            req.realFileType = detected;
+            next();
+        } catch (err) {
+            if (err instanceof Error) {
+                return returnError(res, err.message, 500);
+            }
         }
-
-        req.realFileType = detected;
-
-        next();
-        // eslint-disable-next-line no-unused-vars
-    } catch (err) {
-        return returnError(res, "File processing failed", 500);
-    }
+    };
 };
