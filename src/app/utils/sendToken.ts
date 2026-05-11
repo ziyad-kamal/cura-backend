@@ -2,7 +2,7 @@ import jwt  from "jsonwebtoken";
 import { jwtConfig } from '../../config/jwt.js';
 import { Response } from "express";
 
-export const sendToken = (userData:object,res:Response):void => {
+export const sendToken = (userData:object,res:Response):object => {
     const accessToken = jwt.sign(userData, jwtConfig.accessTokenSecret, {
         expiresIn: jwtConfig.accessExpireTime,
     });
@@ -11,7 +11,8 @@ export const sendToken = (userData:object,res:Response):void => {
         expiresIn: jwtConfig.refreshExpireTime,
     });
 
-    const cookieExpire = 24 * 60 * 60 * 1000;
-    res.cookieHelper("accessToken", accessToken, cookieExpire);
-    res.cookieHelper("refreshToken", refreshToken, cookieExpire);
+    // const cookieExpire = 24 * 60 * 60 * 1000;
+    // res.cookieHelper("accessToken", accessToken, cookieExpire);
+    // res.cookieHelper("refreshToken", refreshToken, cookieExpire);
+    return {refreshToken,accessToken};
 };

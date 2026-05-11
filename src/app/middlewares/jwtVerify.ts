@@ -4,8 +4,11 @@ import { jwtConfig } from '../../config/jwt.js';
 import { returnError } from '../utils/returnJson.js';
 
 export const jwtVerify = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-    const accessToken = req.cookies?.accessToken;
-    const refreshToken = req.cookies?.refreshToken;
+    // const accessToken = req.cookies?.accessToken;
+    // const refreshToken = req.cookies?.refreshToken;
+    const authHeader = req.headers.authorization;
+    const accessToken = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : undefined;
+    const refreshToken = req.headers["x-refresh-token"] as string | undefined;
 
     if (!accessToken && !refreshToken) {
         return returnError(res, "token not found", 401);

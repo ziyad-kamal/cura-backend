@@ -10,7 +10,7 @@ import { sendToken,verifyToken ,findRecord} from '../../utils/index.js';
 import { loginRepo, signupRepo } from "../../repositories/users/authRepository.js";
 import { UserInterface } from "../../../interfaces/models/UserInterface.js";
 
-export const loginService = async (req: Request, res: Response): Promise<UserInterface> => {
+export const loginService = async (req: Request, res: Response): Promise<object> => {
     const { email, password } = req.body;
 
     const user = await loginRepo(email);
@@ -21,9 +21,9 @@ export const loginService = async (req: Request, res: Response): Promise<UserInt
 
     const userData = { _id: user._id, email: user.contact.email };
 
-    sendToken(userData,res);
+    const tokens=sendToken(userData,res);
 
-    return user;
+    return {tokens,user};
 };
 
 export const signupService = async (req: SignupRequestInterface, res: Response): Promise<UserInterface> => {
