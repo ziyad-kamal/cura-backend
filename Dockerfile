@@ -1,17 +1,14 @@
-# back/Dockerfile
-
-FROM node:24.11.1-alpine AS builder
+# Stage 1 — build
+FROM node:24.15.0-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
-COPY tsconfig.json ./
-COPY src ./src
+RUN npm install
+COPY . .
 RUN npm run build
-
-FROM node:24.11.1-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY --from=builder /app/dist ./dist
-EXPOSE 3000
-CMD ["npm", "start"]
+ 
+# Stage 2 — serve with nginx
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
