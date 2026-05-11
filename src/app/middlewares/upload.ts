@@ -12,8 +12,13 @@ const createUploader = (maxBytes: number): Multer =>
         },
     });
 
-const uploadImage = createUploader(fileConfig.maxImageSize);
-const uploadDocument = createUploader(fileConfig.maxDocumentSize);
-const uploadVideo = createUploader(fileConfig.maxVideoSize);
+export const uploadImage = createUploader(fileConfig.maxImageSize);
 
-export { uploadDocument, uploadImage, uploadVideo ,createUploader};
+export const uploadMulter = multer({
+    storage,
+
+    limits: {
+        files: 10,
+        fileSize: fileConfig.maxVideoSize, 
+    },
+});

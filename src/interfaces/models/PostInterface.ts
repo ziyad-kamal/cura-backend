@@ -2,6 +2,7 @@ import mongoose, { Types } from "mongoose";
 
 export interface PostInterface {
     _id?: Types.ObjectId;
+    id?: string;
     content: string;
     files?: { url: string; type: string }[];
     tags: string[];

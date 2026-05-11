@@ -12,7 +12,7 @@ export const indexPostsService = async (req: Request): Promise<PaginationType<Po
 
     const { hasMore, nextCursor, results } = getNextCursor(posts, limit, sortField);
 
-    return { metaData: { hasMore, nextCursor }, posts: results };
+    return { metadata: { hasMore, nextCursor }, posts: results };
 };
 
 export const storePostService = async (req: Request): Promise<PostInterface> => {

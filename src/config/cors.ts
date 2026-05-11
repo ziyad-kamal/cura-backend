@@ -6,7 +6,6 @@ const allowedOrigins = ["http://localhost:5173", "http://localhost:3000", proces
 
 export const applyCors = cors({
     origin: (origin, callback) => {
-        // allow postman and server-to-server requests (no origin)
         if (!origin) return callback(null, true);
 
         if (allowedOrigins.includes(origin)) {

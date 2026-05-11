@@ -13,13 +13,16 @@ const postSchema = new Schema<PostInterface>(
             trim: true,
         },
         files: [
-            {
-                url: String,
-                type: {
-                    type: String,
-                    enum: ["video", "document", "image"],
+            new Schema(
+                {
+                    url: String,
+                    type: {
+                        type: String,
+                        enum: ["video", "document", "image"],
+                    },
                 },
-            },
+                { id: false }, 
+            ),
         ],
         tags: {
             type: [String],
@@ -39,10 +42,11 @@ const postSchema = new Schema<PostInterface>(
             ref: "Admin",
         },
     },
-    
+
     {
         timestamps: true,
         versionKey: false,
+        id:false,
         toJSON: {
             virtuals: true,
         },
