@@ -8,5 +8,7 @@ postRoutes.use(jwtVerify)
 postRoutes.get("/posts", index);
 postRoutes.post("/post/store", store);
 
+// protectedRouter.post("/post/store", [uploadImage.single("image"), verifyFileType, ...postValidator], storePosts);
+
 
 export default postRoutes;
