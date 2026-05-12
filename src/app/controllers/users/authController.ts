@@ -15,8 +15,8 @@ import { ForgetPasswordRequestInterface } from '../../../interfaces/requests/For
 import { VerifyEmailRequestInterface } from '../../../interfaces/requests/VerifyEmailRequestInterface.js';
 
 export const login = asyncHandler(async (req: LoginRequestInterface, res: Response): Promise<Response> => {
-    const data=await loginService(req, res);
-    return returnSuccess(res, "Login successful", 200, {data});
+    const auth=await loginService(req, res);
+    return returnSuccess(res, "Login successful", 200, { auth });
 });
 
 export const signup = asyncHandler(async (req: SignupRequestInterface, res: Response): Promise<Response> => {
