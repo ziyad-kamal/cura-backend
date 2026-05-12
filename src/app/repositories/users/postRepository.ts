@@ -10,7 +10,7 @@ export const indexPostsRepo = (
     limit: number,
 ) => {
     return Post.find(query)
-        .select("author title content filePath createdAt")
+        .select("user content files createdAt")
         .populate({
             path: "comments",
             populate: {
