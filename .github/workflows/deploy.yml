@@ -37,4 +37,5 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
   call-other-repo:
+    needs: build-and-push
     uses: cura-fitness/cura-devops/.github/workflows/deploy.yml@master
