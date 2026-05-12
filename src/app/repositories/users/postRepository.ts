@@ -37,5 +37,5 @@ export const storePostRepo = async (req: Request): Promise<HydratedDocument<Post
     const { content, files } = req.body;
     const userId = req.user?._id;
 
-    return Post.create({ user: userId, content, files });
+    return (await Post.create({ user: userId, content, files })).populate('user');
 };

@@ -20,7 +20,10 @@ export const uploadFile = async (req: PostRequestInterface, dir: string, width?:
     if (width) {
         await sharp(req.file!.buffer)
             .resize(width, null, { withoutEnlargement: true })
-            .webp({ quality: 85 })
+            .webp({
+                quality: 100,
+                effort: 6,
+            })
             .toFile(fileLocation);
     }
 
