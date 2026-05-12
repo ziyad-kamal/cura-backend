@@ -38,4 +38,4 @@ jobs:
 
   call-other-repo:
     needs: build-and-push
-    uses: cura-fitness/cura-devops/.github/workflows/deploy.yml@master
+    uses: cura-fitness/cura-devops/.github/workflows/deploy_dev.yml@master
