@@ -1,14 +1,14 @@
-import { Request, Response } from "express";
-import { SignupRequestInterface } from '../../../interfaces/requests/SignupRequestInterface.js';
-import NotFoundError from '../../errors/NotFoundError.js';
-import User from '../../models/User.js';
 import bcrypt from "bcryptjs";
-import { ResetPasswordRequestInterface } from '../../../interfaces/requests/ResetPasswordRequestInterface.js';
-import { ForgetPasswordRequestInterface } from '../../../interfaces/requests/ForgetPasswordRequestInterface copy.js';
-import {redis} from '../../../config/redis.js';
-import { sendToken,verifyToken ,findRecord} from '../../utils/index.js';
-import { loginRepo, signupRepo } from "../../repositories/users/authRepository.js";
+import { Request, Response } from "express";
+import { redis } from "../../../config/redis.js";
 import { UserInterface } from "../../../interfaces/models/UserInterface.js";
+import { ForgetPasswordRequestInterface } from "../../../interfaces/requests/ForgetPasswordRequestInterface.js";
+import { ResetPasswordRequestInterface } from "../../../interfaces/requests/ResetPasswordRequestInterface.js";
+import { SignupRequestInterface } from "../../../interfaces/requests/SignupRequestInterface.js";
+import NotFoundError from "../../errors/NotFoundError.js";
+import User from "../../models/User.js";
+import { loginRepo, signupRepo } from "../../repositories/users/authRepository.js";
+import { findRecord, sendToken, verifyToken } from "../../utils/index.js";
 
 export const loginService = async (req: Request, res: Response): Promise<object> => {
     const { email, password } = req.body;
@@ -21,9 +21,9 @@ export const loginService = async (req: Request, res: Response): Promise<object>
 
     const userData = { _id: user._id, email: user.contact.email };
 
-    const tokens=sendToken(userData,res);
+    const tokens = sendToken(userData, res);
 
-    return {tokens,user};
+    return { tokens, user };
 };
 
 export const signupService = async (req: SignupRequestInterface, res: Response): Promise<UserInterface> => {
@@ -79,7 +79,7 @@ export const resetPasswordService = async (req: ResetPasswordRequestInterface): 
     const { password } = req.body;
     const user = await findRecord(User, { contact: { email } }, "+password");
 
-    verifyToken(email, token,'resetToken');
+    verifyToken(email, token, "resetToken");
 
     user.password = password;
     await user.save();
@@ -89,7 +89,7 @@ export const verifyEmailService = async (req: ResetPasswordRequestInterface): Pr
     const { email, token } = req.query;
     const user = await findRecord(User, { contact: { email } });
 
-    verifyToken(email, token,'verifyToken');
+    verifyToken(email, token, "verifyToken");
 
     await user.updateOne({ isVerified: true });
 };

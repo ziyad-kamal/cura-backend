@@ -1,26 +1,26 @@
 import { Response } from "express";
-import { LoginRequestInterface } from '../../../interfaces/requests/LoginRequestInterface.js';
-import { SignupRequestInterface } from '../../../interfaces/requests/SignupRequestInterface.js';
+import { ForgetPasswordRequestInterface } from "../../../interfaces/requests/ForgetPasswordRequestInterface.js";
+import { LoginRequestInterface } from "../../../interfaces/requests/LoginRequestInterface.js";
+import { ResetPasswordRequestInterface } from "../../../interfaces/requests/ResetPasswordRequestInterface.js";
+import { SignupRequestInterface } from "../../../interfaces/requests/SignupRequestInterface.js";
+import { VerifyEmailRequestInterface } from "../../../interfaces/requests/VerifyEmailRequestInterface.js";
 import {
     forgetPasswordService,
     loginService,
     resetPasswordService,
     signupService,
     verifyEmailService,
-} from '../../services/users/authService.js';
-import { asyncHandler } from '../../utils/asyncHandler.js';
-import { returnSuccess } from '../../utils/returnJson.js';
-import { ResetPasswordRequestInterface } from '../../../interfaces/requests/ResetPasswordRequestInterface.js';
-import { ForgetPasswordRequestInterface } from '../../../interfaces/requests/ForgetPasswordRequestInterface copy.js';
-import { VerifyEmailRequestInterface } from '../../../interfaces/requests/VerifyEmailRequestInterface.js';
+} from "../../services/users/authService.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import { returnSuccess } from "../../utils/returnJson.js";
 
 export const login = asyncHandler(async (req: LoginRequestInterface, res: Response): Promise<Response> => {
-    const auth=await loginService(req, res);
+    const auth = await loginService(req, res);
     return returnSuccess(res, "Login successful", 200, { auth });
 });
 
 export const signup = asyncHandler(async (req: SignupRequestInterface, res: Response): Promise<Response> => {
-    const user=await signupService(req, res);
+    const user = await signupService(req, res);
     return returnSuccess(res, "Your account has been created successfully", 200, user);
 });
 
@@ -38,9 +38,7 @@ export const resetPassword = asyncHandler(
     },
 );
 
-export const verifyEmail = asyncHandler(
-    async (req: VerifyEmailRequestInterface, res: Response): Promise<Response> => {
-        await verifyEmailService(req);
-        return returnSuccess(res, "you verified your email successfully", 200);
-    },
-);
+export const verifyEmail = asyncHandler(async (req: VerifyEmailRequestInterface, res: Response): Promise<Response> => {
+    await verifyEmailService(req);
+    return returnSuccess(res, "you verified your email successfully", 200);
+});

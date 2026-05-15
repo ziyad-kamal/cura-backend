@@ -9,14 +9,14 @@ const userSchema = new Schema<UserInterface>(
             first: {
                 type: String,
                 required: true,
-                minlength: 3,
+                minlength: 2,
                 maxLength: 30,
                 trim: true,
             },
             last: {
                 type: String,
                 required: true,
-                minlength: 3,
+                minlength: 2,
                 maxLength: 30,
                 trim: true,
             },

@@ -6,6 +6,7 @@ import { seedComments, seedPosts, seedUsers } from "./index.js";
 import seedLikes from "./likeSeeder.js";
 import { CommentInterface } from "../interfaces/models/CommentInterface.js";
 import seedReposts from "./repostSeeder.js";
+import seedConnections from "./ConnectionSeeder.js";
 
 const seedAll = async () => {
     try {
@@ -28,6 +29,7 @@ const seedAll = async () => {
 
         await seedLikes(10, 10, postIds, commentIds, userIds);
         await seedReposts(10, postIds, userIds);
+        await seedConnections(userIds);
 
         console.log("🎉 Database seeding completed successfully!");
         process.exit(0);

@@ -1,42 +1,34 @@
 import { Request, Response } from "express";
-
-import { indexPostsService, storePostService } from "../../services/users/postService.js";
+import { deletePostService, indexPostsService, likePostService, repostService, storePostService, updatePostService } from "../../services/users/postService.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { returnSuccess } from "../../utils/returnJson.js";
 
-export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+export const indexPosts = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const posts = await indexPostsService(req);
     return returnSuccess(res, "", 200, posts);
 });
 
-export const store = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+export const storePost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const post = await storePostService(req);
-    return returnSuccess(res, "", 200, { post });
+    return returnSuccess(res, "you created post successfully", 200, { post });
 });
 
-// const storePosts = asyncHandler(async (req: PostRequestInterface, res: Response) => {
-    // const session = await mongoose.startSession();
-    // const filePath = await uploadImage(req, "public/images", 300);
-    // let post;
-    // await redisClient.set("test", "test", { EX: 2 * 60 * 60 });
-    // await redisClient.get("test");
-    // log.info(req, res, "post is created");
-    // await sendEmail({
-    //     to: "test@example.com",
-    //     subject: "Test Email from Express + TS",
-    //     templateName: "test",
-    //     context: {
-    //         name: "ziyad",
-    //         verificationLink: "link/sdf",
-    //     },
-    // });
-    // await session.withTransaction(async () => {
-    // const { title, content, author } = req.body;
-    // [post] = await Post.create([{ title, content, filePath, author }], { session });
-    // await post.updateOne({ title: "updated" }, { session });
-    // });
-    // await session.endSession();
-    // return returnSuccess(res, "you created post successfully", 201, post);
-// });
+export const updatePost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const post = await updatePostService(req);
+    return returnSuccess(res, "you updated post successfully", 200, { post });
+});
 
-// export { getPosts, showPost, storePosts };
+export const likePost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const isLike = await likePostService(req);
+    return returnSuccess(res, "", 200, { isLike });
+});
+
+export const repost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const isRepost = await repostService(req);
+    return returnSuccess(res, "", 200, { isRepost });
+});
+
+export const deletePost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    await deletePostService(req);
+    return returnSuccess(res, "you deleted post successfully", 200);
+});

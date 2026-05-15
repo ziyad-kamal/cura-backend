@@ -1,11 +1,10 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
-import Connection from '../app/models/Connection.js';
-import { ConnectionInterface } from '../interfaces/models/ConnectionInterface.js';
+import Connection from "../app/models/Connection.js";
+import { ConnectionInterface } from "../interfaces/models/ConnectionInterface.js";
 
 const seedConnections = async (
-    count: number = 30,
     usersIds: Array<Types.ObjectId> = [],
 ): Promise<ConnectionInterface[]> => {
     try {
@@ -14,12 +13,12 @@ const seedConnections = async (
 
         const connections = [];
 
-        for (let i = 0; i < count; i++) {
+        for (let userId of usersIds) {
             const randomDate = faker.date.past({ years: 1 });
 
             connections.push({
                 status: faker.helpers.arrayElement(["pending", "ignored", "accepted"]),
-                receiver: faker.helpers.arrayElement(usersIds),
+                receiver: userId,
                 sender: faker.helpers.arrayElement(usersIds),
                 createdAt: randomDate,
                 updatedAt: randomDate,
