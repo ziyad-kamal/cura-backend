@@ -6,8 +6,22 @@ import Like from "../../models/Like.js";
 import Post from "../../models/Post.js";
 import { findRecord } from "../../utils/findRecord.js";
 import Repost from "../../models/Repost.js";
+import Connection from "../../models/Connection.js";
 
 export const indexPostsRepo = async (query: object, limit: number, authId: string) => {
+    const connections = await Connection.find({
+        status: "accepted",
+        $or: [{ sender: authId }, { receiver: authId }],
+    }).select("sender receiver");
+
+    const userIds = connections.map((connection) => {
+        // if auth user is sender -> return receiver
+        // if auth user is receiver -> return sender
+
+        return connection.sender.toString() === authId ? connection.receiver : connection.sender;
+    });
+    console.log(connections);
+    
     return Post.aggregate([
         { $match: query },
 
@@ -142,7 +156,7 @@ export const storePostRepo = async ({
     tags,
     visibility,
 }: PostDataInterface): Promise<HydratedDocument<PostInterface>> => {
-    return (await Post.create({ user, content, files,tags,visibility })).populate("user");
+    return (await Post.create({ user, content, files, tags, visibility })).populate("user");
 };
 
 export const updatePostRepo = async ({
@@ -164,14 +178,18 @@ export const likePostRepo = async (_id: string, authId: string, type: string): P
     return true;
 };
 
-export const repostRepo = async (_id: string, authId: string, { content, files }: PostDataInterface): Promise<boolean> => {
+export const repostRepo = async (
+    _id: string,
+    authId: string,
+    { content, files }: PostDataInterface,
+): Promise<boolean> => {
     const post = await findRecord(Post, { _id });
     const repost = await Repost.findOne({ post: _id, user: authId });
     if (repost) {
         await Repost.deleteOne({ _id: repost._id });
         return false;
     }
-    await Repost.create({ post: post._id, user: authId ,content, files });
+    await Repost.create({ post: post._id, user: authId, content, files });
     return true;
 };
 

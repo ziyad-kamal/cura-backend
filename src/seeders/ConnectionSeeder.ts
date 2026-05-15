@@ -5,6 +5,7 @@ import Connection from "../app/models/Connection.js";
 import { ConnectionInterface } from "../interfaces/models/ConnectionInterface.js";
 
 const seedConnections = async (
+    connectionCount: number = 20,
     usersIds: Array<Types.ObjectId> = [],
 ): Promise<ConnectionInterface[]> => {
     try {
@@ -12,19 +13,43 @@ const seedConnections = async (
         console.log("🗑️  Cleared existing connections");
 
         const connections = [];
+        const usedPairs = new Set();
 
-        for (let userId of usersIds) {
-            const randomDate = faker.date.past({ years: 1 });
+        for (const userId of usersIds) {
+            let createdConnections = 0;
 
-            connections.push({
-                status: faker.helpers.arrayElement(["pending", "ignored", "accepted"]),
-                receiver: userId,
-                sender: faker.helpers.arrayElement(usersIds),
-                createdAt: randomDate,
-                updatedAt: randomDate,
-            });
+            while (createdConnections < connectionCount) {
+                const receiver = faker.helpers.arrayElement(usersIds);
+
+                // prevent self connection
+                if (receiver.toString() === userId.toString()) {
+                    continue;
+                }
+
+                // prevent duplicate and reverse duplicate
+                const ids = [userId.toString(), receiver.toString()].sort();
+
+                const pairKey = `${ids[0]}-${ids[1]}`;
+
+                if (usedPairs.has(pairKey)) {
+                    continue;
+                }
+
+                usedPairs.add(pairKey);
+
+                const randomDate = faker.date.past({ years: 1 });
+
+                connections.push({
+                    status: faker.helpers.arrayElement(["pending", "ignored", "accepted"]),
+                    sender: userId,
+                    receiver,
+                    createdAt: randomDate,
+                    updatedAt: randomDate,
+                });
+
+                createdConnections++;
+            }
         }
-
         const createdConnections = await Connection.insertMany(connections);
         console.log(`✅ Created ${createdConnections.length} connections`);
 

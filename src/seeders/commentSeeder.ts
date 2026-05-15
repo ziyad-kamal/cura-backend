@@ -23,7 +23,7 @@ const seedComments = async (
 
             for (let i = 0; i < countPerPost; i++) {
                 comments.push({
-                    content: faker.lorem.paragraph({ min: 1, max: 3 }),
+                    content: faker.lorem.paragraph({ min: 1, max: 2 }),
                     user: faker.helpers.arrayElement(userIds),
                     post: postId,
                     createdAt: randomDate,

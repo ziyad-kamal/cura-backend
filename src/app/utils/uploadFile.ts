@@ -1,10 +1,10 @@
 import crypto from "crypto";
+import { Request } from "express";
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
-import { PostRequestInterface } from "../../interfaces/requests/PostRequestInterface.js";
 
-export const uploadFile = async (req: PostRequestInterface, dir: string, width?: number): Promise<string> => {
+export const uploadFile = async (req: Request, dir: string, width?: number): Promise<string> => {
     const fileName = `${crypto.randomBytes(16).toString("hex")}.webp`;
     const dirName = process.cwd();
 

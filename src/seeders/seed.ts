@@ -14,7 +14,7 @@ const seedAll = async () => {
 
         console.log("🌱 Starting database seeding...");
 
-        const createdUsers = await seedUsers(20);
+        const createdUsers = await seedUsers(100);
         const userIds = createdUsers
             .map((user: UserInterface) => user._id)
             .filter((id): id is Types.ObjectId => id !== undefined);
@@ -29,7 +29,7 @@ const seedAll = async () => {
 
         await seedLikes(10, 10, postIds, commentIds, userIds);
         await seedReposts(10, postIds, userIds);
-        await seedConnections(userIds);
+        await seedConnections(20,userIds);
 
         console.log("🎉 Database seeding completed successfully!");
         process.exit(0);
