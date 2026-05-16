@@ -17,6 +17,7 @@ export const indexPostsRepo = async (query: object, limit: number, authId: strin
     const userIds = connections.map((connection) =>
         connection.sender.toString() === authId ? connection.receiver : connection.sender,
     );
+        console.log("userIds: ", userIds);
 
     userIds.push(new mongoose.Types.ObjectId(authId));
 

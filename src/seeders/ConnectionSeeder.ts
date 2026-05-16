@@ -40,7 +40,7 @@ const seedConnections = async (
                 const randomDate = faker.date.past({ years: 1 });
 
                 connections.push({
-                    status: faker.helpers.arrayElement(["pending", "ignored", "accepted"]),
+                    status: faker.helpers.arrayElement([ "accepted"]),
                     sender: userId,
                     receiver,
                     createdAt: randomDate,

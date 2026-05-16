@@ -14,7 +14,7 @@ const seedAll = async () => {
 
         console.log("🌱 Starting database seeding...");
 
-        const createdUsers = await seedUsers(100);
+        const createdUsers = await seedUsers(1000);
         const userIds = createdUsers
             .map((user: UserInterface) => user._id)
             .filter((id): id is Types.ObjectId => id !== undefined);
