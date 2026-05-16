@@ -25,6 +25,7 @@ const seedReposts = async (
                     content: faker.lorem.paragraphs({ min: 2, max: 5 }),
                     user: faker.helpers.arrayElement(userIds),
                     post:postId,
+                    createdAt: faker.date.past({ years: 1 }),
                 });
             }
         }

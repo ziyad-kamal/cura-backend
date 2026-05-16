@@ -6,4 +6,5 @@ export interface RepostInterface {
     files:{url:string,type:string}[]
     user: mongoose.Types.ObjectId;
     post: mongoose.Types.ObjectId;
+    createdAt?: Date;
 }

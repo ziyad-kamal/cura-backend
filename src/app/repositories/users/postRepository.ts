@@ -135,6 +135,8 @@ export const indexPostsRepo = async (query: object, limit: number, authId: strin
     const reposts = await Repost.aggregate([
         { $match: { ...(cursor ? { createdAt: { $lt: new Date(cursor) } } : {}), user: { $in: userIds } } },
         { $addFields: { type: "repost" } },
+
+        // lookup original post with its author
         {
             $lookup: {
                 from: "posts",
@@ -152,11 +154,13 @@ export const indexPostsRepo = async (query: object, limit: number, authId: strin
                         },
                     },
                     { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-                    { $project: { content: 1, files: 1, createdAt: 1, user: 1 } },
+                    { $project: { content: 1, files: 1, tags: 1, visibility: 1, createdAt: 1, user: 1 } },
                 ],
             },
         },
         { $unwind: { path: "$post", preserveNullAndEmptyArrays: true } },
+
+        // user who reposted
         {
             $lookup: {
                 from: "users",
@@ -167,8 +171,83 @@ export const indexPostsRepo = async (query: object, limit: number, authId: strin
             },
         },
         { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+
+        // comments on the repost
+        {
+            $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "post",
+                as: "comments",
+                pipeline: [
+                    { $sort: { createdAt: -1 } },
+                    { $limit: 2 },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "user",
+                            foreignField: "_id",
+                            as: "user",
+                            pipeline: [{ $project: { "name.first": 1, "name.last": 1, image: 1 } }],
+                        },
+                    },
+                    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+                    { $project: { content: 1, user: 1, createdAt: 1 } },
+                ],
+            },
+        },
+
+        { $lookup: { from: "comments", localField: "_id", foreignField: "post", as: "allComments" } },
+        { $lookup: { from: "likes", localField: "_id", foreignField: "post", as: "allLikes" } },
+        { $lookup: { from: "reposts", localField: "_id", foreignField: "post", as: "allReposts" } },
+
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "post",
+                as: "userLike",
+                pipeline: [{ $match: { user: new mongoose.Types.ObjectId(authId) } }],
+            },
+        },
+        {
+            $lookup: {
+                from: "reposts",
+                localField: "_id",
+                foreignField: "post",
+                as: "userRepost",
+                pipeline: [{ $match: { user: new mongoose.Types.ObjectId(authId) } }],
+            },
+        },
+
+        {
+            $addFields: {
+                commentsCount: { $size: "$allComments" },
+                likesCount: { $size: "$allLikes" },
+                repostsCount: { $size: "$allReposts" },
+                isLiked: { $gt: [{ $size: "$userLike" }, 0] },
+                isRepost: { $gt: [{ $size: "$userRepost" }, 0] },
+            },
+        },
+
+        {
+            $project: {
+                type: 1,
+                content: 1,
+                createdAt: 1,
+                user: 1,
+                post: 1,
+                comments: 1,
+                commentsCount: 1,
+                likesCount: 1,
+                repostsCount: 1,
+                isLiked: 1,
+                isRepost: 1,
+            },
+        },
+
         { $sort: { createdAt: -1 } },
-        { $limit: repostLimit + 1 }, // ← +1 to detect hasMore
+        { $limit: repostLimit + 1 },
     ]);
 
     // check hasMore from any of the three sources
