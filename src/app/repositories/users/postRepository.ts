@@ -8,7 +8,7 @@ import { findRecord } from "../../utils/findRecord.js";
 import Repost from "../../models/Repost.js";
 import Connection from "../../models/Connection.js";
 
-export const indexPostsRepo = async (query: object, limit: number, authId: string) => {
+export const indexPostsRepo = async (query: object, limit: number, authId: string, cursor?: string) => {
     const connections = await Connection.find({
         status: "accepted",
         $or: [{ sender: authId }, { receiver: authId }],
@@ -17,7 +17,6 @@ export const indexPostsRepo = async (query: object, limit: number, authId: strin
     const userIds = connections.map((connection) =>
         connection.sender.toString() === authId ? connection.receiver : connection.sender,
     );
-        console.log("userIds: ", userIds);
 
     userIds.push(new mongoose.Types.ObjectId(authId));
 
@@ -104,52 +103,37 @@ export const indexPostsRepo = async (query: object, limit: number, authId: strin
             },
         },
     ];
+    // apply cursor to query
+    const cursorQuery = cursor ? { ...query, createdAt: { $lt: new Date(cursor) } } : query;
+
+    // fetch limit + 1 to detect hasMore
+    const connectionLimit = 7;
+    const publicLimit = 1;
+    const repostLimit = 2;
 
     const [result] = await Post.aggregate([
         {
             $facet: {
-                // 5 posts from connections
                 connectionPosts: [
-                    {
-                        $match: {
-                            ...query,
-                            user: { $in: userIds },
-                        },
-                    },
+                    { $match: { ...cursorQuery, user: { $in: userIds } } },
                     { $addFields: { type: "post" } },
                     { $sort: { createdAt: -1 } },
-                    { $limit: 5 },
+                    { $limit: connectionLimit + 1 }, // ← +1 to detect hasMore
                     ...sharedLookups,
                 ],
-
-                // 3 posts from public strangers
                 publicPosts: [
-                    {
-                        $match: {
-                            ...query,
-                            visibility: "public",
-                            user: { $nin: userIds }, 
-                        },
-                    },
+                    { $match: { ...cursorQuery, visibility: "public", user: { $nin: userIds } } },
                     { $addFields: { type: "post" } },
                     { $sort: { createdAt: -1 } },
-                    { $limit: 3 },
+                    { $limit: publicLimit + 1 }, // ← +1 to detect hasMore
                     ...sharedLookups,
-                ],
-
-                // 2 reposts from connections
-                reposts: [
-                    {
-                        $match: { _id: { $exists: false } }, 
-                    },
                 ],
             },
         },
     ]);
 
-    // 2 reposts from connections
     const reposts = await Repost.aggregate([
-        { $match: { user: { $in: userIds } } },
+        { $match: { ...(cursor ? { createdAt: { $lt: new Date(cursor) } } : {}), user: { $in: userIds } } },
         { $addFields: { type: "repost" } },
         {
             $lookup: {
@@ -184,16 +168,27 @@ export const indexPostsRepo = async (query: object, limit: number, authId: strin
         },
         { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
         { $sort: { createdAt: -1 } },
-        { $limit: 2 },
+        { $limit: repostLimit + 1 }, // ← +1 to detect hasMore
     ]);
 
+    // check hasMore from any of the three sources
+    const hasMore =
+        result.connectionPosts.length > connectionLimit ||
+        result.publicPosts.length > publicLimit ||
+        reposts.length > repostLimit;
+
+    // trim to actual limits
     const feed = [
-        ...reposts, 
-        ...result.connectionPosts, 
-        ...result.publicPosts, 
+        ...reposts.slice(0, repostLimit),
+        ...result.connectionPosts.slice(0, connectionLimit),
+        ...result.publicPosts.slice(0, publicLimit),
     ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    return feed;
+    // next cursor is the createdAt of the last item
+    const lastItem = feed[feed.length - 1];
+    const nextCursor = hasMore && lastItem ? new Date(lastItem.createdAt).toISOString() : null;
+
+    return { feed, hasMore, nextCursor };
 };
 
 export const storePostRepo = async ({

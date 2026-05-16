@@ -1,19 +1,15 @@
 import { Request } from "express";
 import { PostInterface } from "../../../interfaces/models/PostInterface.js";
-import { PaginationType } from "../../../types/PaginationType.js";
 import { deletePostRepo, indexPostsRepo, likePostRepo, repostRepo, storePostRepo, updatePostRepo } from "../../repositories/users/postRepository.js";
-import { getNextCursor, getQueryCursor } from "../../utils/index.js";
 
-export const indexPostsService = async (req: Request): Promise<PaginationType<PostInterface, "posts">> => {
+export const indexPostsService = async (req: Request) => {
     const limit = 10;
-    const { query, sortField } = getQueryCursor(req, "createdAt");
     const authId = req.user?._id as string;
+    const cursor = req.query.cursor as string | undefined;
 
-    const posts = await indexPostsRepo(query, limit,authId);
+    const { feed, hasMore, nextCursor } = await indexPostsRepo({}, limit, authId, cursor);
 
-    const { hasMore, nextCursor, results } = getNextCursor(posts, limit, sortField);
-
-    return { metadata: { hasMore, nextCursor }, posts: results };
+    return { metadata: { hasMore, nextCursor }, posts: feed };
 };
 
 export const storePostService = async (req: Request): Promise<PostInterface> => {
