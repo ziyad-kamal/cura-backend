@@ -38,12 +38,6 @@ const repostSchema = new Schema<RepostInterface>(
     },
 );
 
-repostSchema.virtual("posts", {
-    ref: "Post",
-    localField: "post",
-    foreignField: "_id",
-});
-
 const Repost: Model<RepostInterface> = mongoose.model<RepostInterface>("Repost", repostSchema);
 
 export default Repost;
