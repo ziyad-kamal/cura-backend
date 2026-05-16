@@ -29,7 +29,7 @@ export const likePostService = async (req: Request): Promise<boolean> => {
 };
 
 export const repostService = async (req: Request): Promise<boolean> => {
-    return await repostRepo(req.params._id as string, req.user?._id, { ...req.body });
+    return await repostRepo(req.params._id as string, req.user?._id, req.body.content);
 };
 
 export const deletePostService = async (req: Request): Promise<void> => {

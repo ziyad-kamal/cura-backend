@@ -15,138 +15,146 @@ export const indexPostsRepo = async (query: object, limit: number, authId: strin
     }).select("sender receiver");
 
     const userIds = connections.map((connection) => {
-        // if auth user is sender -> return receiver
-        // if auth user is receiver -> return sender
-
         return connection.sender.toString() === authId ? connection.receiver : connection.sender;
     });
-    console.log(connections);
-    
-    return Post.aggregate([
-        { $match: query },
 
-        {
-            $lookup: {
-                from: "users",
-                localField: "user",
-                foreignField: "_id",
-                as: "user",
-                pipeline: [{ $project: { "name.first": 1, "name.last": 1, image: 1 } }],
+    const [reposts, posts] = await Promise.all([
+        Repost.find({ user: { $in: userIds } })
+            .populate({ path: "user", select: "name image role" })
+            .populate({ path: "post", select: "content files createdAt" })
+            .sort({ createdAt: -1 })
+            .limit(limit - 7),
+
+        Post.aggregate([
+            { $match: query },
+
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "user",
+                    pipeline: [{ $project: { "name.first": 1, "name.last": 1, image: 1 } }],
+                },
             },
-        },
-        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
 
-        {
-            $lookup: {
-                from: "comments",
-                localField: "_id",
-                foreignField: "post",
-                as: "comments",
-                pipeline: [
-                    { $sort: { createdAt: -1 } },
-                    { $limit: 2 },
-                    {
-                        $lookup: {
-                            from: "users",
-                            localField: "user",
-                            foreignField: "_id",
-                            as: "user",
-                            pipeline: [{ $project: { "name.first": 1, "name.last": 1, image: 1 } }],
+            {
+                $lookup: {
+                    from: "comments",
+                    localField: "_id",
+                    foreignField: "post",
+                    as: "comments",
+                    pipeline: [
+                        { $sort: { createdAt: -1 } },
+                        { $limit: 2 },
+                        {
+                            $lookup: {
+                                from: "users",
+                                localField: "user",
+                                foreignField: "_id",
+                                as: "user",
+                                pipeline: [{ $project: { "name.first": 1, "name.last": 1, image: 1 } }],
+                            },
                         },
-                    },
-                    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-                    { $project: { content: 1, user: 1, createdAt: 1 } },
-                ],
+                        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+                        { $project: { content: 1, user: 1, createdAt: 1 } },
+                    ],
+                },
             },
-        },
 
-        {
-            $lookup: {
-                from: "comments",
-                localField: "_id",
-                foreignField: "post",
-                as: "allComments",
+            {
+                $lookup: {
+                    from: "comments",
+                    localField: "_id",
+                    foreignField: "post",
+                    as: "allComments",
+                },
             },
-        },
 
-        {
-            $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "post",
-                as: "allLikes",
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "post",
+                    as: "allLikes",
+                },
             },
-        },
 
-        {
-            $lookup: {
-                from: "reposts",
-                localField: "_id",
-                foreignField: "post",
-                as: "allReposts",
+            {
+                $lookup: {
+                    from: "reposts",
+                    localField: "_id",
+                    foreignField: "post",
+                    as: "allReposts",
+                },
             },
-        },
 
-        {
-            $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "post",
-                as: "userLike",
-                pipeline: [
-                    {
-                        $match: {
-                            user: new mongoose.Types.ObjectId(authId),
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "post",
+                    as: "userLike",
+                    pipeline: [
+                        {
+                            $match: {
+                                user: new mongoose.Types.ObjectId(authId),
+                            },
                         },
-                    },
-                ],
+                    ],
+                },
             },
-        },
 
-        {
-            $lookup: {
-                from: "reposts",
-                localField: "_id",
-                foreignField: "post",
-                as: "userRepost",
-                pipeline: [
-                    {
-                        $match: {
-                            user: new mongoose.Types.ObjectId(authId),
+            {
+                $lookup: {
+                    from: "reposts",
+                    localField: "_id",
+                    foreignField: "post",
+                    as: "userRepost",
+                    pipeline: [
+                        {
+                            $match: {
+                                user: new mongoose.Types.ObjectId(authId),
+                            },
                         },
-                    },
-                ],
+                    ],
+                },
             },
-        },
 
-        {
-            $addFields: {
-                commentsCount: { $size: "$allComments" },
-                likesCount: { $size: "$allLikes" },
-                repostsCount: { $size: "$allReposts" },
-                isLiked: { $gt: [{ $size: "$userLike" }, 0] },
-                isRepost: { $gt: [{ $size: "$userRepost" }, 0] },
+            {
+                $addFields: {
+                    commentsCount: { $size: "$allComments" },
+                    likesCount: { $size: "$allLikes" },
+                    repostsCount: { $size: "$allReposts" },
+                    isLiked: { $gt: [{ $size: "$userLike" }, 0] },
+                    isRepost: { $gt: [{ $size: "$userRepost" }, 0] },
+                },
             },
-        },
 
-        {
-            $project: {
-                content: 1,
-                files: 1,
-                createdAt: 1,
-                user: 1,
-                comments: 1,
-                commentsCount: 1,
-                likesCount: 1,
-                repostsCount: 1,
-                isLiked: 1,
-                isRepost: 1,
+            {
+                $project: {
+                    content: 1,
+                    files: 1,
+                    visibility: 1,
+                    tags: 1,
+                    createdAt: 1,
+                    user: 1,
+                    comments: 1,
+                    commentsCount: 1,
+                    likesCount: 1,
+                    repostsCount: 1,
+                    isLiked: 1,
+                    isRepost: 1,
+                },
             },
-        },
 
-        { $sort: { createdAt: -1 } },
-        { $limit: limit + 1 },
+            { $sort: { createdAt: -1 } },
+            { $limit: limit + 1 },
+        ]),
     ]);
+
+    return [...reposts, ...posts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 };
 
 export const storePostRepo = async ({
@@ -178,29 +186,25 @@ export const likePostRepo = async (_id: string, authId: string, type: string): P
     return true;
 };
 
-export const repostRepo = async (
-    _id: string,
-    authId: string,
-    { content, files }: PostDataInterface,
-): Promise<boolean> => {
+export const repostRepo = async (_id: string, authId: string, content?: string): Promise<boolean> => {
     const post = await findRecord(Post, { _id });
     const repost = await Repost.findOne({ post: _id, user: authId });
     if (repost) {
         await Repost.deleteOne({ _id: repost._id });
         return false;
     }
-    await Repost.create({ post: post._id, user: authId, content, files });
+    await Repost.create({ post: post._id, user: authId, content });
     return true;
 };
 
 export const deletePostRepo = async (_id: string): Promise<void> => {
-    const session = await mongoose.startSession();
+    // const session = await mongoose.startSession();
 
-    await session.withTransaction(async () => {
+    // await session.withTransaction(async () => {
         await findRecord(Post, { _id });
-        await Post.deleteOne({ _id }, { session });
-        await Comment.deleteMany({ post: _id }, { session });
-    });
+        await Post.deleteOne({ _id });
+        await Comment.deleteMany({ post: _id });
+    // });
 
-    await session.endSession();
+    // await session.endSession();
 };
