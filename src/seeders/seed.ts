@@ -27,8 +27,8 @@ const seedAll = async () => {
             .map((comment: CommentInterface) => comment._id)
             .filter((id): id is Types.ObjectId => id !== undefined);
 
-        await seedLikes(10, 10, postIds, commentIds, userIds);
-        await seedReposts(10, postIds, userIds);
+        await seedLikes(3, 3, postIds, commentIds, userIds);
+        await seedReposts(5, postIds, userIds);
         await seedConnections(20,userIds);
 
         console.log("🎉 Database seeding completed successfully!");
