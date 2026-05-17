@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { PostInterface } from "../../../interfaces/models/PostInterface.js";
-import { deletePostRepo, indexPostsRepo, likePostRepo, repostRepo, storePostRepo, updatePostRepo } from "../../repositories/users/postRepository.js";
+import { indexPostsRepo, likePostRepo, repostRepo, storePostRepo, updatePostRepo } from "../../repositories/users/postRepository.js";
 
 export const indexCommentService = async (req: Request) => {
     const authId = req.user?._id as string;
@@ -26,6 +26,3 @@ export const repostService = async (req: Request): Promise<boolean> => {
     return await repostRepo(req.params._id as string, req.user?._id, req.body.content);
 };
 
-export const deletePostService = async (req: Request): Promise<void> => {
-    await deletePostRepo(req.params._id as string);
-};
