@@ -228,7 +228,7 @@ export const likePostRepo = async (_id: string, authId: string, type: string): P
 };
 
 export const repostRepo = async (_id: string, authId: string, content?: string): Promise<boolean> => {
-    const post = await findRecord(Repost, { _id });
+    const post = await findRecord(Post, { _id });
     const repost = await Repost.findOne({ post: _id, user: authId });
     if (repost) {
         await Repost.deleteOne({ _id: repost._id });
@@ -238,8 +238,9 @@ export const repostRepo = async (_id: string, authId: string, content?: string):
     return true;
 };
 
-export const updateRepostRepo = async (_id: string, content?: string): Promise<HydratedDocument<RepostInterface>|null> => {
+export const updateRepostRepo = async (_id: string, authId:string,content?: string): Promise<HydratedDocument<RepostInterface>|null> => {
     await findRecord(Repost, { _id });
+
     return await Repost.findByIdAndUpdate(_id, { content }, { new: true, runValidators: true })
         .populate("user")
         .populate("post");

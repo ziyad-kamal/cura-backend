@@ -5,7 +5,7 @@ export const findRecord = async <T>(model: Model<T>, filter: object,select:strin
     const record = await model.findOne(filter).select(select);
 
     if (!record) {
-        throw new NotFoundError("Record not found");
+        throw new NotFoundError(`${model.modelName} not found`);
     }
 
     return record;

@@ -3,9 +3,23 @@ import { Request } from "express";
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
+import NotFoundError from "../errors/NotFoundError.js";
 
 export const uploadFile = async (req: Request, dir: string, width?: number): Promise<string> => {
-    const fileName = `${crypto.randomBytes(16).toString("hex")}.webp`;
+    let fileName: string;
+    const file = req.file;
+    if (!file) {
+        throw new NotFoundError("File not found");
+    }
+
+    if (width) {
+        fileName = `${crypto.randomBytes(16).toString("hex")}.webp`;
+    } else {
+
+        const extension = path.extname(file.originalname);
+
+        fileName = `${crypto.randomBytes(16).toString("hex")}${extension}`;
+    }
     const dirName = process.cwd();
 
     dir = `/storage/${dir}`;
@@ -31,6 +45,6 @@ export const uploadFile = async (req: Request, dir: string, width?: number): Pro
         /([^:]\/)\/+/g,
         "$1",
     );
-    
+
     return filePath;
 };
