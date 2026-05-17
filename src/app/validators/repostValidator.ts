@@ -4,9 +4,7 @@ import { returnError } from "../utils/returnJson.js";
 
 export const repostValidator: (ValidationChain | RequestHandler)[] = [
     body("content")
-        .trim()
-        .isLength({ min: 3 })
-        .withMessage("Content must be at least 3 characters long"),
+        .trim(),
 
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
