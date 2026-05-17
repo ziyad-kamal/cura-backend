@@ -2,8 +2,13 @@ name: Build and Push to ECR
 
 on:
   push:
-    branches:
-      - develop
+    branches: ["develop"]
+    paths-ignore: ['**.md', 'docs/**', '.vscode/**', '.env.example', '.gitignore', '.dockerignore', '.prettierrc', 'eslint.config.mjs']
+  
+  pull_request:
+    branches: ["develop"]
+    paths-ignore: ['**.md', 'docs/**', '.vscode/**', '.env.example', '.gitignore', '.dockerignore', '.prettierrc', 'eslint.config.mjs']
+      
   workflow_dispatch:
 
 jobs:
