@@ -7,6 +7,7 @@ import { ConnectionInterface } from "../interfaces/models/ConnectionInterface.js
 const seedConnections = async (
     connectionCount: number = 20,
     usersIds: Array<Types.ObjectId> = [],
+    authUserId: Types.ObjectId,
 ): Promise<ConnectionInterface[]> => {
     try {
         await Connection.deleteMany({});
@@ -14,6 +15,22 @@ const seedConnections = async (
 
         const connections = [];
         const usedPairs = new Set();
+
+        for (const userId of usersIds) {
+            const randomDate = faker.date.past({ years: 1 });
+
+            if (userId.toString() === authUserId.toString()) {
+                continue;
+            }
+            
+            connections.push({
+                status: "accepted",
+                sender: authUserId,
+                receiver: userId,
+                createdAt: randomDate,
+                updatedAt: randomDate,
+            });
+        }
 
         for (const userId of usersIds) {
             let createdConnections = 0;
@@ -40,7 +57,7 @@ const seedConnections = async (
                 const randomDate = faker.date.past({ years: 1 });
 
                 connections.push({
-                    status: faker.helpers.arrayElement([ "accepted"]),
+                    status: faker.helpers.arrayElement(["accepted", "pending", "ignored"]),
                     sender: userId,
                     receiver,
                     createdAt: randomDate,

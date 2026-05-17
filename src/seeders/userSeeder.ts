@@ -3,6 +3,8 @@ import { faker } from "@faker-js/faker";
 import User from '../app/models/User.js';
 import { UserRoles } from '../enums/UserRoles.js';
 import { UserInterface } from '../interfaces/models/UserInterface.js';
+import { HydratedDocument } from "mongoose";
+import { PostTag } from "../enums/PostTag.js";
 
 const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterface> => {
     const firstName = faker.person.firstName();
@@ -48,6 +50,8 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
             height: Number(faker.string.numeric(2)),
             gender: faker.helpers.arrayElement(["male", "female"]),
             diseases: "Diabetes and High Blood Pressure",
+            medications:"Metformin and augmentin",
+            tags: faker.helpers.arrayElements(Object.values(PostTag), { min: 1, max: 2 }),
         },
 
         cardPayment: {
@@ -62,7 +66,12 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
     };
 };
 
-export const seedUsers = async (count: number = 30): Promise<UserInterface[]> => {
+export const seedUsers = async (
+    count: number = 30,
+): Promise<{
+    createdUsers: UserInterface[];
+    authUser: HydratedDocument<UserInterface>;
+}> => {
     try {
         await User.deleteMany({});
         console.log("🗑️  Cleared existing users");
@@ -77,13 +86,21 @@ export const seedUsers = async (count: number = 30): Promise<UserInterface[]> =>
             users.push(generateFakeUser(UserRoles.DOCTOR));
         }
 
-        await User.create({
+        const authUser = await User.create({
             name: {
                 first: faker.person.firstName(),
                 last: faker.person.lastName(),
             },
             contact: {
                 email: "user@gmail.com",
+            },
+            userInfo: {
+                age: faker.number.int({ min: 18, max: 65 }),
+                weight: Number(faker.string.numeric(2)),
+                height: Number(faker.string.numeric(2)),    
+                diseases: "Diabetes and High Blood Pressure",
+                medications:"Metformin and augmentin",
+                tags: ["diabetes", "hypertension"],
             },
             password: "12121212",
             role: UserRoles.USER,
@@ -101,11 +118,11 @@ export const seedUsers = async (count: number = 30): Promise<UserInterface[]> =>
             role: UserRoles.DOCTOR,
         });
 
-        const createdUsers = await User.insertMany(users);
-    
+        const createdUsers  = await User.insertMany(users) as UserInterface[];
+
         console.log(`✅ Successfully seeded ${createdUsers.length} users!`);
 
-        return createdUsers as UserInterface[];
+        return { createdUsers, authUser };
     } catch (err: unknown) {
         console.error("Posts seeding failed:", err instanceof Error ? err.message : String(err));
         throw err;

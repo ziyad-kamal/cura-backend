@@ -95,6 +95,8 @@ const userSchema = new Schema<UserInterface>(
                 enum: ["male", "female"],
             },
             diseases: String,
+            medications:String,
+            tags: [String],
         },
 
         cardPayment: {

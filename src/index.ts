@@ -32,8 +32,7 @@ async function bootstrap() {
     app.use(attachHelpers);
 
     app.use(`${appConfig.apiPrefix}`, authRoutes);
-
-    app.use(`${appConfig.apiPrefix}`, postRoutes);
+    app.use(`${appConfig.apiPrefix}/post`, postRoutes);
     app.use(`${appConfig.apiPrefix}`, fileRoutes);
 
     app.use(errorHandler);

@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { deletePostService, indexPostsService, likePostService, repostService, storePostService, updatePostService, updateRepostService } from "../../services/users/postService.js";
+import { deletePostService, storePostService, updatePostService } from "../../services/users/postService.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { returnSuccess } from "../../utils/returnJson.js";
+import { indexCommentService } from "../../services/users/commentService.js";
 
 export const indexPosts = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const posts = await indexPostsService(req);
+    const posts = await indexCommentService(req);
     return returnSuccess(res, "", 200, posts);
 });
 
@@ -16,21 +17,6 @@ export const storePost = asyncHandler(async (req: Request, res: Response): Promi
 export const updatePost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const post = await updatePostService(req);
     return returnSuccess(res, "you updated post successfully", 200, { post });
-});
-
-export const likePost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const isLike = await likePostService(req);
-    return returnSuccess(res, "", 200, { isLike });
-});
-
-export const repost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const isRepost = await repostService(req);
-    return returnSuccess(res, "", 200, { isRepost });
-});
-
-export const updateRepost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const isRepost = await updateRepostService(req);
-    return returnSuccess(res, "", 200, { isRepost });
 });
 
 export const deletePost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {

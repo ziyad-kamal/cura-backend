@@ -41,6 +41,8 @@ export interface UserInterface {
         height: number;
         gender: "male" | "female";
         diseases: string;
+        medications: string; 
+        tags: string[];
     };
 
     cardPayment?: {

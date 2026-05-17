@@ -31,7 +31,7 @@ const seedPosts = async (userIds: Array<Types.ObjectId> = []): Promise<PostInter
                     { url: image, type: "image" },
                     { url: image, type: "image" },
                 ],
-                tag: faker.helpers.arrayElement(Object.values(PostTag)),
+                tags: faker.helpers.arrayElements(Object.values(PostTag), { min: 1, max: 2 }),
                 createdAt: randomDate,
                 updatedAt: randomDate,
             });
