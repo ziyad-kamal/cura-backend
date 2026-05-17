@@ -3,12 +3,10 @@ import { PostInterface } from "../../../interfaces/models/PostInterface.js";
 import { deletePostRepo, indexPostsRepo, likePostRepo, repostRepo, storePostRepo, updatePostRepo } from "../../repositories/users/postRepository.js";
 
 export const indexCommentService = async (req: Request) => {
-    const limit = 10;
     const authId = req.user?._id as string;
     const cursor = req.query.cursor as string | undefined;
 
-    const { feed, hasMore, nextCursor } = await indexPostsRepo({}, limit, authId, cursor);
-
+    const { feed, hasMore, nextCursor } = await indexPostsRepo(authId, cursor);
     return { metadata: { hasMore, nextCursor }, posts: feed };
 };
 
