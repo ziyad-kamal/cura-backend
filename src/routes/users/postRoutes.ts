@@ -15,6 +15,6 @@ postRoutes.post("/like/:_id", likeValidator, validateId, likePost);
 postRoutes.put("/update/:_id", postValidator, validateId, updatePost);
 postRoutes.post("/repost/store/:_id", repostValidator, validateId, repost);
 postRoutes.post("/repost/update/:_id", repostValidator, validateId, updateRepost);
-postRoutes.delete("/delete/:_id", validateId, deletePost);
+postRoutes.delete("/delete/:_id/:type", validateId, deletePost);
 
 export default postRoutes;

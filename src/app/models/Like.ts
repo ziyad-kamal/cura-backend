@@ -13,7 +13,10 @@ const likeSchema = new Schema<LikeInterface>(
         post: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Post",
-            required: true,
+        },
+        repost: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Repost",
         },
         comment: {
             type: mongoose.Schema.Types.ObjectId,
@@ -21,7 +24,7 @@ const likeSchema = new Schema<LikeInterface>(
         },
         type: {
             type: String,
-            enum: ["post", "comment"],
+            enum: ["post", "comment", "repost"],
             required: true,
         },
     },

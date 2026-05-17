@@ -5,6 +5,7 @@ export interface CommentInterface {
     content: string;
     user: mongoose.Types.ObjectId;
     post: mongoose.Types.ObjectId;
+    repost: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }

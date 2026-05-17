@@ -25,13 +25,13 @@ export const likePostService = async (req: Request): Promise<boolean> => {
 };
 
 export const repostService = async (req: Request): Promise<boolean> => {
-    return await repostRepo(req.params._id as string, req.user?._id, req.body.content);
+    return await repostRepo(req.params._id as string, req.user?._id, {...req.body});
 };
 
 export const updateRepostService = async (req: Request): Promise<RepostInterface | null> => {
-    return await updateRepostRepo(req.params._id as string, req.user?._id, req.body.content);
+    return await updateRepostRepo(req.params._id as string, req.body.content);
 };
 
 export const deletePostService = async (req: Request): Promise<void> => {
-    await deletePostRepo(req.params._id as string);
+    await deletePostRepo(req.params._id as string, req.params.type as string);
 };

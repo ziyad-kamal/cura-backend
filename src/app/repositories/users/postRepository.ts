@@ -9,7 +9,7 @@ import Repost from "../../models/Repost.js";
 import Connection from "../../models/Connection.js";
 import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
 
-export const indexPostsRepo = async (authId: string, cursor: string|undefined) => {
+export const indexPostsRepo = async (authId: string, cursor: string | undefined) => {
     const connections = await Connection.find({
         status: "accepted",
         $or: [{ sender: authId }, { receiver: authId }],
@@ -109,7 +109,7 @@ export const indexPostsRepo = async (authId: string, cursor: string|undefined) =
     // reuse for $facet by casting
     const sharedLookups = sharedLookupStages as PipelineStage.FacetPipelineStage[];
     // apply cursor to query
-    const cursorQuery = cursor ?{ createdAt: { $lt: new Date(cursor) } }: {};
+    const cursorQuery = cursor ? { createdAt: { $lt: new Date(cursor) } } : {};
 
     // fetch limit + 1 to detect hasMore
     let connectionLimit;
@@ -217,28 +217,59 @@ export const updatePostRepo = async ({
 };
 
 export const likePostRepo = async (_id: string, authId: string, type: string): Promise<boolean> => {
-    const post = await findRecord(Post, { _id });
-    const like = await Like.findOne({ post: _id, user: authId });
+    let post;
+    let like;
+    if (type === "repost") {
+        post = await findRecord(Repost, { _id });
+        like = await Like.findOne({ repost: post._id, user: authId, type: "repost" });
+    } else {
+        post = await findRecord(Post, { _id });
+        like = await Like.findOne({ post: _id, user: authId, type: "post" });
+    }
+
     if (like) {
         await Like.deleteOne({ _id: like._id });
         return false;
+    }
+
+    if (type === "repost") {
+        await Like.create({ repost: post._id, user: authId, type });
+        return true;
     }
     await Like.create({ post: post._id, user: authId, type });
     return true;
 };
 
-export const repostRepo = async (_id: string, authId: string, content?: string): Promise<boolean> => {
-    const post = await findRecord(Post, { _id });
-    const repost = await Repost.findOne({ post: _id, user: authId });
-    if (repost) {
-        await Repost.deleteOne({ _id: repost._id });
+export const repostRepo = async (
+    _id: string,
+    authId: string,
+    { type, content }: { type: string; content: string },
+): Promise<boolean> => {
+    let postId: string;
+
+    if (type === "repost") {
+        const repostDoc = await findRecord(Repost, { _id });
+        const populated = await repostDoc.populate("post");
+        postId = populated.post._id.toString();
+    } else {
+        const postDoc = await findRecord(Post, { _id });
+        postId = postDoc._id.toString();
+    }
+
+    const existingRepost = await Repost.findOne({ post: postId, user: authId });
+    if (existingRepost) {
+        await Repost.deleteOne({ _id: existingRepost._id });
         return false;
     }
-    await Repost.create({ post: post._id, user: authId, content });
+
+    await Repost.create({ post: postId, user: authId, content });
     return true;
 };
 
-export const updateRepostRepo = async (_id: string, authId:string,content?: string): Promise<HydratedDocument<RepostInterface>|null> => {
+export const updateRepostRepo = async (
+    _id: string,
+    content?: string,
+): Promise<HydratedDocument<RepostInterface> | null> => {
     await findRecord(Repost, { _id });
 
     return await Repost.findByIdAndUpdate(_id, { content }, { new: true, runValidators: true })
@@ -246,12 +277,20 @@ export const updateRepostRepo = async (_id: string, authId:string,content?: stri
         .populate("post");
 };
 
-export const deletePostRepo = async (_id: string): Promise<void> => {
+export const deletePostRepo = async (_id: string, type: string): Promise<void> => {
     // const session = await mongoose.startSession();
 
     // await session.withTransaction(async () => {
+    if (type === "repost") {
+        await findRecord(Repost, { _id });
+        await Repost.deleteOne({ _id });
+        await Like.deleteMany({ repost: _id });
+        await Comment.deleteMany({ repost: _id });
+        return;
+    }
     await findRecord(Post, { _id });
     await Post.deleteOne({ _id });
+    await Like.deleteMany({ post: _id });
     await Comment.deleteMany({ post: _id });
     // });
 

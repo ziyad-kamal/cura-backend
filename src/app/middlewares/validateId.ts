@@ -4,10 +4,12 @@ import { returnError } from "../utils/returnJson.js";
 
 export const validateId = (req: Request, res: Response, next: NextFunction) => {
     for (const param in req.params) {
-        const id = req.params[param] as string;
+        if (param === "_id") {
+            const id = req.params[param] as string;
 
-        if (!Types.ObjectId.isValid(id)) {
-            return returnError(res, `Invalid ${param}`, 422);
+            if (!Types.ObjectId.isValid(id)) {
+                return returnError(res, `Invalid ${param}`, 422);
+            }
         }
     }
 

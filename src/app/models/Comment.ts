@@ -19,6 +19,11 @@ const commentSchema = new Schema<CommentInterface>(
             ref: "Post",
             required: true,
         },
+        repost: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Repost",
+            required: true,
+        },
     },
     {
         timestamps: true,
