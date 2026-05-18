@@ -1,5 +1,8 @@
-import {Request} from "express";
-import {uploadFile} from '../../utils/index.js';
+import { Request } from "express";
+import { uploadFile } from "../../utils/index.js";
+import  fs from "fs";
+import NotFoundError from "../../errors/NotFoundError.js";
+import  path  from 'path';
 
 export const uploadFileService = async (req: Request): Promise<string> => {
     const file = req.file;
@@ -22,4 +25,16 @@ export const uploadFileService = async (req: Request): Promise<string> => {
     }
 
     return uploadedUrl;
+};
+
+export const downloadFileService = async (req: Request): Promise<string> => {
+    const { url } = req.body;
+    const pathname = new URL(url).pathname;
+    const filePath = path.join(process.cwd(), pathname);
+
+    if (!fs.existsSync(filePath)) {
+        throw new NotFoundError("File not found");
+    }
+
+    return filePath;
 };

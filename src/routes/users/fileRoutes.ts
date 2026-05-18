@@ -1,6 +1,6 @@
 import express from "express";
 import { jwtVerify } from "../../app/middlewares/jwtVerify.js";
-import { upload } from "../../app/controllers/users/fileController.js";
+import { download, upload } from "../../app/controllers/users/fileController.js";
 import { uploadMulter } from "../../app/middlewares/upload.js";
 import { verifyFileType } from "../../app/middlewares/verifyFileType.js";
 
@@ -13,5 +13,7 @@ fileRoutes.post(
     verifyFileType(["document", "image", "video"]),
     upload,
 );
+
+fileRoutes.post("/file/download", download);
 
 export default fileRoutes;

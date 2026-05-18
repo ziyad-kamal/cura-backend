@@ -36,9 +36,11 @@ export const uploadFile = async (req: Request, dir: string, width?: number): Pro
             .resize(width, null, { withoutEnlargement: true })
             .webp({
                 quality: 100,
-                effort: 6,
+                effort: 4,
             })
             .toFile(fileLocation);
+    }else{
+        fs.writeFileSync(fileLocation, file.buffer);
     }
 
     const filePath = `${process.env.APP_URL}/${dir.replace(/^public[/\\]?/, "")}/${fileName}`.replace(
