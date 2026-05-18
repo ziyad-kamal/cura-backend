@@ -32,6 +32,10 @@ export const downloadFileService = async (req: Request): Promise<string> => {
     const pathname = new URL(url).pathname;
     const filePath = path.join(process.cwd(), pathname);
 
+    if (!pathname.startsWith("/storage")) {
+        throw new NotFoundError("File not found");
+    }
+    
     if (!fs.existsSync(filePath)) {
         throw new NotFoundError("File not found");
     }

@@ -9,109 +9,30 @@ import Repost from "../../models/Repost.js";
 import Connection from "../../models/Connection.js";
 import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
 
-export const indexPostsRepo = async (authId: string, cursor: string | undefined) => {
+export const indexPostsRepo = async (authId: string, cursor?: string) => {
+    const authObjectId = new mongoose.Types.ObjectId(authId);
+
     const connections = await Connection.find({
         status: "accepted",
-        $or: [{ sender: authId }, { receiver: authId }],
-    }).select("sender receiver");
+        $or: [{ sender: authObjectId }, { receiver: authObjectId }],
+    })
+        .select("sender receiver")
+        .lean();
 
     const userIds = connections.map((connection) =>
         connection.sender.toString() === authId ? connection.receiver : connection.sender,
     );
 
-    userIds.push(new mongoose.Types.ObjectId(authId));
+    userIds.push(authObjectId);
 
-    // shared lookup stages typed for regular aggregate
-    const sharedLookupStages: PipelineStage[] = [
-        {
-            $lookup: {
-                from: "users",
-                localField: "user",
-                foreignField: "_id",
-                as: "user",
-                pipeline: [{ $project: { "name.first": 1, "name.last": 1, image: 1 } }],
-            },
-        },
-        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-        {
-            $lookup: {
-                from: "comments",
-                localField: "_id",
-                foreignField: "post",
-                as: "comments",
-                pipeline: [
-                    { $sort: { createdAt: -1 } },
-                    { $limit: 2 },
-                    {
-                        $lookup: {
-                            from: "users",
-                            localField: "user",
-                            foreignField: "_id",
-                            as: "user",
-                            pipeline: [{ $project: { "name.first": 1, "name.last": 1, image: 1 } }],
-                        },
-                    },
-                    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-                    { $project: { content: 1, user: 1, createdAt: 1 } },
-                ],
-            },
-        },
-        { $lookup: { from: "comments", localField: "_id", foreignField: "post", as: "allComments" } },
-        { $lookup: { from: "likes", localField: "_id", foreignField: "post", as: "allLikes" } },
-        { $lookup: { from: "reposts", localField: "_id", foreignField: "post", as: "allReposts" } },
-        {
-            $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "post",
-                as: "userLike",
-                pipeline: [{ $match: { user: new mongoose.Types.ObjectId(authId) } }],
-            },
-        },
-        {
-            $lookup: {
-                from: "reposts",
-                localField: "_id",
-                foreignField: "post",
-                as: "userRepost",
-                pipeline: [{ $match: { user: new mongoose.Types.ObjectId(authId) } }],
-            },
-        },
-        {
-            $addFields: {
-                commentsCount: { $size: "$allComments" },
-                likesCount: { $size: "$allLikes" },
-                repostsCount: { $size: "$allReposts" },
-                isLiked: { $gt: [{ $size: "$userLike" }, 0] },
-                isRepost: { $gt: [{ $size: "$userRepost" }, 0] },
-            },
-        },
-        {
-            $project: {
-                type: 1,
-                content: 1,
-                files: 1,
-                visibility: 1,
-                tags: 1,
-                createdAt: 1,
-                user: 1,
-                post: 1,
-                comments: 1,
-                commentsCount: 1,
-                likesCount: 1,
-                repostsCount: 1,
-                isLiked: 1,
-                isRepost: 1,
-            },
-        },
-    ];
+    const cursorQuery = cursor
+        ? {
+              createdAt: {
+                  $lt: new Date(cursor),
+              },
+          }
+        : {};
 
-    // reuse for $facet by casting
-    const sharedLookups = sharedLookupStages as PipelineStage.FacetPipelineStage[];
-    // apply cursor to query
-    const cursorQuery = cursor ? { createdAt: { $lt: new Date(cursor) } } : {};
-
-    // fetch limit + 1 to detect hasMore
     let connectionLimit;
     let publicLimit;
     let repostLimit;
@@ -122,79 +43,605 @@ export const indexPostsRepo = async (authId: string, cursor: string | undefined)
         repostLimit = 2;
     } else {
         connectionLimit = 2;
-        publicLimit = 6;
-        repostLimit = 2;
+        publicLimit = 7;
+        repostLimit = 1;
     }
+
+    // =========================
+    // FIRST STAGE:
+    // ONLY MATCH + SORT + LIMIT
+    // =========================
 
     const [result] = await Post.aggregate([
         {
             $facet: {
                 connectionPosts: [
-                    { $match: { ...cursorQuery, user: { $in: userIds } } },
-                    { $addFields: { type: "post" } },
-                    { $sort: { createdAt: -1 } },
-                    { $limit: connectionLimit + 1 }, // ← +1 to detect hasMore
-                    ...sharedLookups,
+                    {
+                        $match: {
+                            ...cursorQuery,
+                            user: {
+                                $in: userIds,
+                            },
+                        },
+                    },
+
+                    {
+                        $sort: {
+                            createdAt: -1,
+                        },
+                    },
+
+                    {
+                        $limit: connectionLimit + 1,
+                    },
+
+                    {
+                        $addFields: {
+                            type: "post",
+                        },
+                    },
                 ],
+
                 publicPosts: [
-                    { $match: { ...cursorQuery, visibility: "public", user: { $nin: userIds } } },
-                    { $addFields: { type: "post" } },
-                    { $sort: { createdAt: -1 } },
-                    { $limit: publicLimit + 1 }, // ← +1 to detect hasMore
-                    ...sharedLookups,
+                    {
+                        $match: {
+                            ...cursorQuery,
+                            visibility: "public",
+
+                            user: {
+                                $nin: userIds,
+                            },
+                        },
+                    },
+
+                    {
+                        $sort: {
+                            createdAt: -1,
+                        },
+                    },
+
+                    {
+                        $limit: publicLimit + 1,
+                    },
+
+                    {
+                        $addFields: {
+                            type: "post",
+                        },
+                    },
                 ],
             },
         },
     ]);
 
     const reposts = await Repost.aggregate([
-        { $match: { ...(cursor ? { createdAt: { $lt: new Date(cursor) } } : {}), user: { $in: userIds } } },
-        { $addFields: { type: "repost" } },
+        {
+            $match: {
+                ...cursorQuery,
+
+                user: {
+                    $in: userIds,
+                },
+            },
+        },
+
+        {
+            $sort: {
+                createdAt: -1,
+            },
+        },
+
+        {
+            $limit: repostLimit + 1,
+        },
+
+        {
+            $addFields: {
+                type: "repost",
+            },
+        },
+    ]);
+
+    // =========================
+    // MERGE + SORT
+    // =========================
+
+    const feedIds = [...result.connectionPosts, ...result.publicPosts, ...reposts]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, connectionLimit + publicLimit + repostLimit);
+
+    const ids = feedIds.map((item) => item._id);
+
+    // =========================
+    // SECOND STAGE:
+    // LOOKUPS ONLY ON LIMITED DOCS
+    // =========================
+
+    const commonPipeline: PipelineStage[] = [
         {
             $lookup: {
-                from: "posts",
-                localField: "post",
+                from: "users",
+                localField: "user",
                 foreignField: "_id",
-                as: "post",
                 pipeline: [
+                    {
+                        $project: {
+                            "name.first": 1,
+                            "name.last": 1,
+                            image: 1,
+                        },
+                    },
+                ],
+                as: "user",
+            },
+        },
+
+        {
+            $unwind: {
+                path: "$user",
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+
+        // latest comments
+        {
+            $lookup: {
+                from: "comments",
+                let: {
+                    docId: "$_id",
+                    docType: "$type",
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $or: [
+                                    {
+                                        $and: [
+                                            {
+                                                $eq: ["$$docType", "post"],
+                                            },
+                                            {
+                                                $eq: ["$post", "$$docId"],
+                                            },
+                                        ],
+                                    },
+
+                                    {
+                                        $and: [
+                                            {
+                                                $eq: ["$$docType", "repost"],
+                                            },
+                                            {
+                                                $eq: ["$repost", "$$docId"],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+
+                    {
+                        $sort: {
+                            createdAt: -1,
+                        },
+                    },
+
+                    {
+                        $limit: 2,
+                    },
+
                     {
                         $lookup: {
                             from: "users",
                             localField: "user",
                             foreignField: "_id",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        "name.first": 1,
+                                        "name.last": 1,
+                                        image: 1,
+                                    },
+                                },
+                            ],
                             as: "user",
-                            pipeline: [{ $project: { "name.first": 1, "name.last": 1, image: 1 } }],
                         },
                     },
-                    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-                    { $project: { content: 1, files: 1, tags: 1, visibility: 1, createdAt: 1, user: 1 } },
+
+                    {
+                        $unwind: {
+                            path: "$user",
+                            preserveNullAndEmptyArrays: true,
+                        },
+                    },
+
+                    {
+                        $lookup: {
+                            from: "likes",
+                            let: {
+                                commentId: "$_id",
+                            },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $eq: ["$comment", "$$commentId"],
+                                        },
+                                    },
+                                },
+
+                                {
+                                    $group: {
+                                        _id: null,
+
+                                        count: {
+                                            $sum: 1,
+                                        },
+
+                                        isLiked: {
+                                            $max: {
+                                                $cond: [
+                                                    {
+                                                        $eq: ["$user", authObjectId],
+                                                    },
+                                                    1,
+                                                    0,
+                                                ],
+                                            },
+                                        },
+                                    },
+                                },
+                            ],
+                            as: "likesMeta",
+                        },
+                    },
+
+                    {
+                        $addFields: {
+                            likesCount: {
+                                $ifNull: [
+                                    {
+                                        $arrayElemAt: ["$likesMeta.count", 0],
+                                    },
+                                    0,
+                                ],
+                            },
+
+                            isLiked: {
+                                $eq: [
+                                    {
+                                        $arrayElemAt: ["$likesMeta.isLiked", 0],
+                                    },
+                                    1,
+                                ],
+                            },
+                        },
+                    },
+
+                    {
+                        $project: {
+                            content: 1,
+                            createdAt: 1,
+                            user: 1,
+                            likesCount: 1,
+                            isLiked: 1,
+                        },
+                    },
                 ],
+                as: "comments",
             },
         },
-        { $unwind: { path: "$post", preserveNullAndEmptyArrays: true } },
-        ...sharedLookupStages, // ← regular PipelineStage type
-        { $sort: { createdAt: -1 } },
-        { $limit: repostLimit + 1 },
+
+        // comments count
+        {
+            $lookup: {
+                from: "comments",
+                let: {
+                    docId: "$_id",
+                    docType: "$type",
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $or: [
+                                    {
+                                        $and: [
+                                            {
+                                                $eq: ["$$docType", "post"],
+                                            },
+                                            {
+                                                $eq: ["$post", "$$docId"],
+                                            },
+                                        ],
+                                    },
+
+                                    {
+                                        $and: [
+                                            {
+                                                $eq: ["$$docType", "repost"],
+                                            },
+                                            {
+                                                $eq: ["$repost", "$$docId"],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+
+                    {
+                        $count: "count",
+                    },
+                ],
+                as: "commentsMeta",
+            },
+        },
+
+        // likes
+        {
+            $lookup: {
+                from: "likes",
+                let: {
+                    docId: "$_id",
+                    docType: "$type",
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $or: [
+                                    {
+                                        $and: [
+                                            {
+                                                $eq: ["$$docType", "post"],
+                                            },
+                                            {
+                                                $eq: ["$post", "$$docId"],
+                                            },
+                                        ],
+                                    },
+
+                                    {
+                                        $and: [
+                                            {
+                                                $eq: ["$$docType", "repost"],
+                                            },
+                                            {
+                                                $eq: ["$repost", "$$docId"],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+
+                    {
+                        $group: {
+                            _id: null,
+
+                            count: {
+                                $sum: 1,
+                            },
+
+                            isLiked: {
+                                $max: {
+                                    $cond: [
+                                        {
+                                            $eq: ["$user", authObjectId],
+                                        },
+                                        1,
+                                        0,
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                ],
+                as: "likesMeta",
+            },
+        },
+
+        // reposts
+        {
+            $lookup: {
+                from: "reposts",
+                let: {
+                    docId: "$_id",
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ["$post", "$$docId"],
+                            },
+                        },
+                    },
+
+                    {
+                        $group: {
+                            _id: null,
+
+                            count: {
+                                $sum: 1,
+                            },
+
+                            isRepost: {
+                                $max: {
+                                    $cond: [
+                                        {
+                                            $eq: ["$user", authObjectId],
+                                        },
+                                        1,
+                                        0,
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                ],
+                as: "repostsMeta",
+            },
+        },
+
+        {
+            $addFields: {
+                commentsCount: {
+                    $ifNull: [
+                        {
+                            $arrayElemAt: ["$commentsMeta.count", 0],
+                        },
+                        0,
+                    ],
+                },
+
+                likesCount: {
+                    $ifNull: [
+                        {
+                            $arrayElemAt: ["$likesMeta.count", 0],
+                        },
+                        0,
+                    ],
+                },
+
+                repostsCount: {
+                    $ifNull: [
+                        {
+                            $arrayElemAt: ["$repostsMeta.count", 0],
+                        },
+                        0,
+                    ],
+                },
+
+                isLiked: {
+                    $eq: [
+                        {
+                            $arrayElemAt: ["$likesMeta.isLiked", 0],
+                        },
+                        1,
+                    ],
+                },
+
+                isRepost: {
+                    $eq: [
+                        {
+                            $arrayElemAt: ["$repostsMeta.isRepost", 0],
+                        },
+                        1,
+                    ],
+                },
+            },
+        },
+
+        {
+            $project: {
+                content: 1,
+                files: 1,
+                tags: 1,
+                visibility: 1,
+                createdAt: 1,
+                user: 1,
+                post: 1,
+                type: 1,
+
+                comments: 1,
+                commentsCount: 1,
+
+                likesCount: 1,
+                repostsCount: 1,
+
+                isLiked: 1,
+                isRepost: 1,
+            },
+        },
+    ];
+
+    const posts = await Post.aggregate([
+        {
+            $match: {
+                _id: {
+                    $in: ids,
+                },
+            },
+        },
+
+        {
+            $addFields: {
+                type: "post",
+            },
+        },
+
+        ...commonPipeline,
     ]);
 
-    // check hasMore from any of the three sources
+    const repostDocs = await Repost.aggregate([
+        {
+            $match: {
+                _id: {
+                    $in: ids,
+                },
+            },
+        },
+
+        {
+            $addFields: {
+                type: "repost",
+            },
+        },
+
+        {
+            $lookup: {
+                from: "posts",
+                localField: "post",
+                foreignField: "_id",
+                pipeline: [
+                    {
+                        $project: {
+                            content: 1,
+                            files: 1,
+                            tags: 1,
+                            visibility: 1,
+                            createdAt: 1,
+                            user: 1,
+                        },
+                    },
+                ],
+                as: "post",
+            },
+        },
+
+        {
+            $unwind: {
+                path: "$post",
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+
+        ...commonPipeline,
+    ]);
+
+    const feed = [...posts, ...repostDocs].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
     const hasMore =
         result.connectionPosts.length > connectionLimit ||
         result.publicPosts.length > publicLimit ||
         reposts.length > repostLimit;
 
-    // trim to actual limits
-    const feed = [
-        ...reposts.slice(0, repostLimit),
-        ...result.connectionPosts.slice(0, connectionLimit),
-        ...result.publicPosts.slice(0, publicLimit),
-    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-    // next cursor is the createdAt of the last item
     const lastItem = feed[feed.length - 1];
+
     const nextCursor = hasMore && lastItem ? new Date(lastItem.createdAt).toISOString() : null;
 
-    return { feed, hasMore, nextCursor };
+    return {
+        feed,
+        hasMore,
+        nextCursor,
+    };
 };
 
 export const storePostRepo = async ({

@@ -31,6 +31,7 @@ const commentSchema = new Schema<CommentInterface>(
 );
 
 commentSchema.index({ post: 1, createdAt: -1 });
+commentSchema.index({ repost: 1, createdAt: -1 });
 
 const Comment: Model<CommentInterface> = mongoose.model<CommentInterface>("Comment", commentSchema);
 

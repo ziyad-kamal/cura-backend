@@ -42,6 +42,9 @@ const repostSchema = new Schema<RepostInterface>(
     },
 );
 
+repostSchema.index({ user: 1, createdAt: -1 });
+repostSchema.index({ post: 1 });
+
 const Repost: Model<RepostInterface> = mongoose.model<RepostInterface>("Repost", repostSchema);
 
 export default Repost;

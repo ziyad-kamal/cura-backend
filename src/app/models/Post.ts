@@ -80,7 +80,8 @@ postSchema.virtual("repostsCount", {
     count: true,
 });
 
-postSchema.index({ createdAt: -1 });
+postSchema.index({ user: 1, createdAt: -1 });
+postSchema.index({ visibility: 1, createdAt: -1 });
 
 const Post: Model<PostInterface> = mongoose.model<PostInterface>("Post", postSchema);
 
