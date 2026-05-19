@@ -9,6 +9,7 @@ import { httpLogger } from "./config/logger.js";
 import { connectRedis } from "./config/redis.js";
 import { authRoutes, postRoutes } from "./routes/users/index.js";
 import fileRoutes from "./routes/users/fileRoutes.js";
+import commentRoutes from "./routes/users/commentRoutes.js";
 
 connectDB();
 
@@ -33,7 +34,9 @@ async function bootstrap() {
 
     app.use(`${appConfig.apiPrefix}`, authRoutes);
     app.use(`${appConfig.apiPrefix}/post`, postRoutes);
-    app.use(`${appConfig.apiPrefix}`, fileRoutes);
+    app.use(`${appConfig.apiPrefix}/file`, fileRoutes);
+    app.use(`${appConfig.apiPrefix}/comment`, commentRoutes);
+
 
     app.use(errorHandler);
 }

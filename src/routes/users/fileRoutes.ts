@@ -8,12 +8,12 @@ const fileRoutes = express.Router();
 
 fileRoutes.use(jwtVerify);
 fileRoutes.post(
-    "/file/upload",
+    "/upload",
     uploadMulter.single("file"),
     verifyFileType(["document", "image", "video"]),
     upload,
 );
 
-fileRoutes.post("/file/download", download);
+fileRoutes.post("/download", download);
 
 export default fileRoutes;
