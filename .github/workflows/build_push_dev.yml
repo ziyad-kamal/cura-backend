@@ -5,10 +5,6 @@ on:
     branches: ["develop"]
     paths-ignore: ['**.md', 'docs/**', '.vscode/**', '.env.example', '.gitignore', '.dockerignore', '.prettierrc', 'eslint.config.mjs']
   
-  pull_request:
-    branches: ["develop"]
-    paths-ignore: ['**.md', 'docs/**', '.vscode/**', '.env.example', '.gitignore', '.dockerignore', '.prettierrc', 'eslint.config.mjs']
-      
   workflow_dispatch:
 
 jobs:
