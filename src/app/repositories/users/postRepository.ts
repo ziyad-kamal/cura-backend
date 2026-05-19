@@ -680,10 +680,10 @@ export const likePostRepo = async (_id: string, authId: string, type: string): P
     }
 
     if (type === "repost") {
-        await Like.create({ repost: post._id, user: authId, type });
+        await Like.create({ repost: post._id, user: authId });
         return true;
     }
-    await Like.create({ post: post._id, user: authId, type });
+    await Like.create({ post: post._id, user: authId });
     return true;
 };
 

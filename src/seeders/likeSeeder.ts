@@ -26,7 +26,6 @@ const seedLikes = async (
                 likes.push({
                     user: faker.helpers.arrayElement(userIds),
                     post:postId,
-                    type:'post',
                 });
             }
         }
@@ -37,7 +36,6 @@ const seedLikes = async (
                     user: faker.helpers.arrayElement(userIds),
                     post: faker.helpers.arrayElement(postIds),
                     commentId,
-                    type: "post",
                 });
             }
         }
