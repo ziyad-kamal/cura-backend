@@ -17,16 +17,17 @@ const commentSchema = new Schema<CommentInterface>(
         post: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Post",
-            required: true,
         },
         repost: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Repost",
-            required: true,
         },
     },
     {
         timestamps: true,
+        versionKey: false,
+        id: false,
+        toJSON: { virtuals: true },
     },
 );
 

@@ -1,10 +1,9 @@
 import { Request } from "express";
 import { PostInterface } from "../../../interfaces/models/PostInterface.js";
-import { likePostRepo, repostRepo, storePostRepo, updatePostRepo } from "../../repositories/users/postRepository.js";
 import { getNextCursor, getQueryCursor } from "../../utils/cursorPagination.js";
 import { PaginationType } from "../../../types/PaginationType.js";
 import { CommentInterface } from "../../../interfaces/models/CommentInterface.js";
-import { indexCommentRepo, storeCommentRepo } from "../../repositories/users/commentRepository.js";
+import { destroyCommentRepo, indexCommentRepo, likeCommentRepo, storeCommentRepo, updateCommentRepo } from "../../repositories/users/commentRepository.js";
 import Post from "../../models/Post.js";
 import Repost from "../../models/Repost.js";
 import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
@@ -22,18 +21,23 @@ export const indexCommentService = async (req: Request): Promise<PaginationType<
     return { metadata: { hasMore, nextCursor }, comments: results };
 };
 
-export const storeCommentService = async (req: Request): Promise<PostInterface> => {
-    return await storeCommentRepo({ ...req.body, user: req.user?._id });
+export const storeCommentService = async (req: Request): Promise<CommentInterface> => {
+    const post: {   
+        model: Model<PostInterface | RepostInterface>;
+        key: string;
+    } = req.params.type === "post" ? { model: Post, key: "post" } : { model: Repost, key: "repost" };
+
+    return await storeCommentRepo({ ...req.body }, req.user?._id, post, req.params._id as string);
 };
 
-export const updatePostService = async (req: Request): Promise<PostInterface | null> => {
-    return await updatePostRepo({ ...req.body, ...req.params });
+export const updateCommentService = async (req: Request): Promise<CommentInterface | null> => {
+    return await updateCommentRepo({ ...req.body }, req.params._id as string);
 };
 
-export const likePostService = async (req: Request): Promise<boolean> => {
-    return await likePostRepo(req.params._id as string, req.user?._id, req.body.type);
+export const likeCommentService = async (req: Request): Promise<void> => {
+    return await likeCommentRepo(req.params._id as string, req.user?._id);
 };
 
-export const repostService = async (req: Request): Promise<boolean> => {
-    return await repostRepo(req.params._id as string, req.user?._id, req.body.content);
+export const destroyCommentService = async (req: Request): Promise<void> => {
+    return await destroyCommentRepo(req.params._id as string);
 };

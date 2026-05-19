@@ -37,7 +37,6 @@ async function bootstrap() {
     app.use(`${appConfig.apiPrefix}/file`, fileRoutes);
     app.use(`${appConfig.apiPrefix}/comment`, commentRoutes);
 
-
     app.use(errorHandler);
 }
 

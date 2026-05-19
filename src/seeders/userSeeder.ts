@@ -104,6 +104,10 @@ export const seedUsers = async (
             },
             password: "12121212",
             role: UserRoles.USER,
+            image: faker.image.urlPicsumPhotos({
+                width: 400,
+                height: 300,
+            }),
         });
 
         await User.create({
@@ -116,6 +120,10 @@ export const seedUsers = async (
             },
             password: "12121212",
             role: UserRoles.DOCTOR,
+            image: faker.image.urlPicsumPhotos({
+                width: 400,
+                height: 300,
+            }),
         });
 
         const createdUsers  = await User.insertMany(users) as UserInterface[];

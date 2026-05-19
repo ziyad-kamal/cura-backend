@@ -22,11 +22,6 @@ const likeSchema = new Schema<LikeInterface>(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Comment",
         },
-        type: {
-            type: String,
-            enum: ["post", "comment", "repost"],
-            required: true,
-        },
     },
     {
         versionKey: false,

@@ -6,5 +6,4 @@ export interface LikeInterface {
     post: mongoose.Types.ObjectId;
     repost: mongoose.Types.ObjectId;
     comment?: mongoose.Types.ObjectId;
-    type: string;
 }
