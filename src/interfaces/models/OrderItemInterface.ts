@@ -1,6 +1,23 @@
-import { Types } from "mongoose";
+import mongoose from "mongoose";
 
 export interface OrderItemInterface {
-    product: Types.ObjectId;
-    amount: number;
+    orderId: mongoose.Types.ObjectId;
+
+    productId: mongoose.Types.ObjectId;
+
+    vendorId: mongoose.Types.ObjectId;
+
+    quantity: number;
+
+    price: number;
+
+    status:
+        | "pending"
+        | "confirmed"
+        | "shipped"
+        | "delivered"
+        | "cancelled";
+
+    createdAt?: Date;
+    updatedAt?: Date;
 }
