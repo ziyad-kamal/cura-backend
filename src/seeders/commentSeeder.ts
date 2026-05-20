@@ -28,6 +28,7 @@ const seedComments = async (
                     post: postId,
                     createdAt: randomDate,
                     updatedAt: randomDate,
+                    repost: postId,
                 });
             }
         }

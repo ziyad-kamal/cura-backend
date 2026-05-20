@@ -1,13 +1,24 @@
-import mongoose, { Types } from "mongoose";
-import { OrderItemInterface } from './OrderItemInterface.js';
+import mongoose from "mongoose";
 
 export interface OrderInterface {
-    _id?: Types.ObjectId;
+    userId: mongoose.Types.ObjectId;
+
     totalPrice: number;
-    status: string;
-    city: string;
-    street: string;
-    products: OrderItemInterface[];
-    user: mongoose.Types.ObjectId;
-    createdAt: Date;
+
+    paymentStatus: "pending" | "paid" | "failed";
+
+    orderStatus:
+        | "pending"
+        | "confirmed"
+        | "shipped"
+        | "delivered"
+        | "cancelled";
+
+    shippingAddress: {
+        city: string;
+        street: string;
+    };
+
+    createdAt?: Date;
+    updatedAt?: Date;
 }
