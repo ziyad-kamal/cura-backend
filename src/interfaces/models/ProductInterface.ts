@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 export interface ProductInterface {
+    _id?: mongoose.Types.ObjectId;
     vendorId: mongoose.Types.ObjectId;
     title: string;
     description?: string;
