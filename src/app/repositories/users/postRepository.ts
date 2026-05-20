@@ -668,10 +668,10 @@ export const likePostRepo = async (_id: string, authId: string, type: string): P
     let like;
     if (type === "repost") {
         post = await findRecord(Repost, { _id });
-        like = await Like.findOne({ repost: post._id, user: authId, type: "repost" });
+        like = await Like.findOne({ repost: post._id, user: authId });
     } else {
         post = await findRecord(Post, { _id });
-        like = await Like.findOne({ post: _id, user: authId, type: "post" });
+        like = await Like.findOne({ post: post._id, user: authId });
     }
 
     if (like) {
