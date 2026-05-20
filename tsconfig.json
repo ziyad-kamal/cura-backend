@@ -4,7 +4,7 @@
          "paths": {
           "@/*": ["src/*"],
           "@app/*": ["src/app/*"],
-          "@cotrollers/*": ["src/app/cotrollers/*"],
+          "@controllers/*": ["src/app/controllers/*"],
           "@models/*": ["src/app/models/*"],
           "@routes/*": ["src/app/routes/*"],
           "@services/*": ["src/app/services/*"],
