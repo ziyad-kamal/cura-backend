@@ -25,9 +25,8 @@ import orderItemRoutes from "./routes/marketplace/orderItemRoutes.js";
 import reviewRoutes from "./routes/marketplace/reviewRoutes.js";
 import repostRoutes from "./routes/users/repostRoutes.js";
 
-connectDB();
-
 const app = express();
+connectDB();
 
 async function bootstrap() {
     app.listen(appConfig.port);

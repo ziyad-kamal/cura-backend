@@ -1,17 +1,5 @@
 {
     "compilerOptions": {
-        "baseUrl": "./src",
-
-        "paths": {
-            "@/*": ["./src/*"],
-            "@app/*": ["./src/app/*"],
-            "@controllers/*": ["./src/app/controllers/*"],
-            "@models/*": ["./src/app/models/*"],
-            "@routes/*": ["./src/app/routes/*"],
-            "@services/*": ["./src/app/services/*"],
-            "@interfaces/*": ["./src/app/interfaces/*"],
-            "@middlewares/*": ["./src/app/middlewares/*"]
-        },
 
         "target": "ES2017",
         "module": "NodeNext",
