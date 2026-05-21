@@ -19,9 +19,10 @@ export const addToWishlistService = async (req: Request) => {
         });
     }
 
-    wishlist.products.push(req.body.productId);
-
-    await wishlist.save();
+    if (!wishlist.products.includes(req.body.productId)) {
+        wishlist.products.push(req.body.productId);
+        await wishlist.save();
+    }
 
     return wishlist;
 };

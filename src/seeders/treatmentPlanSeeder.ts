@@ -8,6 +8,7 @@ const seedTreatmentPlans = async (
     count: number = 30,
     adminIds: Array<Types.ObjectId> = [],
     doctorsIds: Array<Types.ObjectId> = [],
+    consultationIds: Array<Types.ObjectId> = [], // Added consultationIds parameter
 ): Promise<TreatmentPlanInterface[]> => {
     try {
         await TreatmentPlan.deleteMany({});
@@ -19,17 +20,19 @@ const seedTreatmentPlans = async (
             const randomDate = faker.date.past({ years: 1 });
 
             treatmentPlans.push({
-                description: faker.lorem.paragraph({ min: 2, max: 5 }),
-                diagnosis: faker.lorem.word(8),
+                description: faker.lorem.paragraph({ min: 2, max: 5 }), // Good length
+                diagnosis: faker.lorem.sentence({ min: 5, max: 10 }), // More realistic diagnosis length
                 medications: "Paracetamol and Augmentin",
                 procedures: "Stomach removal surgery and stomach wash surgery and liposuction",
                 user: faker.helpers.arrayElement(adminIds),
                 doctor: faker.helpers.arrayElement(doctorsIds),
+                consultation: faker.helpers.arrayElement(consultationIds), // Added required consultation field
                 tags: faker.helpers.arrayElements(["Increases Weight", " Decreases Weight", " Boosts Immunity"], {
                     min: 1,
                     max: 3,
                 }),
-                createdAt: randomDate,
+                createdAt: randomDate, // Corrected type to Date
+                updatedAt: randomDate, // Corrected type to Date
             });
         }
 

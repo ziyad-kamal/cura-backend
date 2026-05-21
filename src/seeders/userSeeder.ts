@@ -46,8 +46,8 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
 
         userInfo: {
             age: faker.number.int({ min: 18, max: 65 }),
-            weight: Number(faker.string.numeric(2)),
-            height: Number(faker.string.numeric(2)),
+            weight: faker.number.int({ min: 40, max: 150 }), // More realistic weight
+            height: faker.number.int({ min: 150, max: 200 }), // More realistic height
             gender: faker.helpers.arrayElement(["male", "female"]),
             diseases: "Diabetes and High Blood Pressure",
             medications:"Metformin and augmentin",

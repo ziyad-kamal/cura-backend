@@ -22,7 +22,7 @@ const categorySchema = new Schema<CategoryInterface>(
             required: true,
             unique: true,
             lowercase: true,
-            trim: true,
+            trim: true, 
         },
 
         image: String,

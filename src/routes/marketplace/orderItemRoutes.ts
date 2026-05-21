@@ -12,4 +12,4 @@ router.get("/", index);
 router.get("/:id", show);
 router.patch("/:id/status", updateStatus);
 
-export default router;
+export default router;  

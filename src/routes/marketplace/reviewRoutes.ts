@@ -7,7 +7,7 @@ import {
     update,
 } from "../../app/controllers/reviews/reviewController.js";
 
-const router = express.Router();
+const router = express.Router();    
 
 router.get("/", index);
 router.post("/", store);
