@@ -6,7 +6,7 @@ const cartSchema = new Schema<CartInterface>(
         userId: {
             type: Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            required: true, 
             unique: true,
         },
 

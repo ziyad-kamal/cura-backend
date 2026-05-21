@@ -11,5 +11,5 @@ const router = express.Router();
 router.get("/", index);
 router.post("/", store);
 router.delete("/:id", destroy);
-
+ 
 export default router;

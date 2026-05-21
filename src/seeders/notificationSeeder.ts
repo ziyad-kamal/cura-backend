@@ -22,7 +22,7 @@ const seedNotifications = async (
 
             notifications.push({
                 message: faker.lorem.paragraph({ min: 1, max: 1 }),
-                ...(isPostType && { postId: faker.helpers.arrayElement(postIds) }),
+                ...(isPostType && { post: faker.helpers.arrayElement(postIds) }),
                 receiver: faker.helpers.arrayElement(usersIds),
                 sender: faker.helpers.arrayElement(usersIds),
                 createdAt: randomDate,

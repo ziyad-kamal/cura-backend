@@ -35,9 +35,9 @@ const seedLikes = async (
             for (let i = 0; i < countPerComment; i++) {
                 likes.push({
                     user: faker.helpers.arrayElement(userIds),
-                    post: faker.helpers.arrayElement(postIds),
-                    commentId,
-                    type: "post",
+                    post: undefined, // A like on a comment is not directly on a post
+                    comment: commentId,
+                    type: "comment", // Type should be 'comment' for comment likes
                 });
             }
         }

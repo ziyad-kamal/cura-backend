@@ -1,15 +1,15 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import Cart from '../app/models/Cart.js';
+import Transaction from '../app/models/Transaction.js';
 import { Types } from "mongoose";
 
-const seedCarts = async (
+const seedTransactions = async (
     count: number = 30,
     orderIds: Array<Types.ObjectId> = [],
     consultationIds: Array<Types.ObjectId> = [],
 ): Promise<void> => {
     try {
-        await Cart.deleteMany({});
+        await Transaction.deleteMany({});
         console.log("🗑️  Cleared existing transactions");
 
         const transactions = [];
@@ -22,12 +22,12 @@ const seedCarts = async (
             });
         }
 
-        const createdCarts = await Cart.insertMany(transactions);
-        console.log(`✅ Created ${createdCarts.length} transactions`);
+        const createdTransactions = await Transaction.insertMany(transactions);
+        console.log(`✅ Created ${createdTransactions.length} transactions`);
     } catch (err: unknown) {
         console.error("Posts seeding failed:", err instanceof Error ? err.message : String(err));
         throw err;
     }
 };
 
-export default seedCarts;
+export default seedTransactions;

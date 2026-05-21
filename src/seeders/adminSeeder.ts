@@ -17,8 +17,9 @@ const seedAdmins = async (
             admins.push({
                 name: faker.person.fullName(),
                 email: faker.internet.email(),
-                phone: Number(faker.string.numeric(11)),
+                phone: Number(faker.string.numeric(11)), // Converted to Number
                 password: '13131313',
+                role: faker.helpers.arrayElement(["admin", "super admin", "company admin"]), // Added required role field
                 createdAt: randomDate,
                 updatedAt: randomDate,
             });

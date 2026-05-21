@@ -19,6 +19,7 @@ const seedConsultations = async (
 
             consultations.push({
                 price: faker.number.int({ min: 300, max: 1000 }),
+                type: faker.helpers.arrayElement(["short term", "medium term", "long term"]), // Added missing 'type' field
                 status: faker.helpers.arrayElement(["pending", "started", "in progress", "completed"]),
                 user: faker.helpers.arrayElement(userIds),
                 doctor: faker.helpers.arrayElement(userIds),
