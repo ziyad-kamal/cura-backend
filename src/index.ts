@@ -25,12 +25,11 @@ import orderItemRoutes from "./routes/marketplace/orderItemRoutes.js";
 import reviewRoutes from "./routes/marketplace/reviewRoutes.js";
 import repostRoutes from "./routes/users/repostRoutes.js";
 
+connectDB();
 
 const app = express();
 
 async function bootstrap() {
-    await connectDB();
-
     app.listen(appConfig.port);
 
     app.use(applyCors);
