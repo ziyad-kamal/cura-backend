@@ -3,8 +3,8 @@ import { destroy, index, like,  store,  update } from "../../app/controllers/use
 import { validateId } from "../../app/middlewares/validateId.js";
 import { postValidator } from "../../app/validators/postValidator.js";
 import { jwtVerify } from "./../../app/middlewares/jwtVerify.js";
-import { authorize } from "@/app/middlewares/authorize.js";
-import Post from "@/app/models/Post.js";
+import { authorize } from "../../app/middlewares/authorize.js";
+import Post from "../../app/models/Post.js";
 
 const postRoutes = express.Router();
 

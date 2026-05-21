@@ -1,6 +1,6 @@
 import { Request } from "express";
-import { likeRepostRepo, storeRepostRepo, updateRepostRepo } from "@/app/repositories/users/repostRepository.js";
-import { RepostInterface } from "@/interfaces/models/RepostInterface.js";
+import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
+import { likeRepostRepo, storeRepostRepo, updateRepostRepo } from "../../repositories/users/repostRepository.js";
 
 export const storeRepostService = async (req: Request): Promise<boolean> => {
     return await storeRepostRepo({ ...req.body }, req.user?._id);

@@ -1,8 +1,8 @@
-import { findRecord } from "@/app/utils/findRecord.js";
-import { returnError } from "@/app/utils/returnJson.js";
-import { OwnerInterface } from "@/interfaces/data/OwnerInterface.js";
 import { NextFunction, Request, Response } from "express";
 import { Model } from "mongoose";
+import { findRecord } from "../utils/findRecord.js";
+import { OwnerInterface } from "../../interfaces/data/OwnerInterface.js";
+import { returnError } from "../utils/returnJson.js";
 
 export const authorize = <T extends OwnerInterface>(model: Model<T>,param :string) => {
     return async(req: Request, res: Response, next: NextFunction) => {
@@ -14,5 +14,6 @@ export const authorize = <T extends OwnerInterface>(model: Model<T>,param :strin
         }
 
         next();
+        
     };
 };
