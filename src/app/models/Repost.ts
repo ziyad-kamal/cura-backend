@@ -10,18 +10,6 @@ const repostSchema = new Schema<RepostInterface>(
             type: String,
             trim: true,
         },
-        files: [
-            new Schema(
-                {
-                    url: String,
-                    type: {
-                        type: String,
-                        enum: ["video", "document", "image"],
-                    },
-                },
-                { id: false },
-            ),
-        ],
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

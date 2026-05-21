@@ -14,13 +14,9 @@ export const showCategoryService = async (req: Request) => {
 };
 
 export const updateCategoryService = async (req: Request) => {
-    return await Category.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-            new: true,
-        }
-    );
+    return await Category.findByIdAndUpdate(req.params.id, req.body, {
+        returnDocument: "after",
+    });
 };
 
 export const deleteCategoryService = async (req: Request) => {

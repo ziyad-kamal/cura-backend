@@ -18,7 +18,7 @@ export const updateOrderItemStatusService = async (
             status: req.body.status,
         },
         {
-            new: true,
-        }
+            returnDocument: "after",
+        },
     );
 };

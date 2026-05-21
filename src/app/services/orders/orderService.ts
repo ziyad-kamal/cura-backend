@@ -49,7 +49,7 @@ export const cancelOrderService = async (req: Request) => {
             orderStatus: "cancelled",
         },
         {
-            new: true,
-        }
+            returnDocument: "after",
+        },
     );
 };

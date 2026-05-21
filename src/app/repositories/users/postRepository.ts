@@ -7,7 +7,6 @@ import Post from "../../models/Post.js";
 import { findRecord } from "../../utils/findRecord.js";
 import Repost from "../../models/Repost.js";
 import Connection from "../../models/Connection.js";
-import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
 
 export const indexPostsRepo = async (authId: string, cursor?: string) => {
     const authObjectId = new mongoose.Types.ObjectId(authId);
@@ -651,90 +650,47 @@ export const storePostRepo = async ({
     tags,
     visibility,
 }: PostDataInterface): Promise<HydratedDocument<PostInterface>> => {
-    return (await Post.create({ user, content, files, tags, visibility })).populate("user");
+    return (await Post.create({ user, content, files, tags, visibility })).populate(
+        "user",
+        "name.first name.last image",
+    );
 };
 
 export const updatePostRepo = async ({
     content,
     files,
+    visibility,
+    tags,
     _id,
 }: PostDataInterface): Promise<HydratedDocument<PostInterface> | null> => {
     await findRecord(Post, { _id });
-    return await Post.findByIdAndUpdate(_id, { content, files }, { new: true, runValidators: true }).populate("user");
+
+    return await Post.findByIdAndUpdate(
+        _id,
+        { content, files, visibility, tags },
+        {
+            returnDocument: "after",
+            runValidators: true,
+        },
+    ).populate("user", "name.first name.last image");
 };
 
-export const likePostRepo = async (_id: string, authId: string, type: string): Promise<boolean> => {
-    let post;
-    let like;
-    if (type === "repost") {
-        post = await findRecord(Repost, { _id });
-        like = await Like.findOne({ repost: post._id, user: authId });
-    } else {
-        post = await findRecord(Post, { _id });
-        like = await Like.findOne({ post: post._id, user: authId });
-    }
-
+export const likePostRepo = async (_id: string, authId: string): Promise<boolean> => {
+    const post = await findRecord(Post, { _id });
+    const like = await Like.findOne({ post: post._id, user: authId });
     if (like) {
         await Like.deleteOne({ _id: like._id });
         return false;
     }
 
-    if (type === "repost") {
-        await Like.create({ repost: post._id, user: authId });
-        return true;
-    }
     await Like.create({ post: post._id, user: authId });
     return true;
 };
 
-export const repostRepo = async (
-    _id: string,
-    authId: string,
-    { type, content }: { type: string; content: string },
-): Promise<boolean> => {
-    let postId: string;
-
-    if (type === "repost") {
-        const repostDoc = await findRecord(Repost, { _id });
-        const populated = await repostDoc.populate("post");
-        postId = populated.post._id.toString();
-    } else {
-        const postDoc = await findRecord(Post, { _id });
-        postId = postDoc._id.toString();
-    }
-
-    const existingRepost = await Repost.findOne({ post: postId, user: authId });
-    if (existingRepost) {
-        await Repost.deleteOne({ _id: existingRepost._id });
-        return false;
-    }
-
-    await Repost.create({ post: postId, user: authId, content });
-    return true;
-};
-
-export const updateRepostRepo = async (
-    _id: string,
-    content?: string,
-): Promise<HydratedDocument<RepostInterface> | null> => {
-    await findRecord(Repost, { _id });
-
-    return await Repost.findByIdAndUpdate(_id, { content }, { new: true, runValidators: true })
-        .populate("user")
-        .populate("post");
-};
-
-export const deletePostRepo = async (_id: string, type: string): Promise<void> => {
+export const deletePostRepo = async (_id: string): Promise<void> => {
     // const session = await mongoose.startSession();
 
     // await session.withTransaction(async () => {
-    if (type === "repost") {
-        await findRecord(Repost, { _id });
-        await Repost.deleteOne({ _id });
-        await Like.deleteMany({ repost: _id });
-        await Comment.deleteMany({ repost: _id });
-        return;
-    }
     await findRecord(Post, { _id });
     await Post.deleteOne({ _id });
     await Like.deleteMany({ post: _id });

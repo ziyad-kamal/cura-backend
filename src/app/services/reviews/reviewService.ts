@@ -15,13 +15,9 @@ export const createReviewService = async (req: Request) => {
 };
 
 export const updateReviewService = async (req: Request) => {
-    return await Review.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-            new: true,
-        }
-    );
+    return await Review.findByIdAndUpdate(req.params.id, req.body, {
+        returnDocument: "after",
+    });
 };
 
 export const deleteReviewService = async (req: Request) => {

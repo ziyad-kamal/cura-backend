@@ -1,7 +1,12 @@
 import { Request } from "express";
 import { PostInterface } from "../../../interfaces/models/PostInterface.js";
-import { deletePostRepo, indexPostsRepo, likePostRepo, repostRepo, storePostRepo, updatePostRepo, updateRepostRepo } from "../../repositories/users/postRepository.js";
-import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
+import {
+    deletePostRepo,
+    indexPostsRepo,
+    likePostRepo,
+    storePostRepo,
+    updatePostRepo,
+} from "../../repositories/users/postRepository.js";
 
 export const indexPostsService = async (req: Request) => {
     const authId = req.user?._id as string;
@@ -16,22 +21,14 @@ export const storePostService = async (req: Request): Promise<PostInterface> => 
     return await storePostRepo({ ...req.body, user: req.user?._id });
 };
 
-export const updatePostService = async (req: Request): Promise<PostInterface|null> => {
+export const updatePostService = async (req: Request): Promise<PostInterface | null> => {
     return await updatePostRepo({ ...req.body, ...req.params });
 };
 
 export const likePostService = async (req: Request): Promise<boolean> => {
-    return await likePostRepo(req.params._id as string,req.user?._id,req.body.type);
-};
-
-export const repostService = async (req: Request): Promise<boolean> => {
-    return await repostRepo(req.params._id as string, req.user?._id, {...req.body});
-};
-
-export const updateRepostService = async (req: Request): Promise<RepostInterface | null> => {
-    return await updateRepostRepo(req.params._id as string, req.body.content);
+    return await likePostRepo(req.params._id as string, req.user?._id);
 };
 
 export const deletePostService = async (req: Request): Promise<void> => {
-    await deletePostRepo(req.params._id as string, req.params.type as string);
+    await deletePostRepo(req.params._id as string);
 };

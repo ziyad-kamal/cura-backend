@@ -18,13 +18,9 @@ export const showProductService = async (req: Request) => {
 };
 
 export const updateProductService = async (req: Request) => {
-    return await Product.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-            new: true,
-        }
-    );
+    return await Product.findByIdAndUpdate(req.params.id, req.body, {
+        returnDocument: "after",
+    });
 };
 
 export const deleteProductService = async (req: Request) => {

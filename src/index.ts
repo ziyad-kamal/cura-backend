@@ -23,6 +23,7 @@ import cartRoutes from "./routes/marketplace/cartRoutes.js";
 import orderRoutes from "./routes/marketplace/orderRoutes.js";
 import orderItemRoutes from "./routes/marketplace/orderItemRoutes.js";
 import reviewRoutes from "./routes/marketplace/reviewRoutes.js";
+import repostRoutes from "./routes/users/repostRoutes.js";
 
 connectDB();
 
@@ -48,6 +49,7 @@ async function bootstrap() {
     //community
     app.use(`${appConfig.apiPrefix}`, authRoutes);
     app.use(`${appConfig.apiPrefix}/post`, postRoutes);
+    app.use(`${appConfig.apiPrefix}/repost`, repostRoutes);
     app.use(`${appConfig.apiPrefix}/file`, fileRoutes);
     app.use(`${appConfig.apiPrefix}/comment`, commentRoutes);
 

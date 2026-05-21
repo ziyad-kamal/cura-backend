@@ -4,34 +4,38 @@ import Like from "../../models/Like.js";
 import { findRecord } from "../../utils/findRecord.js";
 import { CommentInterface } from "../../../interfaces/models/CommentInterface.js";
 import { CommentDataInterface } from "../../../interfaces/data/CommentDataInterface.js";
+import { PostInterface } from "@/interfaces/models/PostInterface.js";
+import { RepostInterface } from "@/interfaces/models/RepostInterface.js";
+import { PostTypeInterface } from "@/interfaces/data/PostTypeInterface.js";
 
-export const indexCommentRepo = async <T>(
+export const indexCommentRepo = async(
     query: {
         [key: string]: unknown;
     },
     limit: number,
-    post: Model<T>,
+    post: PostTypeInterface,
     _id: string,
 ) => {
-    await findRecord(post, { _id });
+    const postRecord=await findRecord(post.model, { _id });
     return await Comment.find(query)
         .select("content  createdAt")
         .populate("likesCount")
         .populate("user", "name.first name.last image")
+        .where({[post.key]: postRecord._id})
         .sort({ createdAt: -1 })
         .limit(limit + 1)
         .lean();
 };
 
-export const storeCommentRepo = async <T>(
+export const storeCommentRepo = async (
     { content }: CommentDataInterface,
     user: string,
-    post: { model: Model<T>; key: string },
+    post: { model: Model<PostInterface | RepostInterface>; key: string },
     _id: string,
 ): Promise<HydratedDocument<CommentInterface>> => {
     await findRecord(post.model, { _id });
 
-    return (await Comment.create({ content, user, [post.key]: _id })).populate("user",' name.first name.last image');
+    return (await Comment.create({ content, user, [post.key]: _id })).populate("user", " name.first name.last image");
 };
 
 export const updateCommentRepo = async (
@@ -43,7 +47,7 @@ export const updateCommentRepo = async (
     return await Comment.findByIdAndUpdate(
         _id,
         { content },
-        { new: true, runValidators: true },
+        { returnDocument: 'after', runValidators: true },
     ).populate("user",'name.first name.last image') as HydratedDocument<CommentInterface>;
 };
 
