@@ -26,11 +26,11 @@ import reviewRoutes from "./routes/marketplace/reviewRoutes.js";
 import repostRoutes from "./routes/users/repostRoutes.js";
 
 const app = express();
-connectDB();
+
 
 async function bootstrap() {
     app.listen(appConfig.port);
-
+    await connectDB();
     app.use(applyCors);
 
     app.use(httpLogger);
