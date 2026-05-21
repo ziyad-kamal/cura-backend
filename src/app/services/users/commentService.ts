@@ -14,7 +14,7 @@ import Post from "../../models/Post.js";
 import Repost from "../../models/Repost.js";
 import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
 import { Model } from "mongoose";
-import { PostTypeInterface } from "@/interfaces/data/PostTypeInterface.js";
+import { PostTypeInterface } from "../../../interfaces/data/PostTypeInterface.js";
 
 export const indexCommentService = async (req: Request): Promise<PaginationType<CommentInterface, "comments">> => {
     const limit = 10;

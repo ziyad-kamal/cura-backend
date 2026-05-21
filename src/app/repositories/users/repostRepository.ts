@@ -3,8 +3,8 @@ import Like from "../../models/Like.js";
 import Post from "../../models/Post.js";
 import { findRecord } from "../../utils/findRecord.js";
 import Repost from "../../models/Repost.js";
-import { RepostDataInterface } from "@/interfaces/data/RepostDataInterface.js";
-import { RepostInterface } from "@/interfaces/models/RepostInterface.js";
+import { RepostDataInterface } from "../../../interfaces/data/RepostDataInterface.js";
+import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
 
 export const storeRepostRepo = async ({ content, post }: RepostDataInterface, user: string): Promise<boolean> => {
     await findRecord(Post, { _id: post });

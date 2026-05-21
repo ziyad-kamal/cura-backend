@@ -4,9 +4,10 @@ import Like from "../../models/Like.js";
 import { findRecord } from "../../utils/findRecord.js";
 import { CommentInterface } from "../../../interfaces/models/CommentInterface.js";
 import { CommentDataInterface } from "../../../interfaces/data/CommentDataInterface.js";
-import { PostInterface } from "@/interfaces/models/PostInterface.js";
-import { RepostInterface } from "@/interfaces/models/RepostInterface.js";
-import { PostTypeInterface } from "@/interfaces/data/PostTypeInterface.js";
+import { PostTypeInterface } from "../../../interfaces/data/PostTypeInterface.js";
+import { PostInterface } from "../../../interfaces/models/PostInterface.js";
+import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
+
 
 export const indexCommentRepo = async(
     query: {
