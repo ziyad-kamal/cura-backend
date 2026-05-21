@@ -19,8 +19,8 @@ export const like = asyncHandler(async (req: Request, res: Response): Promise<Re
 });
 
 export const update = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const post = await updateCommentService(req);
-    return returnSuccess(res, "you updated comment successfully", 200, { post });
+    const comment = await updateCommentService(req);
+    return returnSuccess(res, "you updated comment successfully", 200, { comment });
 });
 
 export const destroy = asyncHandler(async (req: Request, res: Response): Promise<Response> => {

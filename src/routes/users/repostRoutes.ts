@@ -11,6 +11,6 @@ const repostRoutes = express.Router();
 repostRoutes.use(jwtVerify);
 repostRoutes.post("/store", repostValidator, store);
 repostRoutes.post("/like/:_id", validateId(), like);
-repostRoutes.put("/update/:_id", validateId(), repostValidator, authorize(Repost, "_id"), update);
+repostRoutes.put("/update/:_id", validateId(), authorize(Repost, "_id"), repostValidator, update);
 
 export default repostRoutes;

@@ -14,6 +14,5 @@ export const authorize = <T extends OwnerInterface>(model: Model<T>,param :strin
         }
 
         next();
-        
     };
 };

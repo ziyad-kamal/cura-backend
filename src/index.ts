@@ -27,15 +27,15 @@ import repostRoutes from "./routes/users/repostRoutes.js";
 
 const app = express();
 
-
 async function bootstrap() {
     app.listen(appConfig.port);
+
     await connectDB();
+    await connectRedis();
+
     app.use(applyCors);
 
     app.use(httpLogger);
-
-    await connectRedis();
 
     app.use(globalLimiter);
 
