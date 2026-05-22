@@ -10,7 +10,7 @@ import { getNextCursor, getQueryCursor } from "../../utils/cursorPagination.js";
 import { indexProfileRepo } from "../../repositories/users/profileRepository.js";
 
 export const indexProfileService = async (req: Request) => {
-    const limit = 1;
+    const limit = 10;
     const { query, sortField } = getQueryCursor(req, "createdAt");
 
     const profile = await indexProfileRepo(query, limit, req.params.userId as string,req.user?._id);
