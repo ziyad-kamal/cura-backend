@@ -1,11 +1,7 @@
-import { HydratedDocument, Model, Types } from "mongoose";
+import {  Types } from "mongoose";
 import Comment from "../../models/Comment.js";
 import Like from "../../models/Like.js";
 import { findRecord } from "../../utils/findRecord.js";
-import { CommentInterface } from "../../../interfaces/models/CommentInterface.js";
-import { CommentDataInterface } from "../../../interfaces/data/CommentDataInterface.js";
-import { PostInterface } from "../../../interfaces/models/PostInterface.js";
-import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
 import User from "../../models/User.js";
 import Post from "../../models/Post.js";
 
@@ -169,31 +165,9 @@ export const indexProfileRepo = async (
     };
 };
 
-export const storeCommentRepo = async (
-    { content }: CommentDataInterface,
-    user: string,
-    post: { model: Model<PostInterface | RepostInterface>; key: string },
-    userId: string,
-): Promise<HydratedDocument<CommentInterface>> => {
-    await findRecord(post.model, { userId });
-
-    return (await Comment.create({ content, user, [post.key]: userId })).populate(
-        "user",
-        " name.first name.last image",
-    );
-};
-
-export const updateCommentRepo = async (
-    { content }: CommentDataInterface,
-    userId: string,
-): Promise<HydratedDocument<CommentInterface>> => {
-    await findRecord(Comment, { userId });
-
-    return (await Comment.findByIdAndUpdate(
-        userId,
-        { content },
-        { returnDocument: "after", runValidators: true },
-    ).populate("user", "name.first name.last image")) as HydratedDocument<CommentInterface>;
+export const updateProfileRepo = async (
+): Promise<void> => {
+    
 };
 
 export const likeCommentRepo = async (userId: string, authId: string): Promise<void> => {

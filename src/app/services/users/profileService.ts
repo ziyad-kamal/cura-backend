@@ -4,10 +4,9 @@ import {
     deletePostRepo,
     likePostRepo,
     storePostRepo,
-    updatePostRepo,
 } from "../../repositories/users/postRepository.js";
 import { getNextCursor, getQueryCursor } from "../../utils/cursorPagination.js";
-import { indexProfileRepo } from "../../repositories/users/profileRepository.js";
+import { indexProfileRepo, updateProfileRepo } from "../../repositories/users/profileRepository.js";
 
 export const indexProfileService = async (req: Request) => {
     const limit = 10;
@@ -24,8 +23,8 @@ export const storePostService = async (req: Request): Promise<PostInterface> => 
     return await storePostRepo({ ...req.body, user: req.user?._id });
 };
 
-export const updatePostService = async (req: Request): Promise<PostInterface | null> => {
-    return await updatePostRepo({ ...req.body, ...req.params });
+export const updateProfileService = async (req: Request): Promise<void> => {
+    return await updateProfileRepo();
 };
 
 export const likePostService = async (req: Request): Promise<boolean> => {
