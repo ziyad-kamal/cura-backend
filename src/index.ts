@@ -24,6 +24,7 @@ import orderRoutes from "./routes/marketplace/orderRoutes.js";
 import orderItemRoutes from "./routes/marketplace/orderItemRoutes.js";
 import reviewRoutes from "./routes/marketplace/reviewRoutes.js";
 import repostRoutes from "./routes/users/repostRoutes.js";
+import profileRoutes from "./routes/users/profileRoutes.js";
 
 const app = express();
 
@@ -51,6 +52,7 @@ async function bootstrap() {
     app.use(`${appConfig.apiPrefix}/repost`, repostRoutes);
     app.use(`${appConfig.apiPrefix}/file`, fileRoutes);
     app.use(`${appConfig.apiPrefix}/comment`, commentRoutes);
+    app.use(`${appConfig.apiPrefix}/profile`, profileRoutes);
 
     // marketplace
     app.use(`${appConfig.apiPrefix}/vendors`, vendorRoutes);
@@ -61,7 +63,6 @@ async function bootstrap() {
     app.use(`${appConfig.apiPrefix}/orders`, orderRoutes);
     app.use(`${appConfig.apiPrefix}/order-items`, orderItemRoutes);
     app.use(`${appConfig.apiPrefix}/reviews`, reviewRoutes);
-
 
     app.use(errorHandler);
 } 

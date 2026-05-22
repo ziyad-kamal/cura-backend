@@ -45,9 +45,11 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
         }),
 
         userInfo: {
+            bio: faker.lorem.sentence(2),
+            job: faker.person.jobTitle(),
             age: faker.number.int({ min: 18, max: 65 }),
-            weight: faker.number.int({ min: 40, max: 150 }), // More realistic weight
-            height: faker.number.int({ min: 150, max: 200 }), // More realistic height
+            weight: faker.number.int({ min: 40, max: 150 }),
+            height: faker.number.int({ min: 150, max: 200 }), 
             gender: faker.helpers.arrayElement(["male", "female"]),
             diseases: "Diabetes and High Blood Pressure",
             medications:"Metformin and augmentin",
@@ -86,6 +88,44 @@ export const seedUsers = async (
             users.push(generateFakeUser(UserRoles.DOCTOR));
         }
 
+        const firstName = faker.person.firstName();
+        const lastName = faker.person.lastName();
+
+        await User.create({
+            name: {
+                first: faker.person.firstName(),
+                last: faker.person.lastName(),
+            },
+            contact: {
+                email: "doctor@gmail.com",
+                phone: faker.string.numeric(11),
+                address: {
+                    city: faker.location.city(),
+                    street: faker.location.streetAddress(),
+                },
+            },
+            isVerified: true,
+            isActive: true,
+            cardPayment: {
+                number: faker.finance.creditCardNumber("visa").replace(/\D/g, ""),
+                name: `${firstName} ${lastName}`,
+                cvv: faker.finance.creditCardCVV(),
+                expDate: faker.date
+                    .future({ years: 5 })
+                    .toLocaleDateString("en", { month: "2-digit", year: "2-digit" }),
+            },
+            password: "12121212",
+            role: UserRoles.DOCTOR,
+            image: faker.image.urlPicsumPhotos({
+                width: 400,
+                height: 300,
+            }),
+            coverImage: faker.image.urlPicsumPhotos({
+                width: 1200,
+                height: 400,
+            }),
+        });
+
         const authUser = await User.create({
             name: {
                 first: faker.person.firstName(),
@@ -95,12 +135,24 @@ export const seedUsers = async (
                 email: "user@gmail.com",
             },
             userInfo: {
+                bio: faker.lorem.sentence({min: 5, max: 10}),
+                job: faker.person.jobTitle(),
                 age: faker.number.int({ min: 18, max: 65 }),
                 weight: Number(faker.string.numeric(2)),
-                height: Number(faker.string.numeric(2)),    
+                height: Number(faker.string.numeric(2)),
                 diseases: "Diabetes and High Blood Pressure",
-                medications:"Metformin and augmentin",
+                medications: "Metformin and augmentin",
                 tags: ["diabetes", "hypertension"],
+            },
+            isVerified: true,
+            isActive: true,
+            cardPayment: {
+                number: faker.finance.creditCardNumber("visa").replace(/\D/g, ""),
+                name: `${firstName} ${lastName}`,
+                cvv: faker.finance.creditCardCVV(),
+                expDate: faker.date
+                    .future({ years: 5 })
+                    .toLocaleDateString("en", { month: "2-digit", year: "2-digit" }),
             },
             password: "12121212",
             role: UserRoles.USER,
@@ -108,21 +160,9 @@ export const seedUsers = async (
                 width: 400,
                 height: 300,
             }),
-        });
-
-        await User.create({
-            name: {
-                first: faker.person.firstName(),
-                last: faker.person.lastName(),
-            },
-            contact: {
-                email: "doctor@gmail.com",
-            },
-            password: "12121212",
-            role: UserRoles.DOCTOR,
-            image: faker.image.urlPicsumPhotos({
-                width: 400,
-                height: 300,
+            coverImage: faker.image.urlPicsumPhotos({
+                width: 1200,
+                height: 400,
             }),
         });
 

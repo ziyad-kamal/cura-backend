@@ -22,7 +22,6 @@ export const loginService = async (req: Request, res: Response): Promise<object>
     const userData = { _id: user._id, email: user.contact.email };
 
     const tokens = sendToken(userData, res);
-
     return { tokens, user };
 };
 
@@ -92,4 +91,8 @@ export const verifyEmailService = async (req: ResetPasswordRequestInterface): Pr
     verifyToken(email, token, "verifyToken");
 
     await user.updateOne({ isVerified: true });
+};
+
+export const logoutService = async (req: ResetPasswordRequestInterface): Promise<void> => {
+    
 };

@@ -42,3 +42,8 @@ export const verifyEmail = asyncHandler(async (req: VerifyEmailRequestInterface,
     await verifyEmailService(req);
     return returnSuccess(res, "you verified your email successfully", 200);
 });
+
+// export const logout = asyncHandler(async (req: VerifyEmailRequestInterface, res: Response): Promise<Response> => {
+//     await logoutService(req);
+//     return returnSuccess(res, "you verified your email successfully", 200);
+// });
