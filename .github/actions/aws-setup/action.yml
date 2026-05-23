@@ -1,0 +1,31 @@
+name: Checkout and AWS Setup
+description: Checkout code, configure AWS credentials, and login to ECR
+
+inputs:
+  aws-access-key-id:
+    description: AWS Access Key ID
+    required: true
+  aws-secret-access-key:
+    description: AWS Secret Access Key
+    required: true
+  aws-region:
+    description: AWS Region
+    required: true
+
+outputs:
+  registry:
+    description: ECR registry URL
+    value: ${{ steps.login-ecr.outputs.registry }}
+
+runs:
+  using: composite
+  steps:
+
+    - uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+
+    - id: login-ecr
+      uses: aws-actions/amazon-ecr-login@fa648b43de3d4d023bcb3f89ed6940096949c419
