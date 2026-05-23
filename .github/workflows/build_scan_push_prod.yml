@@ -23,19 +23,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c
+      - id: checkout-aws-setup
+        uses: ./.github/actions/checkout-aws-setup
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@fa648b43de3d4d023bcb3f89ed6940096949c419
 
       - name: Set short SHA
         id: sha
@@ -45,7 +38,7 @@ jobs:
 
       - name: Build and tag image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ steps.checkout-aws-setup.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:master-sha-${{ steps.sha.outputs.SHORT }} .
@@ -53,7 +46,7 @@ jobs:
       - name: Push master SHA tag
         if: github.ref == 'refs/heads/master'
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ steps.checkout-aws-setup.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:master-sha-${{ steps.sha.outputs.SHORT }}
@@ -61,7 +54,7 @@ jobs:
       - name: Push semver and latest tags
         if: startsWith(github.ref, 'refs/tags/v')
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ steps.checkout-aws-setup.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           VERSION: ${{ github.ref_name }}
         run: |
@@ -71,11 +64,12 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
       - name: Trigger DevOps Workflow
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           PAT: ${{ secrets.PAT }}
-
         run: |
           curl -X POST \
+            --fail-with-body \
             -H "Authorization: Bearer ${PAT}" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/cura-fitness/cura-devops/actions/workflows/deploy_prod.yml/dispatches \
