@@ -4,6 +4,7 @@ import {
     deletePostRepo,
     indexPostsRepo,
     likePostRepo,
+    repostPostRepo,
     storePostRepo,
     updatePostRepo,
 } from "../../repositories/users/postRepository.js";
@@ -19,6 +20,10 @@ export const indexPostsService = async (req: Request) => {
 
 export const storePostService = async (req: Request): Promise<PostInterface> => {
     return await storePostRepo({ ...req.body, user: req.user?._id });
+};
+
+export const repostPostService = async (req: Request): Promise<boolean> => {
+    return await repostPostRepo({ ...req.body }, req.user?._id);
 };
 
 export const updatePostService = async (req: Request): Promise<PostInterface | null> => {

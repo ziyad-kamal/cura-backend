@@ -1,9 +1,10 @@
-import {  Types } from "mongoose";
+import { Types } from "mongoose";
 import Comment from "../../models/Comment.js";
 import Like from "../../models/Like.js";
 import { findRecord } from "../../utils/findRecord.js";
 import User from "../../models/User.js";
 import Post from "../../models/Post.js";
+import { UserDataInterface } from "../../../interfaces/data/UserDataInterface.js";
 
 export const indexProfileRepo = async (
     query: {
@@ -166,8 +167,12 @@ export const indexProfileRepo = async (
 };
 
 export const updateProfileRepo = async (
+    { bio, job, firstName, lastName, image, coverImage }: UserDataInterface,
+    authId: string,
 ): Promise<void> => {
-    
+    const user=await findRecord(User, { _id: authId });
+
+    user.updateOne({ userInfo: { bio, job }, name: { first: firstName, last: lastName }, image, coverImage });
 };
 
 export const likeCommentRepo = async (userId: string, authId: string): Promise<void> => {

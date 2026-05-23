@@ -13,6 +13,11 @@ export const store = asyncHandler(async (req: Request, res: Response): Promise<R
     return returnSuccess(res, "you post successfully", 200, { post });
 });
 
+export const repost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const post = await storePostService(req);
+    return returnSuccess(res, "you post successfully", 200, { post });
+});
+
 export const update = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const post = await updatePostService(req);
     return returnSuccess(res, "you updated post successfully", 200, { post });

@@ -7,6 +7,7 @@ import Post from "../../models/Post.js";
 import { findRecord } from "../../utils/findRecord.js";
 import Repost from "../../models/Repost.js";
 import Connection from "../../models/Connection.js";
+import { RepostDataInterface } from "../../../interfaces/data/RepostDataInterface.js";
 
 export const indexPostsRepo = async (authId: string, cursor?: string) => {
     const authObjectId = new mongoose.Types.ObjectId(authId);
@@ -654,6 +655,19 @@ export const storePostRepo = async ({
         "user",
         "name.first name.last image",
     );
+};
+
+export const repostPostRepo = async ({ content, post }: RepostDataInterface, user: string): Promise<boolean> => {
+    await findRecord(Post, { _id: post });
+    const existingRepost = await Post.findOne({ post, user });
+
+    if (existingRepost) {
+        await Repost.deleteOne({ _id: existingRepost._id });
+        return false;
+    }
+
+    await Repost.create({ content, post, user });
+    return true;
 };
 
 export const updatePostRepo = async ({

@@ -1,9 +1,7 @@
 import { Request } from "express";
-import { PostInterface } from "../../../interfaces/models/PostInterface.js";
 import {
     deletePostRepo,
     likePostRepo,
-    storePostRepo,
 } from "../../repositories/users/postRepository.js";
 import { getNextCursor, getQueryCursor } from "../../utils/cursorPagination.js";
 import { indexProfileRepo, updateProfileRepo } from "../../repositories/users/profileRepository.js";
@@ -19,12 +17,9 @@ export const indexProfileService = async (req: Request) => {
     return { metadata: { hasMore, nextCursor }, posts: results, user: profile.user };
 };
 
-export const storePostService = async (req: Request): Promise<PostInterface> => {
-    return await storePostRepo({ ...req.body, user: req.user?._id });
-};
-
 export const updateProfileService = async (req: Request): Promise<void> => {
-    return await updateProfileRepo();
+    const authId = req.user?._id as string; 
+    return await updateProfileRepo({...req.body} ,authId);
 };
 
 export const likePostService = async (req: Request): Promise<boolean> => {
