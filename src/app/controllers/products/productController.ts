@@ -35,7 +35,7 @@ export const show = asyncHandler(async (req: Request, res: Response): Promise<Re
 
 export const update = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const product = await updateProductService(req);
-
+    
     return returnSuccess(res, "product updated successfully", 200, {
         product,
     });

@@ -2,36 +2,44 @@ import { Request } from "express";
 import Cart from "../../models/Cart.js";
 
 export const getCartService = async (req: Request) => {
-    return await Cart.findOne({
+    const userId = req.user?._id;
 
-        userId: req.user?._id,
-    }).populate("items.productId");
+    if (!userId) {
+        return null;
+    }
+
+    return await Cart.findOne({ userId }).populate("items.productId");
 };
 
 export const addToCartService = async (req: Request) => {
-    const { productId, vendorId, quantity, price } = req.body;
-    const userId = req.user?._id; 
+    const { productId, vendorId, quantity, price, userId } = req.body;
 
-    let cart = await Cart.findOne({ userId });
+    const finalUserId = userId || req.user?._id;
+
+    if (!finalUserId) {
+        throw new Error("User ID required");
+    }
+
+    let cart = await Cart.findOne({ userId: finalUserId });
 
     if (!cart) {
-        return await Cart.create({
-            userId,
+        cart = await Cart.create({
+            userId: finalUserId,
             items: [{ productId, vendorId, quantity, price }],
             totalPrice: quantity * price
         });
-    }
-
-    const itemIndex = cart.items.findIndex(item => item.productId?.toString() === productId);
-
-    if (itemIndex > -1) {
-        cart.items[itemIndex].quantity += quantity;
     } else {
-        cart.items.push({ productId, vendorId, quantity, price });
-    }
-    cart.totalPrice = cart.items.reduce((total, item) => total + (item.quantity * item.price), 0);
+        const itemIndex = cart.items.findIndex(item => item.productId?.toString() === productId);
 
-    await cart.save();
+        if (itemIndex > -1) {
+            cart.items[itemIndex].quantity += quantity;
+        } else {
+            cart.items.push({ productId, vendorId, quantity, price });
+        }
+
+        cart.totalPrice = cart.items.reduce((total, item) => total + (item.quantity * item.price), 0);
+        await cart.save();
+    }
     return cart;
 };
 
