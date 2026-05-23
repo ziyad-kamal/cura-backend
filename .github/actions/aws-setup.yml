@@ -20,7 +20,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
 
     - uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
       with:
