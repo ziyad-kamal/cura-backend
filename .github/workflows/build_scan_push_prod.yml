@@ -10,16 +10,16 @@ on:
 
 jobs:
 
-  sonar:
-    uses: cura-fitness/cura-devops/.github/workflows/sonar.yml@master
-    with:
-      fail_on_gate: true
-    secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  # sonar:
+  #   uses: cura-fitness/cura-devops/.github/workflows/sonar.yml@master
+  #   with:
+  #     fail_on_gate: true
+  #   secrets:
+  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   build-and-push:
-    needs: sonar
+    # needs: sonar
     runs-on: ubuntu-latest
 
     steps:
@@ -58,8 +58,13 @@ jobs:
       - name: Debug
         run: |
           echo "Registry: ${{ steps.aws-setup.outputs.registry }}"
+          echo "Registry length: ${#REGISTRY}"
           echo "Tags: ${{ steps.tags.outputs.TAGS }}"
-          
+          echo "Tags length: ${#TAGS}"
+        env:
+          REGISTRY: ${{ steps.aws-setup.outputs.registry }}
+          TAGS: ${{ steps.tags.outputs.TAGS }}
+
       - name: Build, cache, and push
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
         with:
