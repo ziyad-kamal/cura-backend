@@ -26,7 +26,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.aws-setup.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
-          IMAGE_TAG=${GITHUB_SHA::7}
+          IMAGE_TAG=dev-sha-${GITHUB_SHA::7}
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:dev
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
