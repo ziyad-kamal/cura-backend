@@ -11,7 +11,7 @@ on:
 jobs:
 
   sonar:
-    uses: ./.github/workflows/sonar.yml
+    uses: cura-fitness/cura-devops/.github/workflows/sonar.yml@master
     with:
       fail_on_gate: true
     secrets:
