@@ -76,17 +76,15 @@ jobs:
       #     cache-from: type=gha
       #     cache-to: type=gha,mode=min
 
-      - name: Debug build command
+      - name: Test buildx push
         env:
           ECR_REGISTRY: ${{ steps.aws-setup.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
-          echo "docker buildx build --push -t $ECR_REGISTRY/$ECR_REPOSITORY:buildx-test ." > /tmp/debug.txt
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: debug
-          path: /tmp/debug.txt
+          docker buildx build \
+            --push \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:buildx-test \
+            .
 
       - name: Trigger DevOps Workflow
         if: startsWith(github.ref, 'refs/tags/v')
