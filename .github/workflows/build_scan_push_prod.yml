@@ -32,6 +32,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+
       - name: Set short SHA
         id: sha
         run: |
@@ -54,6 +55,11 @@ jobs:
 
           echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
 
+      - name: Debug
+        run: |
+          echo "Registry: ${{ steps.aws-setup.outputs.registry }}"
+          echo "Tags: ${{ steps.tags.outputs.TAGS }}"
+          
       - name: Build, cache, and push
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
         with:
