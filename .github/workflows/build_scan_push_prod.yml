@@ -9,7 +9,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
   sonar:
     uses: cura-fitness/cura-devops/.github/workflows/sonar.yml@master
     with:
@@ -32,38 +31,39 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+
       - name: Set short SHA
         id: sha
         run: |
-          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
-          echo "SHORT=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "SHORT=$(echo "$GITHUB_SHA" | cut -c1-7)" >> $GITHUB_OUTPUT
 
-      - name: Build and tag image
+      - name: Compute image tags
+        id: tags
         env:
-          ECR_REGISTRY: ${{ steps.aws-setup.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:master-sha-${{ steps.sha.outputs.SHORT }} .
-
-      - name: Push master SHA tag
-        if: github.ref == 'refs/heads/master'
-        env:
-          ECR_REGISTRY: ${{ steps.aws-setup.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-        run: |
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:master-sha-${{ steps.sha.outputs.SHORT }}
-
-      - name: Push semver and latest tags
-        if: startsWith(github.ref, 'refs/tags/v')
-        env:
-          ECR_REGISTRY: ${{ steps.aws-setup.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          REGISTRY: ${{ steps.aws-setup.outputs.registry }}
+          REPO: ${{ secrets.ECR_REPOSITORY }}
+          SHORT: ${{ steps.sha.outputs.SHORT }}
           VERSION: ${{ github.ref_name }}
         run: |
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:master-sha-${{ steps.sha.outputs.SHORT }} $ECR_REGISTRY/$ECR_REPOSITORY:${VERSION#v}
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:master-sha-${{ steps.sha.outputs.SHORT }} $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${VERSION#v}
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          BASE="$REGISTRY/$REPO"
+          TAGS="$BASE:master-sha-$SHORT"
+
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAGS="$TAGS,$BASE:${VERSION#v},$BASE:latest"
+          fi
+
+          echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
+
+      - name: Build, cache, and push
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          provenance: false
+          tags: ${{ steps.tags.outputs.TAGS }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Trigger DevOps Workflow
         if: startsWith(github.ref, 'refs/tags/v')

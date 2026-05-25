@@ -4,14 +4,14 @@ on:
   push:
     branches: ["develop"]
     paths-ignore: ['**.md', 'docs/**', '.vscode/**', '.env.example', '.gitignore', '.dockerignore', '.prettierrc', 'eslint.config.mjs']
-  
+
   workflow_dispatch:
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    steps:  
+    steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
 
       - id: aws-setup
@@ -21,16 +21,31 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Build, tag, and push image to ECR
-        env:
-          ECR_REGISTRY: ${{ steps.aws-setup.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+      - name: Set short SHA
+        id: sha
         run: |
-          IMAGE_TAG=dev-sha-${GITHUB_SHA::7}
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:dev
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:dev
+          echo "SHORT=$(echo "$GITHUB_SHA" | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Compute image tags
+        id: tags
+        env:
+          REGISTRY: ${{ steps.aws-setup.outputs.registry }}
+          REPO: ${{ secrets.ECR_REPOSITORY }}
+          SHORT: ${{ steps.sha.outputs.SHORT }}
+        run: |
+          BASE="$REGISTRY/$REPO"
+          echo "TAGS=$BASE:dev-sha-$SHORT,$BASE:dev" >> $GITHUB_OUTPUT
+
+      - name: Build, cache, and push
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          provenance: false
+          tags: ${{ steps.tags.outputs.TAGS }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Trigger DevOps Workflow
         env:
