@@ -9,17 +9,16 @@ on:
   workflow_dispatch:
 
 jobs:
-
-  # sonar:
-  #   uses: cura-fitness/cura-devops/.github/workflows/sonar.yml@master
-  #   with:
-  #     fail_on_gate: true
-  #   secrets:
-  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  sonar:
+    uses: cura-fitness/cura-devops/.github/workflows/sonar.yml@master
+    with:
+      fail_on_gate: true
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   build-and-push:
-    # needs: sonar
+    needs: sonar
     runs-on: ubuntu-latest
 
     steps:
