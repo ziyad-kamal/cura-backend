@@ -657,16 +657,16 @@ export const storePostRepo = async ({
     );
 };
 
-export const repostPostRepo = async ({ content, post }: RepostDataInterface, user: string): Promise<boolean> => {
+export const repostPostRepo = async ({ content, post }: RepostDataInterface, authId: string): Promise<boolean> => {
     await findRecord(Post, { _id: post });
-    const existingRepost = await Post.findOne({ post, user });
+    const isRepost = await Repost.findOne({ post, user: authId });
 
-    if (existingRepost) {
-        await Repost.deleteOne({ _id: existingRepost._id });
+    if (isRepost) {
+        await Repost.deleteOne({ _id: isRepost._id });
         return false;
     }
 
-    await Repost.create({ content, post, user });
+    await Repost.create({ content, post, user: authId });
     return true;
 };
 

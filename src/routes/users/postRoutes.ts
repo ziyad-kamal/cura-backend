@@ -11,7 +11,7 @@ const postRoutes = express.Router();
 postRoutes.use(jwtVerify);
 postRoutes.get("", index);
 postRoutes.post("/store", postValidator, store);
-postRoutes.post("/repost", repost);
+postRoutes.post("/repost",repost);
 postRoutes.post("/like/:_id", validateId(), like);
 postRoutes.put("/update/:_id", validateId(), authorize(Post, "_id"), postValidator, update);
 postRoutes.delete("/delete/:_id", validateId(), authorize(Post,'_id'), destroy);

@@ -23,7 +23,7 @@ export const storePostService = async (req: Request): Promise<PostInterface> => 
 };
 
 export const repostPostService = async (req: Request): Promise<boolean> => {
-    return await repostPostRepo({ ...req.body }, req.user?._id);
+    return await repostPostRepo({ ...req.body },req.user?._id);
 };
 
 export const updatePostService = async (req: Request): Promise<PostInterface | null> => {

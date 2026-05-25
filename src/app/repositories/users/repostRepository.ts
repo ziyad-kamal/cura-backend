@@ -1,21 +1,21 @@
 import { HydratedDocument } from "mongoose";
 import Like from "../../models/Like.js";
-import Post from "../../models/Post.js";
 import { findRecord } from "../../utils/findRecord.js";
 import Repost from "../../models/Repost.js";
 import { RepostDataInterface } from "../../../interfaces/data/RepostDataInterface.js";
 import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
+import RecordExistError from "../../errors/RecordExistError.js";
+import Comment from "../../models/Comment.js";
 
-export const storeRepostRepo = async ({ content, post }: RepostDataInterface, user: string): Promise<boolean> => {
-    await findRecord(Post, { _id: post });
-    const existingRepost = await Repost.findOne({ post, user });
+export const storeRepostRepo = async ({ content, post }: RepostDataInterface, authId: string,repostId:string): Promise<boolean> => {
+    await findRecord(Repost, { _id: repostId });
+    const existingRepost = await Repost.findOne({ _id: repostId, user: authId });
 
     if (existingRepost) {
-        await Repost.deleteOne({ _id: existingRepost._id });
-        return false;
+        throw new RecordExistError("you already reposted this post before");
     }
 
-    await Repost.create({ content, post, user });
+    await Repost.create({ content, post, user: authId });
     return true;
 };
 
@@ -42,4 +42,11 @@ export const likeRepostRepo = async (_id: string, authId: string): Promise<boole
 
     await Like.create({ repost: repost._id, user: authId });
     return true;
+};
+
+export const destroyRepostRepo = async (_id: string): Promise<void> => {
+    const repost = await findRecord(Repost, { _id });
+    await repost.deleteOne({_id})
+    await Like.deleteMany({ repost: _id });
+    await Comment.deleteMany({ repost: _id });
 };

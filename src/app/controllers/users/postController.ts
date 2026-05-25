@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { deletePostService, indexPostsService, likePostService, storePostService, updatePostService } from "../../services/users/postService.js";
+import { deletePostService, indexPostsService, likePostService, repostPostService, storePostService, updatePostService } from "../../services/users/postService.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { returnSuccess } from "../../utils/returnJson.js";
 
@@ -14,8 +14,9 @@ export const store = asyncHandler(async (req: Request, res: Response): Promise<R
 });
 
 export const repost = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const post = await storePostService(req);
-    return returnSuccess(res, "you post successfully", 200, { post });
+    const isRepost = await repostPostService(req);
+    const msg = isRepost ? "you repost successfully" : "you unrepost successfully";
+    return returnSuccess(res, msg, 200, { isRepost });
 });
 
 export const update = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
@@ -25,7 +26,8 @@ export const update = asyncHandler(async (req: Request, res: Response): Promise<
 
 export const like = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const isLike = await likePostService(req);
-    return returnSuccess(res, "", 200, { isLike });
+    const msg = isLike ? "you like post successfully" : "you unlike post successfully";
+    return returnSuccess(res, msg, 200, { isLike });
 });
 
 export const destroy = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
