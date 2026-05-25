@@ -54,16 +54,6 @@ jobs:
 
           echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
 
-      - name: Debug
-        run: |
-          echo "Registry: ${{ steps.aws-setup.outputs.registry }}"
-          echo "Registry length: ${#REGISTRY}"
-          echo "Tags: ${{ steps.tags.outputs.TAGS }}"
-          echo "Tags length: ${#TAGS}"
-        env:
-          REGISTRY: ${{ steps.aws-setup.outputs.registry }}
-          TAGS: ${{ steps.tags.outputs.TAGS }}
-
       - name: Build, cache, and push
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
         with:
