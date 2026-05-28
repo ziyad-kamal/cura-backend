@@ -8,6 +8,7 @@ import { findRecord } from "../../utils/findRecord.js";
 import Repost from "../../models/Repost.js";
 import Connection from "../../models/Connection.js";
 import { RepostDataInterface } from "../../../interfaces/data/RepostDataInterface.js";
+import { resolveFiles } from "../../utils/resolveFiles.js";
 
 export const indexPostsRepo = async (authId: string, cursor?: string) => {
     const authObjectId = new mongoose.Types.ObjectId(authId);
@@ -169,6 +170,7 @@ export const indexPostsRepo = async (authId: string, cursor?: string) => {
                             "name.first": 1,
                             "name.last": 1,
                             image: 1,
+                            'userInfo.job': 1,
                         },
                     },
                 ],
@@ -609,7 +611,30 @@ export const indexPostsRepo = async (authId: string, cursor?: string) => {
                             user: 1,
                         },
                     },
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "user",
+                            foreignField: "_id",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        "name.first": 1,
+                                        "name.last": 1,
+                                        image: 1,
+                                        'userInfo.job': 1,
+                                    },
+                                },
+                            ],
+                            as: "user",
+                        },
+                    },
+
+                    {
+                        $unwind: "$user",
+                    },
                 ],
+
                 as: "post",
             },
         },
@@ -624,7 +649,7 @@ export const indexPostsRepo = async (authId: string, cursor?: string) => {
         ...commonPipeline,
     ]);
 
-    const feed = [...posts, ...repostDocs].sort(
+    let feed = [...posts, ...repostDocs].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
 
@@ -636,6 +661,22 @@ export const indexPostsRepo = async (authId: string, cursor?: string) => {
     const lastItem = feed[feed.length - 1];
 
     const nextCursor = hasMore && lastItem ? new Date(lastItem.createdAt).toISOString() : null;
+
+    feed = await Promise.all(
+        feed.map(async (item) => ({
+            ...item,
+            files: await resolveFiles(item.files,item.visibility),
+            ...(item.post
+                ? {
+                      post: {
+                          ...item.post,
+                          files: await resolveFiles(item.post.files,item.post.visibility),
+                      },
+                  }
+                : {}),
+        })),
+    );
+
 
     return {
         feed,
@@ -650,11 +691,17 @@ export const storePostRepo = async ({
     user,
     tags,
     visibility,
-}: PostDataInterface): Promise<HydratedDocument<PostInterface>> => {
-    return (await Post.create({ user, content, files, tags, visibility })).populate(
-        "user",
-        "name.first name.last image",
-    );
+}: PostDataInterface): Promise<PostInterface> => {
+    const post = await (
+        await Post.create({ user, content, files, tags, visibility })
+    ).populate("user", "name.first name.last image userInfo.job");
+
+    const resolvedFiles = await resolveFiles(files,visibility);
+
+    return {
+        ...post.toObject(),
+        files: resolvedFiles,
+    } ;
 };
 
 export const repostPostRepo = async ({ content, post }: RepostDataInterface, authId: string): Promise<boolean> => {
@@ -686,7 +733,7 @@ export const updatePostRepo = async ({
             returnDocument: "after",
             runValidators: true,
         },
-    ).populate("user", "name.first name.last image");
+    ).populate("user", "name.first name.last image userInfo.job");
 };
 
 export const likePostRepo = async (_id: string, authId: string): Promise<boolean> => {

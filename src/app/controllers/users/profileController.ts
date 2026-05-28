@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { returnSuccess } from "../../utils/returnJson.js";
-import { destroyCommentService } from "../../services/users/commentService.js";
-import { indexProfileService, updateProfileService } from "../../services/users/profileService.js";
+import { connectProfileService, indexProfileService, updateProfileService } from "../../services/users/profileService.js";
 
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const profile = await indexProfileService(req);
@@ -10,11 +9,11 @@ export const index = asyncHandler(async (req: Request, res: Response): Promise<R
 });
 
 export const update = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const comment = await updateProfileService(req);
-    return returnSuccess(res, "you updated comment successfully", 200, { comment });
+    const user = await updateProfileService(req);
+    return returnSuccess(res, "you updated profile successfully", 200, { user });
 });
 
-export const destroy = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    await destroyCommentService(req);
+export const connect = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    await connectProfileService(req);
     return returnSuccess(res, "you deleted comment successfully", 200);
 });

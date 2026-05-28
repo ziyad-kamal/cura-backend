@@ -1,10 +1,11 @@
 import { Types } from "mongoose";
 import Comment from "../../models/Comment.js";
-import Like from "../../models/Like.js";
 import { findRecord } from "../../utils/findRecord.js";
 import User from "../../models/User.js";
 import Post from "../../models/Post.js";
 import { UserDataInterface } from "../../../interfaces/data/UserDataInterface.js";
+import { awsConfig } from "../../../config/aws.js";
+import { UserInterface } from "../../../interfaces/models/UserInterface.js";
 
 export const indexProfileRepo = async (
     query: {
@@ -143,6 +144,27 @@ export const indexProfileRepo = async (
                 },
             },
         },
+        {
+            $addFields: {
+                files: {
+                    $map: {
+                        input: { $ifNull: ["$files", []] },
+                        as: "file",
+                        in: {
+                            s3Key: "$$file.s3Key",
+                            type: "$$file.type",
+                            name: "$$file.name",
+                            url: {
+                                $concat: [
+                                    `https://${awsConfig.s3_bucket_name}.s3.${awsConfig.region}.amazonaws.com/`,
+                                    "$$file.s3Key",
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        },
 
         {
             $project: {
@@ -167,20 +189,24 @@ export const indexProfileRepo = async (
 };
 
 export const updateProfileRepo = async (
-    { bio, job, firstName, lastName, image, coverImage }: UserDataInterface,
+    { bio, job, firstName, lastName }: UserDataInterface,
     authId: string,
-): Promise<void> => {
-    const user=await findRecord(User, { _id: authId });
+): Promise<UserInterface|null> => {
+    await findRecord(User, { _id: authId });
 
-    user.updateOne({ userInfo: { bio, job }, name: { first: firstName, last: lastName }, image, coverImage });
+    return User.findByIdAndUpdate(
+        authId,
+        {
+            "userInfo.bio": bio,
+            "userInfo.job": job,
+            "name.first": firstName,
+            "name.last": lastName,
+        },
+        { returnDocument: "after" },
+    ).select("name userInfo.bio userInfo.job");;
 };
 
-export const likeCommentRepo = async (userId: string, authId: string): Promise<void> => {
-    await findRecord(Comment, { userId });
-    await Like.create({ user: authId, comment: userId });
-};
-
-export const destroyCommentRepo = async (userId: string): Promise<void> => {
+export const connectProfileRepo = async (userId: string): Promise<void> => {
     await findRecord(Comment, { userId });
     await Comment.findByIdAndDelete(userId);
 };

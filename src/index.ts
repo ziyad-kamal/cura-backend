@@ -25,11 +25,16 @@ import orderItemRoutes from "./routes/marketplace/orderItemRoutes.js";
 import reviewRoutes from "./routes/marketplace/reviewRoutes.js";
 import repostRoutes from "./routes/users/repostRoutes.js";
 import profileRoutes from "./routes/users/profileRoutes.js";
+    import { EventEmitter } from "events";
+
 
 const app = express();
 
 async function bootstrap() {
     app.listen(appConfig.port);
+
+    EventEmitter.defaultMaxListeners = 15;
+
 
     await connectDB();
     await connectRedis();

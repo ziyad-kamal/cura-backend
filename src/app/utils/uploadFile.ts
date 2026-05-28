@@ -5,17 +5,16 @@ import path from "path";
 import sharp from "sharp";
 import NotFoundError from "../errors/NotFoundError.js";
 
-export const uploadFile = async (req: Request, dir: string, width?: number): Promise<string> => {
+export const uploadFile = async (req: Request, dir: string, isImage: boolean, width?: number): Promise<string> => {
     let fileName: string;
     const file = req.file;
     if (!file) {
         throw new NotFoundError("File not found");
     }
 
-    if (width) {
+    if (isImage) {
         fileName = `${crypto.randomBytes(16).toString("hex")}.webp`;
     } else {
-
         const extension = path.extname(file.originalname);
 
         fileName = `${crypto.randomBytes(16).toString("hex")}${extension}`;
@@ -31,7 +30,7 @@ export const uploadFile = async (req: Request, dir: string, width?: number): Pro
         fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    if (width) {
+    if (isImage) {
         await sharp(req.file!.buffer)
             .resize(width, null, { withoutEnlargement: true })
             .webp({
@@ -39,7 +38,7 @@ export const uploadFile = async (req: Request, dir: string, width?: number): Pro
                 effort: 4,
             })
             .toFile(fileLocation);
-    }else{
+    } else {
         fs.writeFileSync(fileLocation, file.buffer);
     }
 
