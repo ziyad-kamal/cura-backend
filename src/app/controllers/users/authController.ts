@@ -20,8 +20,8 @@ export const login = asyncHandler(async (req: LoginRequestInterface, res: Respon
 });
 
 export const signup = asyncHandler(async (req: SignupRequestInterface, res: Response): Promise<Response> => {
-    const user = await signupService(req, res);
-    return returnSuccess(res, "Your account has been created successfully", 200, user);
+    const data = await signupService(req, res);
+    return returnSuccess(res, "Your account has been created successfully", 200, data);
 });
 
 export const forgetPassword = asyncHandler(
