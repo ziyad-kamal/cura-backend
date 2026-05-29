@@ -8,10 +8,8 @@ import {
     storePostRepo,
     updatePostRepo,
 } from "../../repositories/users/postRepository.js";
-import { awsConfig, s3Client } from "../../../config/aws.js";
-import { CopyObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import NotFoundError from "../../errors/NotFoundError.js";
-import CustomError from "../../errors/CustomError.js";
+import { handleS3Files } from "../../utils/handleS3Files.js";
+import { resolveFiles } from "../../utils/resolveFiles.js";
 
 export const indexPostsService = async (req: Request) => {
     const authId = req.user?._id as string;
@@ -23,45 +21,18 @@ export const indexPostsService = async (req: Request) => {
 };
 
 export const storePostService = async (req: Request): Promise<PostInterface> => {
-    const { files } = req.body;
+    const { files, visibility } = req.body;
 
-    let updatedFiles = files || [];
+    let updatedFiles = await handleS3Files(files);
 
-    if (files && files.length > 0) {
-        updatedFiles = await Promise.all(
-            files.map(async (file: { s3Key: string; type: string; name: string }) => {
-                if (!file.s3Key) {
-                    throw new NotFoundError("Missing required s3Key in request body.");
-                }
+    const post =  await storePostRepo({ ...req.body, files: updatedFiles, user: req.user?._id });
 
-                if (!file.s3Key.startsWith("staging/")) {
-                    throw new CustomError("Invalid s3Key format. Expected to start with 'staging/'.", 400);
-                }
-
-                const finalKey = file.s3Key.replace("staging/", `public/posts/`);
-                const bucketName = awsConfig.s3_bucket_name;
-
-                await s3Client.send(
-                    new CopyObjectCommand({
-                        Bucket: bucketName,
-                        CopySource: encodeURIComponent(`${bucketName}/${file.s3Key}`),
-                        Key: finalKey,
-                    }),
-                );
-
-                await s3Client.send(
-                    new DeleteObjectCommand({
-                        Bucket: bucketName,
-                        Key: file.s3Key,
-                    }),
-                );
-
-                return { ...file, s3Key: finalKey };
-            }),
-        );
+    if (updatedFiles.length > 0) {
+        const resolvedFiles = await resolveFiles(updatedFiles, visibility);
+        return { ...post, files: resolvedFiles } as PostInterface;
     }
 
-    return await storePostRepo({ ...req.body, files: updatedFiles, user: req.user?._id });
+    return post;
 };
 
 export const repostPostService = async (req: Request): Promise<boolean> => {
@@ -69,7 +40,18 @@ export const repostPostService = async (req: Request): Promise<boolean> => {
 };
 
 export const updatePostService = async (req: Request): Promise<PostInterface | null> => {
-    return await updatePostRepo({ ...req.body, ...req.params });
+    const { files, visibility } = req.body;
+
+    let updatedFiles = await handleS3Files(files);
+
+    const post = await updatePostRepo({ ...req.body, files: updatedFiles, ...req.params });
+
+    if (updatedFiles.length > 0) {
+        const resolvedFiles = await resolveFiles(updatedFiles, visibility);
+        return { ...post, files: resolvedFiles } as PostInterface;
+    }
+
+    return post;
 };
 
 export const likePostService = async (req: Request): Promise<boolean> => {

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { returnSuccess } from "../../utils/returnJson.js";
-import { connectProfileService, indexProfileService, updateProfileService } from "../../services/users/profileService.js";
+import { acceptProfileService, connectProfileService, ignoreProfileService, indexProfileService, updateProfileService } from "../../services/users/profileService.js";
 
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const profile = await indexProfileService(req);
@@ -15,5 +15,15 @@ export const update = asyncHandler(async (req: Request, res: Response): Promise<
 
 export const connect = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     await connectProfileService(req);
-    return returnSuccess(res, "you deleted comment successfully", 200);
+    return returnSuccess(res, "you sent request successfully", 200);
+});
+
+export const accept = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    await acceptProfileService(req);
+    return returnSuccess(res, "you accepted request successfully", 200);
+});
+
+export const ignore = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    await ignoreProfileService(req);
+    return returnSuccess(res, "you ignored request successfully", 200);
 });

@@ -1,11 +1,11 @@
 import { Types } from "mongoose";
-import Comment from "../../models/Comment.js";
 import { findRecord } from "../../utils/findRecord.js";
 import User from "../../models/User.js";
 import Post from "../../models/Post.js";
 import { UserDataInterface } from "../../../interfaces/data/UserDataInterface.js";
-import { awsConfig } from "../../../config/aws.js";
 import { UserInterface } from "../../../interfaces/models/UserInterface.js";
+import Connection from "../../models/Connection.js";
+import { HydratedDocument } from "mongoose";
 
 export const indexProfileRepo = async (
     query: {
@@ -68,10 +68,47 @@ export const indexProfileRepo = async (
                 },
             },
 
+            // connection status
+            {
+                $lookup: {
+                    from: "connections",
+                    let: { userId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $or: [
+                                        {
+                                            $and: [
+                                                { $eq: ["$sender", "$$userId"] },
+                                                { $eq: ["$receiver", new Types.ObjectId(authId)] },
+                                            ],
+                                        },
+                                        {
+                                            $and: [
+                                                { $eq: ["$receiver", "$$userId"] },
+                                                { $eq: ["$sender", new Types.ObjectId(authId)] },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            $project: {
+                                status: 1,
+                                sender: 1,
+                            },
+                        },
+                    ],
+                    as: "connectionMeta",
+                },
+            },
+
             {
                 $project: {
-                    firstName: 1,
-                    lastName: 1,
+                    firstName: "$name.first",
+                    lastName: "$name.last",
                     image: 1,
                     coverImage: 1,
                     job: "$userInfo.job",
@@ -83,6 +120,15 @@ export const indexProfileRepo = async (
 
                     followingCount: {
                         $ifNull: [{ $arrayElemAt: ["$following.count", 0] }, 0],
+                    },
+                    // "pending" | "accepted" | "rejected" | null
+                    connectionStatus: {
+                        $ifNull: [{ $arrayElemAt: ["$connectionMeta.status", 0] }, null],
+                    },
+
+                    // tells frontend if auth user is the sender (to show "cancel request" vs "accept")
+                    isConnectionSender: {
+                        $eq: [{ $arrayElemAt: ["$connectionMeta.sender", 0] }, new Types.ObjectId(authId)],
                     },
                 },
             },
@@ -118,6 +164,15 @@ export const indexProfileRepo = async (
 
         {
             $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "post",
+                as: "comments",
+            },
+        },
+
+        {
+            $lookup: {
                 from: "reposts",
                 localField: "_id",
                 foreignField: "post",
@@ -129,6 +184,10 @@ export const indexProfileRepo = async (
             $addFields: {
                 likesCount: {
                     $size: "$likes",
+                },
+
+                commentsCount: {
+                    $size: "$comments",
                 },
 
                 repostsCount: {
@@ -144,36 +203,17 @@ export const indexProfileRepo = async (
                 },
             },
         },
-        {
-            $addFields: {
-                files: {
-                    $map: {
-                        input: { $ifNull: ["$files", []] },
-                        as: "file",
-                        in: {
-                            s3Key: "$$file.s3Key",
-                            type: "$$file.type",
-                            name: "$$file.name",
-                            url: {
-                                $concat: [
-                                    `https://${awsConfig.s3_bucket_name}.s3.${awsConfig.region}.amazonaws.com/`,
-                                    "$$file.s3Key",
-                                ],
-                            },
-                        },
-                    },
-                },
-            },
-        },
 
         {
             $project: {
                 content: 1,
                 files: 1,
                 tags: 1,
+                visibility: 1,
                 createdAt: 1,
 
                 likesCount: 1,
+                commentsCount: 1,
                 repostsCount: 1,
 
                 isLiked: 1,
@@ -191,7 +231,7 @@ export const indexProfileRepo = async (
 export const updateProfileRepo = async (
     { bio, job, firstName, lastName }: UserDataInterface,
     authId: string,
-): Promise<UserInterface|null> => {
+): Promise<HydratedDocument<UserInterface> | null> => {
     await findRecord(User, { _id: authId });
 
     return User.findByIdAndUpdate(
@@ -203,10 +243,43 @@ export const updateProfileRepo = async (
             "name.last": lastName,
         },
         { returnDocument: "after" },
-    ).select("name userInfo.bio userInfo.job");;
+    ).select("name userInfo.bio userInfo.job");
 };
 
-export const connectProfileRepo = async (userId: string): Promise<void> => {
-    await findRecord(Comment, { userId });
-    await Comment.findByIdAndDelete(userId);
+export const connectProfileRepo = async (_id: string,authId:string): Promise<void> => {
+    await findRecord(User, { _id });
+
+    Connection.create({
+        sender: authId,
+        receiver: _id,
+        status: "pending",
+    });
+};
+
+export const acceptProfileRepo = async (_id: string, authId: string): Promise<void> => {
+    await findRecord(User, { _id });
+
+    Connection.findOneAndUpdate(
+        {
+            sender: _id,
+            receiver: authId,
+        },
+        {
+            status: "accepted",
+        },
+    );
+};
+
+export const ignoreProfileRepo = async (_id: string, authId: string): Promise<void> => {
+    await findRecord(User, { _id });
+
+    Connection.findOneAndUpdate(
+        {
+            sender: _id,
+            receiver: authId,
+        },
+        {
+            status: "ignored",
+        },
+    );
 };

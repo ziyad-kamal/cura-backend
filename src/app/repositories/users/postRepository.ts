@@ -9,6 +9,8 @@ import Repost from "../../models/Repost.js";
 import Connection from "../../models/Connection.js";
 import { RepostDataInterface } from "../../../interfaces/data/RepostDataInterface.js";
 import { resolveFiles } from "../../utils/resolveFiles.js";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { awsConfig, s3Client } from "../../../config/aws.js";
 
 export const indexPostsRepo = async (authId: string, cursor?: string) => {
     const authObjectId = new mongoose.Types.ObjectId(authId);
@@ -170,7 +172,7 @@ export const indexPostsRepo = async (authId: string, cursor?: string) => {
                             "name.first": 1,
                             "name.last": 1,
                             image: 1,
-                            'userInfo.job': 1,
+                            "userInfo.job": 1,
                         },
                     },
                 ],
@@ -622,7 +624,7 @@ export const indexPostsRepo = async (authId: string, cursor?: string) => {
                                         "name.first": 1,
                                         "name.last": 1,
                                         image: 1,
-                                        'userInfo.job': 1,
+                                        "userInfo.job": 1,
                                     },
                                 },
                             ],
@@ -665,18 +667,17 @@ export const indexPostsRepo = async (authId: string, cursor?: string) => {
     feed = await Promise.all(
         feed.map(async (item) => ({
             ...item,
-            files: await resolveFiles(item.files,item.visibility),
+            files: await resolveFiles(item.files, item.visibility),
             ...(item.post
                 ? {
                       post: {
                           ...item.post,
-                          files: await resolveFiles(item.post.files,item.post.visibility),
+                          files: await resolveFiles(item.post.files, item.post.visibility),
                       },
                   }
                 : {}),
         })),
     );
-
 
     return {
         feed,
@@ -692,16 +693,9 @@ export const storePostRepo = async ({
     tags,
     visibility,
 }: PostDataInterface): Promise<PostInterface> => {
-    const post = await (
+    return await (
         await Post.create({ user, content, files, tags, visibility })
     ).populate("user", "name.first name.last image userInfo.job");
-
-    const resolvedFiles = await resolveFiles(files,visibility);
-
-    return {
-        ...post.toObject(),
-        files: resolvedFiles,
-    } ;
 };
 
 export const repostPostRepo = async ({ content, post }: RepostDataInterface, authId: string): Promise<boolean> => {
@@ -752,10 +746,27 @@ export const deletePostRepo = async (_id: string): Promise<void> => {
     // const session = await mongoose.startSession();
 
     // await session.withTransaction(async () => {
-    await findRecord(Post, { _id });
+    const post = await findRecord(Post, { _id });
     await Post.deleteOne({ _id });
     await Like.deleteMany({ post: _id });
     await Comment.deleteMany({ post: _id });
+    await Repost.deleteMany({ post: _id });
+
+    if (post.files?.length) {
+        await Promise.all(
+            post.files.map((file) =>
+                s3Client
+                    .send(
+                        new DeleteObjectCommand({
+                            Bucket: awsConfig.s3_bucket_name,
+                            Key: file.s3Key,
+                        }),
+                    )
+                    .catch(() => {}),
+            ),
+        );
+    }
+
     // });
 
     // await session.endSession();

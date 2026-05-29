@@ -10,10 +10,7 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const isDoctor = role === "doctor";
-    const image = faker.image.urlPicsumPhotos({
-        width: 800,
-        height: 600,
-    });
+    const image = "staging/6402b1fef3de441cd31377f65554612a.png";
 
     return {
         name: {
@@ -116,14 +113,8 @@ export const seedUsers = async (
             },
             password: "12121212",
             role: UserRoles.DOCTOR,
-            image: faker.image.urlPicsumPhotos({
-                width: 400,
-                height: 300,
-            }),
-            coverImage: faker.image.urlPicsumPhotos({
-                width: 1200,
-                height: 400,
-            }),
+            image: "staging/6402b1fef3de441cd31377f65554612a.png",
+            coverImage: "staging/6402b1fef3de441cd31377f65554612a.png",
         });
 
         const authUser = await User.create({
@@ -135,7 +126,7 @@ export const seedUsers = async (
                 email: "user@gmail.com",
             },
             userInfo: {
-                bio: faker.lorem.sentence({min: 5, max: 10}),
+                bio: faker.lorem.sentence({ min: 5, max: 10 }),
                 job: faker.person.jobTitle(),
                 age: faker.number.int({ min: 18, max: 65 }),
                 weight: Number(faker.string.numeric(2)),
@@ -156,14 +147,8 @@ export const seedUsers = async (
             },
             password: "12121212",
             role: UserRoles.USER,
-            image: faker.image.urlPicsumPhotos({
-                width: 400,
-                height: 300,
-            }),
-            coverImage: faker.image.urlPicsumPhotos({
-                width: 1200,
-                height: 400,
-            }),
+            image: "staging/6402b1fef3de441cd31377f65554612a.png",
+            coverImage: "staging/6402b1fef3de441cd31377f65554612a.png",
         });
 
         const createdUsers  = await User.insertMany(users) as UserInterface[];

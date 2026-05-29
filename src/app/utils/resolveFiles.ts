@@ -1,10 +1,11 @@
 import { getSignedFileUrl } from "./getSignedFileUrl.js";
 
-export const resolveFiles = async (files: { s3Key: string; type: string }[] | undefined, visibility: string) => {
+export const resolveFiles = async (files: { s3Key: string;}[] | undefined, visibility: string) => {
     if (!files?.length) return [];
 
     if (visibility === "public") {
-        return files.map((file) => {
+        return files.filter((file) => file.s3Key)
+        .map((file) => {
             const s3Key = file.s3Key.replace("public/", "");
 
             return {
