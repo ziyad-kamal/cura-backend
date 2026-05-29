@@ -1,41 +1,54 @@
-import { Request, Response } from "express";
-
+import { Response } from "express";
+import { returnSuccess, returnError } from "../../utils/returnJson.js";
 import {
-    addToCartService,
-    clearCartService,
     getCartService,
+    addToCartService,
     removeFromCartService,
+    clearCartService,
+    syncCartService,
 } from "../../services/carts/cartService.js";
 
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { returnSuccess } from "../../utils/returnJson.js";
+export const index = async (req: any, res: Response) => {
+    try {
+        const cart = await getCartService(req);
+        return returnSuccess(res, "Cart fetched successfully", 200, cart);
+    } catch (error: any) {
+        return returnError(res, error.message || "Error fetching cart", 500);
+    }
+};
 
-export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const cart = await getCartService(req);
+export const sync = async (req: any, res: Response) => {
+    try {
+        const updatedCart = await syncCartService(req);
+        return returnSuccess(res, "Cart synced successfully", 200, updatedCart);
+    } catch (error: any) {
+        return returnError(res, error.message || "Error syncing cart", 500);
+    }
+};
 
-    return returnSuccess(res, "", 200, {
-        cart,
-    });
-});
+export const store = async (req: any, res: Response) => {
+    try {
+        const updatedCart = await addToCartService(req); 
+        return returnSuccess(res, "Item added to cart successfully", 200, updatedCart);
+    } catch (error: any) {
+        return returnError(res, error.message || "Error adding item to cart", 500);
+    }
+};
 
-export const store = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const cart = await addToCartService(req);
+export const destroy = async (req: any, res: Response) => {
+    try {
+        const updatedCart = await removeFromCartService(req);
+        return returnSuccess(res, "Item removed from cart successfully", 200, updatedCart);
+    } catch (error: any) {
+        return returnError(res, error.message || "Error removing item from cart", 500);
+    }
+};
 
-    return returnSuccess(res, "product added to cart", 200, {
-        cart,
-    });
-});
-
-export const destroy = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    const cart = await removeFromCartService(req);
-
-    return returnSuccess(res, "product removed from cart", 200, {
-        cart,
-    });
-});
-
-export const clear = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-    await clearCartService(req);
-
-    return returnSuccess(res, "cart cleared successfully", 200);
-});
+export const clear = async (req: any, res: Response) => {
+    try {
+        const updatedCart = await clearCartService(req);
+        return returnSuccess(res, "Cart cleared successfully", 200, updatedCart);
+    } catch (error: any) {
+        return returnError(res, error.message || "Error clearing cart", 500);
+    }
+};

@@ -17,6 +17,9 @@ export interface OrderInterface {
     shippingAddress: {
         city: string;
         street: string;
+        name: string;
+        email: string;
+        phone: string;
     };
 
     createdAt?: Date;
