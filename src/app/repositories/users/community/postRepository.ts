@@ -1,16 +1,16 @@
-import mongoose, { HydratedDocument, PipelineStage } from "mongoose";
-import { PostDataInterface } from "../../../interfaces/data/PostDataInterface.js";
-import { PostInterface } from "../../../interfaces/models/PostInterface.js";
-import Comment from "../../models/Comment.js";
-import Like from "../../models/Like.js";
-import Post from "../../models/Post.js";
-import { findRecord } from "../../utils/findRecord.js";
-import Repost from "../../models/Repost.js";
-import Connection from "../../models/Connection.js";
-import { RepostDataInterface } from "../../../interfaces/data/RepostDataInterface.js";
-import { resolveFiles } from "../../utils/resolveFiles.js";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { awsConfig, s3Client } from "../../../config/aws.js";
+import mongoose, {  PipelineStage } from "mongoose";
+import { awsConfig, s3Client } from "../../../../config/aws.js";
+import { PostDataInterface } from "../../../../interfaces/data/PostDataInterface.js";
+import { RepostDataInterface } from "../../../../interfaces/data/RepostDataInterface.js";
+import { PostInterface } from "../../../../interfaces/models/PostInterface.js";
+import Comment from "../../../models/Comment.js";
+import Connection from "../../../models/Connection.js";
+import Like from "../../../models/Like.js";
+import Post from "../../../models/Post.js";
+import Repost from "../../../models/Repost.js";
+import { findRecord } from "../../../utils/findRecord.js";
+import { resolveFiles } from "../../../utils/resolveFiles.js";
 
 export const indexPostsRepo = async (authId: string, cursor?: string) => {
     const authObjectId = new mongoose.Types.ObjectId(authId);
@@ -693,9 +693,11 @@ export const storePostRepo = async ({
     tags,
     visibility,
 }: PostDataInterface): Promise<PostInterface> => {
-    return await (
+    const post= await (
         await Post.create({ user, content, files, tags, visibility })
     ).populate("user", "name.first name.last image userInfo.job");
+
+    return post.toObject();
 };
 
 export const repostPostRepo = async ({ content, post }: RepostDataInterface, authId: string): Promise<boolean> => {
@@ -717,10 +719,10 @@ export const updatePostRepo = async ({
     visibility,
     tags,
     _id,
-}: PostDataInterface): Promise<HydratedDocument<PostInterface> | null> => {
+}: PostDataInterface): Promise<PostInterface | null> => {
     await findRecord(Post, { _id });
 
-    return await Post.findByIdAndUpdate(
+    const post= await Post.findByIdAndUpdate(
         _id,
         { content, files, visibility, tags },
         {
@@ -728,6 +730,8 @@ export const updatePostRepo = async ({
             runValidators: true,
         },
     ).populate("user", "name.first name.last image userInfo.job");
+
+    return post?.toObject() || null;
 };
 
 export const likePostRepo = async (_id: string, authId: string): Promise<boolean> => {

@@ -1,4 +1,3 @@
-import cookieParser from "cookie-parser";
 import express from "express";
 
 import errorHandler from "./app/errors/errorHandler.js";
@@ -10,22 +9,19 @@ import { applyCors } from "./config/cors.js";
 import { appConfig, connectDB } from "./config/index.js";
 import { httpLogger } from "./config/logger.js";
 import { connectRedis } from "./config/redis.js";
-import { authRoutes, postRoutes } from "./routes/users/index.js";
 import fileRoutes from "./routes/users/fileRoutes.js";
-import commentRoutes from "./routes/users/commentRoutes.js";
+import { authRoutes, postRoutes ,profileRoutes,repostRoutes,commentRoutes} from "./routes/users/index.js";
 
 // marketplace
-import vendorRoutes from "./routes/marketplace/vendorRoutes.js";
-import categoryRoutes from "./routes/marketplace/categoryRoutes.js";
-import productRoutes from "./routes/marketplace/productRoutes.js";
-import wishlistRoutes from "./routes/marketplace/wishlistRoutes.js";
+import { EventEmitter } from "events";
 import cartRoutes from "./routes/marketplace/cartRoutes.js";
-import orderRoutes from "./routes/marketplace/orderRoutes.js";
+import categoryRoutes from "./routes/marketplace/categoryRoutes.js";
 import orderItemRoutes from "./routes/marketplace/orderItemRoutes.js";
+import orderRoutes from "./routes/marketplace/orderRoutes.js";
+import productRoutes from "./routes/marketplace/productRoutes.js";
 import reviewRoutes from "./routes/marketplace/reviewRoutes.js";
-import repostRoutes from "./routes/users/repostRoutes.js";
-import profileRoutes from "./routes/users/profileRoutes.js";
-    import { EventEmitter } from "events";
+import vendorRoutes from "./routes/marketplace/vendorRoutes.js";
+import wishlistRoutes from "./routes/marketplace/wishlistRoutes.js";
 
 
 const app = express();
@@ -34,7 +30,6 @@ async function bootstrap() {
     app.listen(appConfig.port);
 
     EventEmitter.defaultMaxListeners = 15;
-
 
     await connectDB();
     await connectRedis();
@@ -47,7 +42,7 @@ async function bootstrap() {
 
     app.use(express.json());
 
-    app.use(cookieParser());
+    // app.use(cookieParser());
 
     app.use(attachHelpers);
 
@@ -70,6 +65,6 @@ async function bootstrap() {
     app.use(`${appConfig.apiPrefix}/reviews`, reviewRoutes);
 
     app.use(errorHandler);
-} 
+}
 
 bootstrap();

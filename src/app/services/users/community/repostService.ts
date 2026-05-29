@@ -1,9 +1,14 @@
 import { Request } from "express";
-import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
-import { destroyRepostRepo, likeRepostRepo, storeRepostRepo, updateRepostRepo } from "../../repositories/users/repostRepository.js";
+import { RepostInterface } from "../../../../interfaces/models/RepostInterface.js";
+import {
+    destroyRepostRepo,
+    likeRepostRepo,
+    storeRepostRepo,
+    updateRepostRepo,
+} from "../../../repositories/users/community/repostRepository.js";
 
 export const storeRepostService = async (req: Request): Promise<boolean> => {
-    return await storeRepostRepo({ ...req.body }, req.user?._id,req.params._id as string);
+    return await storeRepostRepo({ ...req.body }, req.user?._id, req.params._id as string);
 };
 
 export const updateRepostService = async (req: Request): Promise<RepostInterface | null> => {

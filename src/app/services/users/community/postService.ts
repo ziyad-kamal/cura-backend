@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { PostInterface } from "../../../interfaces/models/PostInterface.js";
+import { PostInterface } from "../../../../interfaces/models/PostInterface.js";
 import {
     deletePostRepo,
     indexPostsRepo,
@@ -7,9 +7,9 @@ import {
     repostPostRepo,
     storePostRepo,
     updatePostRepo,
-} from "../../repositories/users/postRepository.js";
-import { handleS3Files } from "../../utils/handleS3Files.js";
-import { resolveFiles } from "../../utils/resolveFiles.js";
+} from "../../../repositories/users/community/postRepository.js";
+import { handleS3Files } from "../../../utils/handleS3Files.js";
+import { resolveFiles } from "../../../utils/resolveFiles.js";
 
 export const indexPostsService = async (req: Request) => {
     const authId = req.user?._id as string;
@@ -25,14 +25,14 @@ export const storePostService = async (req: Request): Promise<PostInterface> => 
 
     let updatedFiles = await handleS3Files(files);
 
-    const post =  await storePostRepo({ ...req.body, files: updatedFiles, user: req.user?._id });
+    const post = await storePostRepo({ ...req.body, files: updatedFiles, user: req.user?._id });
 
     if (updatedFiles.length > 0) {
         const resolvedFiles = await resolveFiles(updatedFiles, visibility);
         return { ...post, files: resolvedFiles } as PostInterface;
     }
 
-    return post;
+    return post
 };
 
 export const repostPostService = async (req: Request): Promise<boolean> => {

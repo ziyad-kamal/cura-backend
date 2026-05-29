@@ -1,11 +1,10 @@
-import { Types } from "mongoose";
-import { findRecord } from "../../utils/findRecord.js";
-import User from "../../models/User.js";
-import Post from "../../models/Post.js";
-import { UserDataInterface } from "../../../interfaces/data/UserDataInterface.js";
-import { UserInterface } from "../../../interfaces/models/UserInterface.js";
-import Connection from "../../models/Connection.js";
-import { HydratedDocument } from "mongoose";
+import { HydratedDocument, Types } from "mongoose";
+import { UserDataInterface } from "../../../../interfaces/data/UserDataInterface.js";
+import { UserInterface } from "../../../../interfaces/models/UserInterface.js";
+import Connection from "../../../models/Connection.js";
+import Post from "../../../models/Post.js";
+import User from "../../../models/User.js";
+import { findRecord } from "../../../utils/findRecord.js";
 
 export const indexProfileRepo = async (
     query: {
@@ -246,7 +245,7 @@ export const updateProfileRepo = async (
     ).select("name userInfo.bio userInfo.job");
 };
 
-export const connectProfileRepo = async (_id: string,authId:string): Promise<void> => {
+export const connectProfileRepo = async (_id: string, authId: string): Promise<void> => {
     await findRecord(User, { _id });
 
     Connection.create({

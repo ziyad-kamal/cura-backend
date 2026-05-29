@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { returnSuccess } from "../../utils/returnJson.js";
-import { destroyCommentService, indexCommentService, likeCommentService, storeCommentService, updateCommentService } from "../../services/users/commentService.js";
+import {
+    destroyCommentService,
+    indexCommentService,
+    likeCommentService,
+    storeCommentService,
+    updateCommentService,
+} from "../../../services/users/community/commentService.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { returnSuccess } from "../../../utils/returnJson.js";
 
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const comments = await indexCommentService(req);

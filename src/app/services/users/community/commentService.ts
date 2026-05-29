@@ -1,20 +1,20 @@
 import { Request } from "express";
-import { PostInterface } from "../../../interfaces/models/PostInterface.js";
-import { getNextCursor, getQueryCursor } from "../../utils/cursorPagination.js";
-import { PaginationType } from "../../../types/PaginationType.js";
-import { CommentInterface } from "../../../interfaces/models/CommentInterface.js";
+import { Model } from "mongoose";
+import { PostTypeInterface } from "../../../../interfaces/data/PostTypeInterface.js";
+import { CommentInterface } from "../../../../interfaces/models/CommentInterface.js";
+import { PostInterface } from "../../../../interfaces/models/PostInterface.js";
+import { RepostInterface } from "../../../../interfaces/models/RepostInterface.js";
+import { PaginationType } from "../../../../types/PaginationType.js";
+import Post from "../../../models/Post.js";
+import Repost from "../../../models/Repost.js";
 import {
     destroyCommentRepo,
     indexCommentRepo,
     likeCommentRepo,
     storeCommentRepo,
     updateCommentRepo,
-} from "../../repositories/users/commentRepository.js";
-import Post from "../../models/Post.js";
-import Repost from "../../models/Repost.js";
-import { RepostInterface } from "../../../interfaces/models/RepostInterface.js";
-import { Model } from "mongoose";
-import { PostTypeInterface } from "../../../interfaces/data/PostTypeInterface.js";
+} from "../../../repositories/users/community/commentRepository.js";
+import { getNextCursor, getQueryCursor } from "../../../utils/cursorPagination.js";
 
 export const indexCommentService = async (req: Request): Promise<PaginationType<CommentInterface, "comments">> => {
     const limit = 10;

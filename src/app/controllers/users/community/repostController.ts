@@ -1,7 +1,12 @@
 import { Request, Response } from "express";
-import { destroyRepostService, likeRepostService, storeRepostService, updateRepostService } from "../../services/users/repostService.js";
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { returnSuccess } from "../../utils/returnJson.js";
+import {
+    destroyRepostService,
+    likeRepostService,
+    storeRepostService,
+    updateRepostService,
+} from "../../../services/users/community/repostService.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { returnSuccess } from "../../../utils/returnJson.js";
 
 export const store = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const isRepost = await storeRepostService(req);
@@ -22,5 +27,5 @@ export const like = asyncHandler(async (req: Request, res: Response): Promise<Re
 
 export const destroy = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     await destroyRepostService(req);
-    return returnSuccess(res, 'you deleted repost successfully', 200);
+    return returnSuccess(res, "you deleted repost successfully", 200);
 });

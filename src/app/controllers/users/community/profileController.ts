@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { returnSuccess } from "../../utils/returnJson.js";
-import { acceptProfileService, connectProfileService, ignoreProfileService, indexProfileService, updateProfileService } from "../../services/users/profileService.js";
+import {
+    acceptProfileService,
+    connectProfileService,
+    ignoreProfileService,
+    indexProfileService,
+    updateProfileService,
+} from "../../../services/users/community/profileService.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { returnSuccess } from "../../../utils/returnJson.js";
 
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const profile = await indexProfileService(req);

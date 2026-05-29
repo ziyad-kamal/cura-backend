@@ -1,7 +1,14 @@
 import { Request, Response } from "express";
-import { deletePostService, indexPostsService, likePostService, repostPostService, storePostService, updatePostService } from "../../services/users/postService.js";
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { returnSuccess } from "../../utils/returnJson.js";
+import {
+    deletePostService,
+    indexPostsService,
+    likePostService,
+    repostPostService,
+    storePostService,
+    updatePostService,
+} from "../../../services/users/community/postService.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { returnSuccess } from "../../../utils/returnJson.js";
 
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const posts = await indexPostsService(req);
