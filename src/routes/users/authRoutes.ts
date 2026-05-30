@@ -18,6 +18,6 @@ authRoutes.post("/login", loginValidator, login);
 authRoutes.post("/signup", signupValidator, signup);
 authRoutes.post("/forget/password", forgetPasswordValidator, forgetPassword);
 authRoutes.post("/reset/password", resetPasswordValidator, resetPassword);
-authRoutes.post("/verify/email", verifyEmailValidator, verifyEmail);
+authRoutes.get("/verify/email", verifyEmailValidator, verifyEmail);
 
 export default authRoutes;
