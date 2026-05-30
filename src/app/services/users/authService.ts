@@ -80,6 +80,7 @@ export const resetPasswordService = async (req: ResetPasswordRequestInterface): 
     const user = await findRecord(User, { contact: { email } }, "+password");
 
     verifyToken(email, token, "resetToken");
+    await redis.del(`resetToken${email}`);
 
     user.password = password;
     await user.save();
