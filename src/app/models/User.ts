@@ -53,7 +53,6 @@ const userSchema = new Schema<UserInterface>(
         },
         password: {
             type: String,
-            required: true,
             minlength: 8,
             maxLength: 80,
             select: false,
@@ -105,6 +104,12 @@ const userSchema = new Schema<UserInterface>(
             name: String,
             cvv: String,
             expDate: String,
+        },
+
+        provider: {
+            type: String,
+            enum: ["local", "google"],
+            default: "local",
         },
 
         role: {

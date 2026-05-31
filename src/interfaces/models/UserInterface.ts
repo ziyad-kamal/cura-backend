@@ -56,6 +56,8 @@ export interface UserInterface {
     image?: string;
     coverImage?: string;
 
+    provider:string;
+
     createdAt?: Date;
     updatedAt?: Date;
     // eslint-disable-next-line no-unused-vars

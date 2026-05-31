@@ -6,23 +6,50 @@ import { ResetPasswordRequestInterface } from "../../../interfaces/requests/Rese
 import { SignupRequestInterface } from "../../../interfaces/requests/SignupRequestInterface.js";
 import NotFoundError from "../../errors/NotFoundError.js";
 import User from "../../models/User.js";
-import { loginRepo, signupRepo } from "../../repositories/users/authRepository.js";
+import { googleLoginRepo, loginRepo, signupRepo } from "../../repositories/users/authRepository.js";
 import { findRecord, sendToken, verifyToken } from "../../utils/index.js";
 import { emailQueue } from "../../queues/emailQueue.js";
 import { appConfig } from "../../../config/app.js";
+import { verifyGoogleToken } from "../../../config/googleAuth.js";
 
 export const loginService = async (req: Request, res: Response): Promise<object> => {
     const { email, password } = req.body;
 
     const user = await loginRepo(email);
     const isMatch = await user?.comparePassword(password);
-    if (!isMatch || !user) {    
+    if (!isMatch || !user) {
         throw new NotFoundError("incorrect password or email");
     }
 
     const userData = { _id: user._id, email: user.contact.email };
 
     const tokens = sendToken(userData, res);
+    return { tokens, user };
+};
+
+export const googleLoginService = async (req: Request, res: Response): Promise<object> => {
+    const { token } = req.body;
+
+    const payload = await verifyGoogleToken(token);
+
+    if (!payload?.email) {
+        throw new NotFoundError('email not found')
+    }
+
+    const user = await googleLoginRepo({
+        email: payload.email,
+        given_name: payload.given_name || "",
+        family_name: payload.family_name || "",
+    });
+
+    const tokens = sendToken(
+        {
+            _id: user?._id,
+            email: user?.contact.email,
+        },
+        res,
+    );
+
     return { tokens, user };
 };
 
@@ -49,9 +76,9 @@ export const signupService = async (req: SignupRequestInterface, res: Response):
 
     const userData = { _id: user._id, email };
 
-    const tokens=sendToken(userData, res);
+    const tokens = sendToken(userData, res);
 
-    return { tokens ,user};
+    return { tokens, user };
 };
 
 export const forgetPasswordService = async (req: ForgetPasswordRequestInterface): Promise<void> => {
@@ -95,6 +122,4 @@ export const verifyEmailService = async (req: ResetPasswordRequestInterface): Pr
     await user.updateOne({ isVerified: true });
 };
 
-export const logoutService = async (req: ResetPasswordRequestInterface): Promise<void> => {
-    
-};
+export const logoutService = async (req: ResetPasswordRequestInterface): Promise<void> => {};

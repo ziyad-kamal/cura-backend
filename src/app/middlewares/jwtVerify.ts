@@ -37,9 +37,7 @@ export const jwtVerify = async (req: Request, res: Response, next: NextFunction)
                         expiresIn: jwtConfig.accessExpireTime,
                     } as SignOptions,
                 );
-
-                res.cookieHelper("accessToken", newAccessToken, 2 * 24 * 60 * 60 * 1000);
-
+                res.setHeader("Authorization", `Bearer ${newAccessToken}`);
                 req.user = userData;
                 return next();
                 // eslint-disable-next-line no-unused-vars

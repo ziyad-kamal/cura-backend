@@ -6,6 +6,7 @@ import { SignupRequestInterface } from "../../../interfaces/requests/SignupReque
 import { VerifyEmailRequestInterface } from "../../../interfaces/requests/VerifyEmailRequestInterface.js";
 import {
     forgetPasswordService,
+    googleLoginService,
     loginService,
     resetPasswordService,
     signupService,
@@ -16,6 +17,11 @@ import { returnSuccess } from "../../utils/returnJson.js";
 
 export const login = asyncHandler(async (req: LoginRequestInterface, res: Response): Promise<Response> => {
     const auth = await loginService(req, res);
+    return returnSuccess(res, "Login successful", 200, { auth });
+});
+
+export const googleLogin = asyncHandler(async (req: LoginRequestInterface, res: Response): Promise<Response> => {
+    const auth = await googleLoginService(req, res);
     return returnSuccess(res, "Login successful", 200, { auth });
 });
 
