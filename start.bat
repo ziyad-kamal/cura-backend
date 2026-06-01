@@ -16,7 +16,7 @@ echo Starting MongoDB...
 net start MongoDB
 
 echo Starting Backend...
-cd /d D:\CURA\backend
+cd /d D:\final-project\backend
 npm run dev
 
 pause
