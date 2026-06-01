@@ -13,10 +13,8 @@ export const loginRepo = (email: string): Promise<UserInterface | null> => {
 
 export const googleLoginRepo = async (payload: { email: string; given_name :string,family_name:string}): Promise<UserInterface | null> => {
     let user = await User.findOne({
-        contact: {
-            email: payload.email,
-        },
-        provider:'google'
+        "contact.email": payload.email,
+        provider: "google",
     });
 
     if (!user) {
