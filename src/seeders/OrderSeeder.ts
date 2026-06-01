@@ -32,6 +32,9 @@ const seedOrders = async (
                 shippingAddress: {
                     city: faker.location.city(),
                     street: faker.location.street(),
+                    name: faker.person.fullName(),
+                    email: faker.internet.email(),
+                    phone: faker.phone.number(),
                 },
                 orderStatus: faker.helpers.arrayElement(["pending", "confirmed", "shipped", "delivered", "cancelled"]),
                 paymentStatus: faker.helpers.arrayElement(["pending", "paid", "failed"]),

@@ -6,7 +6,8 @@ export const indexVendorsService = async (req: Request) => {
 };
 
 export const createVendorService = async (req: Request) => {
-    return await Vendor.create(req.body);
+    const vendor = await Vendor.create(req.body);
+    return vendor;
 };
 
 export const showVendorService = async (req: Request) => {

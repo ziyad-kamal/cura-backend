@@ -13,10 +13,11 @@ export const addToWishlistService = async (req: Request) => {
     });
 
     if (!wishlist) {
-        return await Wishlist.create({
+        const newWishlist = await Wishlist.create({
             userId: req.user?.id,
             products: [req.body.productId],
         });
+        return await newWishlist.populate("products");
     }
 
     if (!wishlist.products.includes(req.body.productId)) {
@@ -24,7 +25,8 @@ export const addToWishlistService = async (req: Request) => {
         await wishlist.save();
     }
 
-    return wishlist;
+    // إرجاع قائمة الرغبات كاملة مع تفاصيل المنتجات بعد الإضافة
+    return await wishlist.populate("products");
 };
 
 export const removeFromWishlistService = async (req: Request) => {
@@ -40,5 +42,5 @@ export const removeFromWishlistService = async (req: Request) => {
         {
             new: true,
         }
-    );
+    ).populate("products"); // إرجاع القائمة محدثة بعد الحذف مباشرة
 };

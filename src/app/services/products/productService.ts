@@ -8,19 +8,30 @@ export const indexProductsService = async (req: Request) => {
 };
 
 export const createProductService = async (req: Request) => {
-    return await Product.create(req.body);
-};
-
-export const showProductService = async (req: Request) => {
-    return await Product.findById(req.params.id)
+    const product = await Product.create(req.body);
+    
+    return await Product.findById(product._id)
         .populate("vendorId")
         .populate("categoryId");
 };
 
+export const showProductService = async (req: Request) => {
+    const populated = await Product.findById(req.params.id)
+        .populate("vendorId")
+        .populate("categoryId");
+
+    return populated;
+};
+
 export const updateProductService = async (req: Request) => {
-    return await Product.findByIdAndUpdate(req.params.id, req.body, {
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, {
         returnDocument: "after",
     });
+    // Return the updated product fully populated
+    return await Product.findById(updatedProduct?._id)
+        .populate("vendorId")
+        .populate("categoryId")
+    // .populate("reviews");
 };
 
 export const deleteProductService = async (req: Request) => {
