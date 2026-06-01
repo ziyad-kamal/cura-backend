@@ -10,7 +10,7 @@ const returnSuccess = <T>(
     const resObject: Record<string, unknown> = {
         success: true,
         ...(msg !== "" && { msg }),
-        ...(data !== null && { data }),
+        ...(data !== null && data),
     };
 
     return res.status(code).json(resObject);
