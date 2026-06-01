@@ -15,7 +15,7 @@ const postSchema = new Schema<PostInterface>(
         files: [
             new Schema(
                 {
-                    url: String,
+                    s3Key: String,
                     type: {
                         type: String,
                         enum: ["video", "document", "image"],

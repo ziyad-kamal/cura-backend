@@ -4,7 +4,7 @@ import { PostTag } from "../../enums/PostTag.js";
 
 export interface PostDataInterface {
     content: string;
-    files?: { url: string; type: string }[];
+    files?: { s3Key: string; type: string }[];
     _id?: string;
     user?:Types.ObjectId;
     tags: PostTag[];

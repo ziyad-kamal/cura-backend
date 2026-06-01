@@ -16,10 +16,6 @@ const seedPosts = async (userIds: Array<Types.ObjectId> = []): Promise<PostInter
         }
 
         const posts = [];
-        const image = faker.image.urlPicsumPhotos({
-            width: 800,
-            height: 600,
-        });
 
         for (let userId of userIds) {
             const randomDate = faker.date.past({ years: 1 });
@@ -28,8 +24,8 @@ const seedPosts = async (userIds: Array<Types.ObjectId> = []): Promise<PostInter
                 content: faker.lorem.paragraphs({ min: 2, max: 5 }),
                 user: userId,
                 files: [
-                    { url: image, type: "image" },
-                    { url: image, type: "image" },
+                    { s3Key: 'staging/039d157188b33ce23e5b96def8bf2093.png', type: "image" },
+                    { s3Key: 'staging/039d157188b33ce23e5b96def8bf2093.png', type: "image" },
                 ],
                 tags: faker.helpers.arrayElements(Object.values(PostTag), { min: 1, max: 2 }),
                 createdAt: randomDate,

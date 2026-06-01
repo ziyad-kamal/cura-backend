@@ -9,9 +9,8 @@ on:
   workflow_dispatch:
 
 jobs:
-
   sonar:
-    uses: ./.github/workflows/sonar.yml
+    uses: cura-fitness/cura-devops/.github/workflows/sonar.yml@master
     with:
       fail_on_gate: true
     secrets:
@@ -23,59 +22,56 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c
+      - id: aws-setup
+        uses: cura-fitness/cura-devops/.github/actions/aws-setup@master
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@fa648b43de3d4d023bcb3f89ed6940096949c419
 
       - name: Set short SHA
         id: sha
         run: |
-          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
-          echo "SHORT=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "SHORT=$(echo "$GITHUB_SHA" | cut -c1-7)" >> $GITHUB_OUTPUT
 
-      - name: Build and tag image
+      - name: Compute image tags
+        id: tags
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:master-sha-${{ steps.sha.outputs.SHORT }} .
-
-      - name: Push master SHA tag
-        if: github.ref == 'refs/heads/master'
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-        run: |
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:master-sha-${{ steps.sha.outputs.SHORT }}
-
-      - name: Push semver and latest tags
-        if: startsWith(github.ref, 'refs/tags/v')
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          REGISTRY: ${{ steps.aws-setup.outputs.registry }}
+          REPO: ${{ secrets.ECR_REPOSITORY }}
+          SHORT: ${{ steps.sha.outputs.SHORT }}
           VERSION: ${{ github.ref_name }}
         run: |
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:master-sha-${{ steps.sha.outputs.SHORT }} $ECR_REGISTRY/$ECR_REPOSITORY:${VERSION#v}
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:master-sha-${{ steps.sha.outputs.SHORT }} $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${VERSION#v}
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          BASE="$REGISTRY/$REPO"
+          TAGS="$BASE:master-sha-$SHORT"
+
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAGS="$TAGS,$BASE:${VERSION#v},$BASE:latest"
+          fi
+
+          echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
+
+      - name: Build, cache, and push
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          provenance: false
+          tags: ${{ steps.tags.outputs.TAGS }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Trigger DevOps Workflow
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           PAT: ${{ secrets.PAT }}
-
         run: |
           curl -X POST \
+            --fail-with-body \
             -H "Authorization: Bearer ${PAT}" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/cura-fitness/cura-devops/actions/workflows/deploy_prod.yml/dispatches \

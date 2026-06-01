@@ -6,6 +6,7 @@ import { SignupRequestInterface } from "../../../interfaces/requests/SignupReque
 import { VerifyEmailRequestInterface } from "../../../interfaces/requests/VerifyEmailRequestInterface.js";
 import {
     forgetPasswordService,
+    googleLoginService,
     loginService,
     resetPasswordService,
     signupService,
@@ -19,9 +20,14 @@ export const login = asyncHandler(async (req: LoginRequestInterface, res: Respon
     return returnSuccess(res, "Login successful", 200, { auth });
 });
 
+export const googleLogin = asyncHandler(async (req: LoginRequestInterface, res: Response): Promise<Response> => {
+    const auth = await googleLoginService(req, res);
+    return returnSuccess(res, "Login successful", 200, { auth });
+});
+
 export const signup = asyncHandler(async (req: SignupRequestInterface, res: Response): Promise<Response> => {
-    const user = await signupService(req, res);
-    return returnSuccess(res, "Your account has been created successfully", 200, user);
+    const data = await signupService(req, res);
+    return returnSuccess(res, "Your account has been created successfully", 200, data);
 });
 
 export const forgetPassword = asyncHandler(
@@ -42,3 +48,8 @@ export const verifyEmail = asyncHandler(async (req: VerifyEmailRequestInterface,
     await verifyEmailService(req);
     return returnSuccess(res, "you verified your email successfully", 200);
 });
+
+// export const logout = asyncHandler(async (req: VerifyEmailRequestInterface, res: Response): Promise<Response> => {
+//     await logoutService(req);
+//     return returnSuccess(res, "you verified your email successfully", 200);
+// });

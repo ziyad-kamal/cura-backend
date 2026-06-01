@@ -1,14 +1,16 @@
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
 import { redis } from "../../../config/redis.js";
-import { UserInterface } from "../../../interfaces/models/UserInterface.js";
 import { ForgetPasswordRequestInterface } from "../../../interfaces/requests/ForgetPasswordRequestInterface.js";
 import { ResetPasswordRequestInterface } from "../../../interfaces/requests/ResetPasswordRequestInterface.js";
 import { SignupRequestInterface } from "../../../interfaces/requests/SignupRequestInterface.js";
 import NotFoundError from "../../errors/NotFoundError.js";
 import User from "../../models/User.js";
-import { loginRepo, signupRepo } from "../../repositories/users/authRepository.js";
+import { googleLoginRepo, loginRepo, signupRepo } from "../../repositories/users/authRepository.js";
 import { findRecord, sendToken, verifyToken } from "../../utils/index.js";
+import { emailQueue } from "../../queues/emailQueue.js";
+import { appConfig } from "../../../config/app.js";
+import { verifyGoogleToken } from "../../../config/googleAuth.js";
 
 export const loginService = async (req: Request, res: Response): Promise<object> => {
     const { email, password } = req.body;
@@ -22,11 +24,36 @@ export const loginService = async (req: Request, res: Response): Promise<object>
     const userData = { _id: user._id, email: user.contact.email };
 
     const tokens = sendToken(userData, res);
+    return { tokens, user };
+};
+
+export const googleLoginService = async (req: Request, res: Response): Promise<object> => {
+    const { token } = req.body;
+
+    const payload = await verifyGoogleToken(token);
+
+    if (!payload?.email) {
+        throw new NotFoundError('email not found')
+    }
+
+    const user = await googleLoginRepo({
+        email: payload.email,
+        given_name: payload.given_name || "",
+        family_name: payload.family_name || "",
+    });
+
+    const tokens = sendToken(
+        {
+            _id: user?._id,
+            email: user?.contact.email,
+        },
+        res,
+    );
 
     return { tokens, user };
 };
 
-export const signupService = async (req: SignupRequestInterface, res: Response): Promise<UserInterface> => {
+export const signupService = async (req: SignupRequestInterface, res: Response): Promise<object> => {
     const { firstName, lastName, email, password, role } = req.body;
 
     const user = await signupRepo(firstName, lastName, email, password, role);
@@ -36,22 +63,22 @@ export const signupService = async (req: SignupRequestInterface, res: Response):
 
     await redis.set(`verifyToken${userEmail}`, token, "EX", 5 * 60);
 
-    // await emailQueue.add("verify-email", {
-    //     to: user.contact.email,
-    //     subject: "verify your email",
-    //     templateName: "verifyEmail",
-    //     context: {
-    //         name: user.name.first,
-    //         verificationLink: `${appConfig.appUrl}/api/verify/email?email=${userEmail}&token=${token}`,
-    //         app: appConfig.appName,
-    //     },
-    // });
+    await emailQueue.add("verify-email", {
+        to: user.contact.email,
+        subject: "verify your email",
+        templateName: "verifyEmail",
+        context: {
+            name: user.name.first,
+            verificationLink: `${appConfig.frontendUrl}/seeker?email=${userEmail}&token=${token}`,
+            app: appConfig.appName,
+        },
+    });
 
     const userData = { _id: user._id, email };
 
-    sendToken(userData, res);
+    const tokens = sendToken(userData, res);
 
-    return user;
+    return { tokens, user };
 };
 
 export const forgetPasswordService = async (req: ForgetPasswordRequestInterface): Promise<void> => {
@@ -62,16 +89,16 @@ export const forgetPasswordService = async (req: ForgetPasswordRequestInterface)
 
     await redis.set(`resetToken${userEmail}`, token, "EX", 5 * 60);
 
-    // await emailQueue.add("forget-password", {
-    //     to: user.contact.email,
-    //     subject: "forget password",
-    //     templateName: "forgetPassword",
-    //     context: {
-    //         name: user.name.first,
-    //         resetPasswordLink: `${appConfig.frontendUrl}/reset/password?email=${userEmail}&token=${token}`,
-    //         app: appConfig.appName,
-    //     },
-    // });
+    await emailQueue.add("forget-password", {
+        to: user.contact.email,
+        subject: "forget password",
+        templateName: "forgetPassword",
+        context: {
+            name: user.name.first,
+            resetPasswordLink: `${appConfig.frontendUrl}/reset/password?email=${userEmail}&token=${token}`,
+            app: appConfig.appName,
+        },
+    });
 };
 
 export const resetPasswordService = async (req: ResetPasswordRequestInterface): Promise<void> => {
@@ -80,6 +107,7 @@ export const resetPasswordService = async (req: ResetPasswordRequestInterface): 
     const user = await findRecord(User, { contact: { email } }, "+password");
 
     verifyToken(email, token, "resetToken");
+    await redis.del(`resetToken${email}`);
 
     user.password = password;
     await user.save();
@@ -93,3 +121,5 @@ export const verifyEmailService = async (req: ResetPasswordRequestInterface): Pr
 
     await user.updateOne({ isVerified: true });
 };
+
+export const logoutService = async (req: ResetPasswordRequestInterface): Promise<void> => {};

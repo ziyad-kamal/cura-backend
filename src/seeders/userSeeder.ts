@@ -10,10 +10,7 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const isDoctor = role === "doctor";
-    const image = faker.image.urlPicsumPhotos({
-        width: 800,
-        height: 600,
-    });
+    const image = "staging/6402b1fef3de441cd31377f65554612a.png";
 
     return {
         name: {
@@ -45,9 +42,11 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
         }),
 
         userInfo: {
+            bio: faker.lorem.sentence(2),
+            job: faker.person.jobTitle(),
             age: faker.number.int({ min: 18, max: 65 }),
-            weight: faker.number.int({ min: 40, max: 150 }), // More realistic weight
-            height: faker.number.int({ min: 150, max: 200 }), // More realistic height
+            weight: faker.number.int({ min: 40, max: 150 }),
+            height: faker.number.int({ min: 150, max: 200 }), 
             gender: faker.helpers.arrayElement(["male", "female"]),
             diseases: "Diabetes and High Blood Pressure",
             medications:"Metformin and augmentin",
@@ -86,6 +85,38 @@ export const seedUsers = async (
             users.push(generateFakeUser(UserRoles.DOCTOR));
         }
 
+        const firstName = faker.person.firstName();
+        const lastName = faker.person.lastName();
+
+        await User.create({
+            name: {
+                first: faker.person.firstName(),
+                last: faker.person.lastName(),
+            },
+            contact: {
+                email: "doctor@gmail.com",
+                phone: faker.string.numeric(11),
+                address: {
+                    city: faker.location.city(),
+                    street: faker.location.streetAddress(),
+                },
+            },
+            isVerified: true,
+            isActive: true,
+            cardPayment: {
+                number: faker.finance.creditCardNumber("visa").replace(/\D/g, ""),
+                name: `${firstName} ${lastName}`,
+                cvv: faker.finance.creditCardCVV(),
+                expDate: faker.date
+                    .future({ years: 5 })
+                    .toLocaleDateString("en", { month: "2-digit", year: "2-digit" }),
+            },
+            password: "12121212",
+            role: UserRoles.DOCTOR,
+            image: "staging/6402b1fef3de441cd31377f65554612a.png",
+            coverImage: "staging/6402b1fef3de441cd31377f65554612a.png",
+        });
+
         const authUser = await User.create({
             name: {
                 first: faker.person.firstName(),
@@ -95,35 +126,29 @@ export const seedUsers = async (
                 email: "user@gmail.com",
             },
             userInfo: {
+                bio: faker.lorem.sentence({ min: 5, max: 10 }),
+                job: faker.person.jobTitle(),
                 age: faker.number.int({ min: 18, max: 65 }),
                 weight: Number(faker.string.numeric(2)),
-                height: Number(faker.string.numeric(2)),    
+                height: Number(faker.string.numeric(2)),
                 diseases: "Diabetes and High Blood Pressure",
-                medications:"Metformin and augmentin",
+                medications: "Metformin and augmentin",
                 tags: ["diabetes", "hypertension"],
+            },
+            isVerified: true,
+            isActive: true,
+            cardPayment: {
+                number: faker.finance.creditCardNumber("visa").replace(/\D/g, ""),
+                name: `${firstName} ${lastName}`,
+                cvv: faker.finance.creditCardCVV(),
+                expDate: faker.date
+                    .future({ years: 5 })
+                    .toLocaleDateString("en", { month: "2-digit", year: "2-digit" }),
             },
             password: "12121212",
             role: UserRoles.USER,
-            image: faker.image.urlPicsumPhotos({
-                width: 400,
-                height: 300,
-            }),
-        });
-
-        await User.create({
-            name: {
-                first: faker.person.firstName(),
-                last: faker.person.lastName(),
-            },
-            contact: {
-                email: "doctor@gmail.com",
-            },
-            password: "12121212",
-            role: UserRoles.DOCTOR,
-            image: faker.image.urlPicsumPhotos({
-                width: 400,
-                height: 300,
-            }),
+            image: "staging/6402b1fef3de441cd31377f65554612a.png",
+            coverImage: "staging/6402b1fef3de441cd31377f65554612a.png",
         });
 
         const createdUsers  = await User.insertMany(users) as UserInterface[];

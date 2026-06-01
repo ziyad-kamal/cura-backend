@@ -27,7 +27,7 @@ export const postValidator: (ValidationChain | RequestHandler)[] = [
 
     body("files").isArray().withMessage("invalid files format"),
 
-    body("files.*.url").isLength({ max: 140 }).withMessage("url mustn't be more than 140 characters long"),
+    body("files.*.s3Key").isLength({ max: 140 }).withMessage("url mustn't be more than 140 characters long"),
 
     body("files.*.type").isLength({ max: 10 }).withMessage("type mustn't be more than 10 characters long"),
 

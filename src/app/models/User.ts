@@ -53,12 +53,10 @@ const userSchema = new Schema<UserInterface>(
         },
         password: {
             type: String,
-            required: true,
             minlength: 8,
             maxLength: 80,
             select: false,
         },
-        image: String,
         isVerified: {
             type: Boolean,
             default: false,
@@ -83,6 +81,8 @@ const userSchema = new Schema<UserInterface>(
         },
 
         userInfo: {
+            bio: String,
+            job: String,
             age: {
                 type: Number,
                 maxLength: 3,
@@ -95,7 +95,7 @@ const userSchema = new Schema<UserInterface>(
                 enum: ["male", "female"],
             },
             diseases: String,
-            medications:String,
+            medications: String,
             tags: [String],
         },
 
@@ -106,10 +106,18 @@ const userSchema = new Schema<UserInterface>(
             expDate: String,
         },
 
+        provider: {
+            type: String,
+            enum: ["local", "google"],
+            default: "local",
+        },
+
         role: {
             type: String,
             enum: Object.values(UserRoles),
         },
+        image: String,
+        coverImage: String,
     },
     { timestamps: true, versionKey: false },
 );
@@ -122,6 +130,14 @@ userSchema.pre("save", async function () {
 
 userSchema.methods.comparePassword = function (password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.toJSON = function () {
+    const obj = this.toObject();
+
+    delete obj.password;
+
+    return obj;
 };
 
 const User = mongoose.model<UserInterface>("User", userSchema);

@@ -1,6 +1,7 @@
 import express from "express";
 import {
     forgetPassword,
+    googleLogin,
     login,
     resetPassword,
     signup,
@@ -15,9 +16,10 @@ import { verifyEmailValidator } from "../../app/validators/verifyEmailValidator.
 const authRoutes = express.Router();
 
 authRoutes.post("/login", loginValidator, login);
+authRoutes.post("/google/login", googleLogin);
 authRoutes.post("/signup", signupValidator, signup);
 authRoutes.post("/forget/password", forgetPasswordValidator, forgetPassword);
 authRoutes.post("/reset/password", resetPasswordValidator, resetPassword);
-authRoutes.post("/verify/email", verifyEmailValidator, verifyEmail);
+authRoutes.get("/verify/email", verifyEmailValidator, verifyEmail);
 
 export default authRoutes;

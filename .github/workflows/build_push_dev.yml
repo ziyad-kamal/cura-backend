@@ -4,45 +4,15 @@ on:
   push:
     branches: ["develop"]
     paths-ignore: ['**.md', 'docs/**', '.vscode/**', '.env.example', '.gitignore', '.dockerignore', '.prettierrc', 'eslint.config.mjs']
-  
+
   workflow_dispatch:
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@fa648b43de3d4d023bcb3f89ed6940096949c419
-
-      - name: Build, tag, and push image to ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:dev
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:dev
-
-      - name: Trigger DevOps Workflow
-        env:
-          PAT: ${{ secrets.PAT }}
-        run: |
-          curl -X POST \
-            -H "Authorization: Bearer ${PAT}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/cura-fitness/cura-devops/actions/workflows/deploy_dev.yml/dispatches \
-            -d '{"ref":"master"}'
+  build:
+    uses: cura-fitness/cura-devops/.github/workflows/build_push_dev.yml@master
+    secrets:
+      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION:            ${{ secrets.AWS_REGION }}
+      ECR_REPOSITORY:        ${{ secrets.ECR_REPOSITORY }}
+      PAT:                   ${{ secrets.PAT }}

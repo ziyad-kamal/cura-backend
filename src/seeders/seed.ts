@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Types } from "mongoose";
 
 import { connectDB } from "../config/index.js";
@@ -13,9 +14,9 @@ import seedConnections from "./ConnectionSeeder.js";
 import { seedCategories } from "./categorySeeder.js";
 import { seedVendors } from "./vendorSeeder.js";
 import { seedProducts } from "./productSeeder.js";
-import seedConsultations from "./consultationSeeder.js";
-import seedTreatmentPlans from "./treatmentPlanSeeder.js";
 import seedCarts from "./cartSeeder.js";
+import { CategoryInterface } from "../interfaces/models/CategoryInterface.js";
+import { VendorInterface } from "../interfaces/models/VendorInterface.js";
 
 const seedAll = async () => {
     try {
@@ -34,9 +35,7 @@ const seedAll = async () => {
 
         const createdPosts = await seedPosts(userIds);
 
-        const postIds = createdPosts
-            .map((post) => post._id)
-            .filter((id): id is Types.ObjectId => id !== undefined);
+        const postIds = createdPosts.map((post) => post._id).filter((id): id is Types.ObjectId => id !== undefined);
 
         const createdComments = await seedComments(30, postIds, userIds);
 
@@ -52,7 +51,7 @@ const seedAll = async () => {
         // NEW: ADMIN & COMPANY SYSTEM
         // =====================
         const createdAdmins = await seedAdmins(10);
-        const adminIds = createdAdmins.map(a => a._id).filter((id): id is Types.ObjectId => id !== undefined);
+        const adminIds = createdAdmins.map((a) => a._id).filter((id): id is Types.ObjectId => id !== undefined);
         await seedCompanies(10, adminIds);
 
         // =====================
@@ -62,19 +61,15 @@ const seedAll = async () => {
 
         // 1. Categories
         const categories = await seedCategories();
-        const categoryIds = categories
-            .map((c: any) => c._id)
-            .filter((id: Types.ObjectId) => id);
+        const categoryIds = categories.map((c: CategoryInterface) => c._id).filter((id: Types.ObjectId) => id);
 
         // 2. Vendors (use existing users - NO user seeding)
         const vendors = await seedVendors(userIds.slice(0, 10));
-        const vendorIds = vendors
-            .map((v: any) => v._id)
-            .filter((id: Types.ObjectId) => id);
+        const vendorIds = vendors.map((v: VendorInterface) => v._id).filter((id: Types.ObjectId) => id);
 
         // 3. Products (depend on vendors + categories)
         const products = await seedProducts(vendorIds, categoryIds);
- 
+
         // 4. Carts (Seeding carts for a subset of users)
         await seedCarts(userIds.slice(10, 30), products);
 
