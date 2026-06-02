@@ -17,7 +17,6 @@ const reviewSchema = new Schema<ReviewInterface>(
 
         rating: {
             type: Number,
-            required: true,
             min: 1,
             max: 5,
         },

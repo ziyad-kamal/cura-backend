@@ -5,7 +5,7 @@ export interface ReviewInterface {
 
     productId: mongoose.Types.ObjectId;
 
-    rating: number;
+    rating?: number;
 
     comment?: string;
 

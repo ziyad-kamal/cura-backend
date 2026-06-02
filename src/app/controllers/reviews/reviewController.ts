@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import {
+    checkUserRatingService,
     createReviewService,
     deleteReviewService,
     indexReviewsService,
@@ -14,6 +15,12 @@ export const index = asyncHandler(async (req: Request, res: Response): Promise<R
     const reviews = await indexReviewsService(req);
 
     return returnSuccess(res, "", 200, reviews);
+});
+
+export const checkRating = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const result = await checkUserRatingService(req);
+
+    return returnSuccess(res, "", 200, result);
 });
 
 export const store = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
