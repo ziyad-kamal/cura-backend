@@ -17,6 +17,9 @@ import { seedProducts } from "./productSeeder.js";
 import seedCarts from "./cartSeeder.js";
 import { CategoryInterface } from "../interfaces/models/CategoryInterface.js";
 import { VendorInterface } from "../interfaces/models/VendorInterface.js";
+import seedChatrooms from "./chatroomSeeder.js";
+import seedMessages from "./messageSeeder.js";
+import seedConsultations from "./consultationSeeder.js";
 
 const seedAll = async () => {
     try {
@@ -46,6 +49,23 @@ const seedAll = async () => {
         await seedLikes(3, 3, postIds, commentIds, userIds);
         await seedReposts(5, postIds, userIds);
         await seedConnections(10, userIds, authUser._id);
+        const createdConsultations = await seedConsultations(50, userIds);
+
+        const consultationIds = createdConsultations
+            .map((consult) => consult._id)
+            .filter((id): id is Types.ObjectId => id !== undefined);
+
+        const createdChatrooms = await seedChatrooms(30, userIds, [], consultationIds, authUser._id);
+        const chatRoomsIds = createdChatrooms
+            .map((chatroom) => chatroom._id)
+            .filter((id): id is Types.ObjectId => id !== undefined);
+
+        const createdMessages = await seedMessages(authUser._id, userIds, chatRoomsIds);
+        const messageIds = createdMessages
+            .map((message) => message._id)
+            .filter((id): id is Types.ObjectId => id !== undefined);
+
+        await seedChatrooms(30, userIds, messageIds, consultationIds, authUser._id);
 
         // =====================
         // NEW: ADMIN & COMPANY SYSTEM

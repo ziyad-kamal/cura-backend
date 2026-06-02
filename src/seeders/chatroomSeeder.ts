@@ -1,13 +1,15 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import Chatroom from '../app/models/Chatroom.js';
+import Chatroom from "../app/models/Chatroom.js";
 import { Types } from "mongoose";
-import { ChatroomInterface } from '../interfaces/models/ChatroomInterface.js';
+import { ChatroomInterface } from "../interfaces/models/ChatroomInterface.js";
 
 const seedChatrooms = async (
     count: number = 30,
     userIds: Array<Types.ObjectId> = [],
+    messageIds: Array<Types.ObjectId> = [],
     consultationIds: Array<Types.ObjectId> = [],
+    authId?: Types.ObjectId,
 ): Promise<ChatroomInterface[]> => {
     try {
         await Chatroom.deleteMany({});
@@ -22,15 +24,17 @@ const seedChatrooms = async (
                 isActive: faker.datatype.boolean({ probability: 0.7 }),
                 consultation: faker.helpers.arrayElement(consultationIds),
                 receiver: faker.helpers.arrayElement(userIds),
-                sender: faker.helpers.arrayElement(userIds),
+                sender: authId || faker.helpers.arrayElement(userIds),
                 createdAt: randomDate,
+                ...(messageIds.length > 0 && { lastMessage: faker.helpers.arrayElement(messageIds) }),
+                activeUntil: faker.date.future({ years: 1 }),
             });
         }
 
         const createdChatrooms = await Chatroom.insertMany(chatrooms);
         console.log(`✅ Created ${createdChatrooms.length} chatrooms`);
 
-        return createdChatrooms;
+        return createdChatrooms as unknown as ChatroomInterface[];
     } catch (err: unknown) {
         console.error("Posts seeding failed:", err instanceof Error ? err.message : String(err));
         throw err;

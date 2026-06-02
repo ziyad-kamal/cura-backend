@@ -10,7 +10,7 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const isDoctor = role === "doctor";
-    const image = "staging/6402b1fef3de441cd31377f65554612a.png";
+    const image = "public/posts/86381e92c4a401687272bdd2ddd157f5.png";
 
     return {
         name: {
@@ -113,7 +113,7 @@ export const seedUsers = async (
             },
             password: "12121212",
             role: UserRoles.DOCTOR,
-            image: "staging/6402b1fef3de441cd31377f65554612a.png",
+            image: 'public/posts/86381e92c4a401687272bdd2ddd157f5.png',
             coverImage: "staging/6402b1fef3de441cd31377f65554612a.png",
         });
 
@@ -147,7 +147,7 @@ export const seedUsers = async (
             },
             password: "12121212",
             role: UserRoles.USER,
-            image: "staging/6402b1fef3de441cd31377f65554612a.png",
+            image: "public/posts/86381e92c4a401687272bdd2ddd157f5.png",
             coverImage: "staging/6402b1fef3de441cd31377f65554612a.png",
         });
 

@@ -10,7 +10,7 @@ import { appConfig, connectDB } from "./config/index.js";
 import { httpLogger } from "./config/logger.js";
 import { connectRedis } from "./config/redis.js";
 import fileRoutes from "./routes/users/fileRoutes.js";
-import { authRoutes, postRoutes ,profileRoutes,repostRoutes,commentRoutes} from "./routes/users/index.js";
+import { authRoutes, postRoutes, profileRoutes, repostRoutes, commentRoutes } from "./routes/users/index.js";
 
 // marketplace
 import { EventEmitter } from "events";
@@ -22,13 +22,14 @@ import productRoutes from "./routes/marketplace/productRoutes.js";
 import reviewRoutes from "./routes/marketplace/reviewRoutes.js";
 import vendorRoutes from "./routes/marketplace/vendorRoutes.js";
 import wishlistRoutes from "./routes/marketplace/wishlistRoutes.js";
-
+import { createServer } from "http";
+import { initSocket } from "./config/socket.js";
+import chatroomRoutes from "./routes/users/consultation/chatroomRoutes.js";
 
 const app = express();
+const httpServer = createServer(app); // ← use http server not express directly
 
 async function bootstrap() {
-    app.listen(appConfig.port);
-
     EventEmitter.defaultMaxListeners = 15;
 
     await connectDB();
@@ -64,7 +65,14 @@ async function bootstrap() {
     app.use(`${appConfig.apiPrefix}/order-items`, orderItemRoutes);
     app.use(`${appConfig.apiPrefix}/reviews`, reviewRoutes);
 
+    // consultation
+    app.use(`${appConfig.apiPrefix}/chatrooms`, chatroomRoutes);
+
     app.use(errorHandler);
+
+    initSocket(httpServer);
+
+    httpServer.listen(appConfig.port);
 }
 
 bootstrap();
