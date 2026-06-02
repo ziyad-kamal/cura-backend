@@ -22,6 +22,7 @@ import productRoutes from "./routes/marketplace/productRoutes.js";
 import reviewRoutes from "./routes/marketplace/reviewRoutes.js";
 import vendorRoutes from "./routes/marketplace/vendorRoutes.js";
 import wishlistRoutes from "./routes/marketplace/wishlistRoutes.js";
+import paymentRoutes from "./routes/marketplace/paymentRoutes.js";
 
 
 const app = express();
@@ -39,6 +40,9 @@ async function bootstrap() {
     app.use(httpLogger);
 
     app.use(globalLimiter);
+
+    // Register payments route BEFORE global express.json() for webhook raw body parsing
+    app.use(`${appConfig.apiPrefix}/payments`, paymentRoutes);
 
     app.use(express.json());
 

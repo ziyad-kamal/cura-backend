@@ -3,8 +3,9 @@ import { Request } from "express";
 import Order from "../../models/Order.js";
 import OrderItem from "../../models/OrderItem.js";
 import Cart from "../../models/Cart.js";
+import Product from "../../models/Product.js";
 
-const mapOrderForFrontend = async (order: any) => {
+export const mapOrderForFrontend = async (order: any) => {
     const orderObj = order.toObject ? order.toObject() : order;
     
     // Fetch associated OrderItems and populate their product details
@@ -59,8 +60,30 @@ export const createOrderService = async (req: Request) => {
     });
 
     if (cart && cart.items.length > 0) {
+        // Create order items and decrease stock
         await Promise.all(
             cart.items.map(async (item) => {
+                // Decrease product stock
+                const product = await Product.findByIdAndUpdate(
+                    item.productId,
+                    { $inc: { stock: -item.quantity } },
+                    { new: true }
+                );
+
+                if (!product) {
+                    throw new Error(`Product not found: ${item.productId}`);
+                }
+
+                if (product.stock < 0) {
+                    // Restore stock if something went wrong
+                    await Product.findByIdAndUpdate(
+                        item.productId,
+                        { $inc: { stock: item.quantity } }
+                    );
+                    throw new Error(`Insufficient stock for product: ${product.title}`);
+                }
+
+                // Create order item
                 await OrderItem.create({
                     orderId: order._id,
                     productId: item.productId,
@@ -103,5 +126,59 @@ export const cancelOrderService = async (req: Request) => {
         throw new Error("Order not found");
     }
 
+    // Restore stock for all order items
+    const orderItems = await OrderItem.find({ orderId: req.params.id });
+    
+    await Promise.all(
+        orderItems.map(async (item) => {
+            await Product.findByIdAndUpdate(
+                item.productId,
+                { $inc: { stock: item.quantity } },
+                { new: true }
+            );
+        })
+    );
+
     return await mapOrderForFrontend(updatedOrder);
+};
+
+export const updateOrderStatusService = async (req: Request) => {
+    const { orderStatus, paymentStatus } = req.body;
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+        req.params.id,
+        {
+            ...(orderStatus && { orderStatus }),
+            ...(paymentStatus && { paymentStatus }),
+        },
+        {
+            new: true,
+        }
+    );
+
+    if (!updatedOrder) {
+        throw new Error("Order not found");
+    }
+
+    return await mapOrderForFrontend(updatedOrder);
+};
+
+export const updateOrderItemStatusService = async (req: Request) => {
+    const { itemId } = req.params;
+    const { status } = req.body;
+
+    const orderItem = await OrderItem.findByIdAndUpdate(
+        itemId,
+        { status },
+        { new: true }
+    ).populate({
+        path: "productId",
+        select: "title name price images image category vendorId description",
+    });
+
+    if (!orderItem) {
+        throw new Error("Order item not found");
+    }
+
+    return orderItem;
 };

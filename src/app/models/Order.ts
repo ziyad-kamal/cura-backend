@@ -33,6 +33,11 @@ const orderSchema = new Schema<OrderInterface>(
             default: "pending",
         },
 
+        stripePaymentIntentId: {
+            type: String,
+            default: null,
+        },
+
         shippingAddress: {
             city: {
                 type: String,

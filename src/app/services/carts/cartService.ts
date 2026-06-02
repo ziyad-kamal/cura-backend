@@ -42,7 +42,7 @@ export const addToCartService = async (req: Request) => {
         });
         await cart.populate({
             path: 'items.productId',
-            select: 'title name price images image category vendorId', // ✅ ضيفي title و images
+            select: 'title name price images image category vendorId',
         })
     } else {
         const itemIndex = cart.items.findIndex(item => item.productId?.toString() === productId);

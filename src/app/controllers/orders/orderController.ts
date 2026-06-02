@@ -5,6 +5,8 @@ import {
     createOrderService,
     indexOrdersService,
     showOrderService,
+    updateOrderStatusService,
+    updateOrderItemStatusService,
 } from "../../services/orders/orderService.js";
 
 import { asyncHandler } from "../../utils/asyncHandler.js";
@@ -37,5 +39,21 @@ export const cancel = asyncHandler(async (req: Request, res: Response): Promise<
 
     return returnSuccess(res, "order cancelled successfully", 200, {
         order,
+    });
+});
+
+export const updateStatus = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const order = await updateOrderStatusService(req);
+
+    return returnSuccess(res, "order status updated successfully", 200, {
+        order,
+    });
+});
+
+export const updateItemStatus = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const item = await updateOrderItemStatusService(req);
+
+    return returnSuccess(res, "item status updated successfully", 200, {
+        item,
     });
 });
