@@ -4,8 +4,15 @@ import { ChatroomInterface } from "../../../../interfaces/models/ChatroomInterfa
 import Message from "../../../models/Message.js";
 import { MessageInterface } from "../../../../interfaces/models/MessageInterface.js";
 
-export const indexChatroomsRepo = async (authId: string): Promise<{recentMessages:MessageInterface[],chatrooms:ChatroomInterface[]}> => {
+export const indexChatroomsRepo = async (
+    authId: string,
+    query: {
+        [key: string]: unknown;
+    },
+    limit: number,
+): Promise<{ recentMessages: MessageInterface[]; chatrooms: ChatroomInterface[] }> => {
     const chatrooms = await Chatroom.find({
+        ...query,
         $or: [{ sender: authId }, { receiver: authId }],
     })
         .populate({
@@ -21,6 +28,7 @@ export const indexChatroomsRepo = async (authId: string): Promise<{recentMessage
             isActive: -1,
             createdAt: -1,
         })
+        .limit(limit + 1)
         .lean();
 
     chatrooms.sort((a, b) => {
@@ -30,7 +38,7 @@ export const indexChatroomsRepo = async (authId: string): Promise<{recentMessage
         const dateA = lastMsgA?.createdAt ? new Date(lastMsgA.createdAt) : new Date(a.createdAt);
         const dateB = lastMsgB?.createdAt ? new Date(lastMsgB.createdAt) : new Date(b.createdAt);
 
-        return dateB.getTime() - dateA.getTime(); 
+        return dateB.getTime() - dateA.getTime();
     });
 
     const mostRecentActiveRoom = chatrooms[0];

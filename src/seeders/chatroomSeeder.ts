@@ -24,7 +24,7 @@ const seedChatrooms = async (
                 isActive: faker.datatype.boolean({ probability: 0.7 }),
                 consultation: faker.helpers.arrayElement(consultationIds),
                 receiver: faker.helpers.arrayElement(userIds),
-                sender: authId || faker.helpers.arrayElement(userIds),
+                sender: authId ,
                 createdAt: randomDate,
                 ...(messageIds.length > 0 && { lastMessage: faker.helpers.arrayElement(messageIds) }),
                 activeUntil: faker.date.future({ years: 1 }),

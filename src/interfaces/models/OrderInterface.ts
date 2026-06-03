@@ -14,6 +14,8 @@ export interface OrderInterface {
         | "delivered"
         | "cancelled";
 
+    stripePaymentIntentId?: string;
+
     shippingAddress: {
         city: string;
         street: string;

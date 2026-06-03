@@ -36,14 +36,14 @@ export const seedProducts = async (
 
     const products = [];
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 50; i++) {
         products.push({
             title: `Product ${i + 1}`,
             price: Math.floor(Math.random() * 5000),
             stock: 10,
             vendorId: vendorIds[i % vendorIds.length],
             categoryId: categoryIds[i % categoryIds.length],
-            images: [realImages[i]], 
+            images: [realImages[i % realImages.length]], 
         });
     }
 

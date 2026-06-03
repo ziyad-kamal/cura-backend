@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Product from "../../models/Product.js";
+
 import {
     createProductService,
     deleteProductService,
@@ -9,63 +10,160 @@ import {
 
 export const index = async (req: Request, res: Response) => {
     try {
-        const { page = 1, limit = 10, search, category, minPrice, maxPrice } = req.query;
+        const {
+            page = 1,
+            limit = 15,
+            search,
+            category,
+            minPrice,
+            maxPrice,
+            sortBy,
+            inStock,
+            minRating,
+        } = req.query;
 
+        // 1. Pagination values
+        const pageNum = Math.max(1, Number(page) || 1);
+        const limitNum = Math.max(1, Number(limit) || 15);
+        
+        console.log('🔍 Backend Query:', { pageNum, limitNum, page, limit, search, category, inStock, minRating });
+
+        // 2. Build query object
         const query: any = {};
 
-        // filtration based on search
+        // Search
         if (search) {
-            query.name = { $regex: search, $options: "i" };
+            query.title = {
+                $regex: search as string,
+                $options: "i",
+            };
         }
 
-        // filtration based on category
-        if (category) {
-            query.categoryId = category;
+        // Category
+        if (category && category !== "All Products") {
+            const { default: Category } = await import(
+                "../../models/Category.js"
+            );
+
+            const categoryDoc = await Category.findOne({
+                name: category as string,
+            });
+
+            if (categoryDoc) {
+                query.categoryId = categoryDoc._id;
+            }
         }
 
-        // filtration based on price range
+        // Price range
         if (minPrice || maxPrice) {
             query.price = {};
-            if (minPrice) query.price.$gte = Number(minPrice);
-            if (maxPrice) query.price.$lte = Number(maxPrice);
+
+            if (minPrice) {
+                query.price.$gte = Number(minPrice);
+            }
+
+            if (maxPrice) {
+                query.price.$lte = Number(maxPrice);
+            }
         }
 
-        const products = await Product.find(query)
-            .populate("categoryId")
-            .populate("vendorId")
-            .limit(Number(limit))
-            .skip((Number(page) - 1) * Number(limit));
+        // In Stock filter
+        if (inStock === "true") {
+            query.stock = { $gt: 0 };
+        }
 
-        const total = await Product.countDocuments(query);
-        const totalPages = Math.ceil(total / Number(limit));
+        // Minimum Rating filter
+        if (minRating && Number(minRating) > 0) {
+            query.ratingAverage = { $gte: Number(minRating) };
+        }
 
-        res.status(200).json({
+        // 3. Build sort query
+        let sortQuery: any = {};
+
+        switch (sortBy) {
+            case "priceLow":
+                sortQuery = { price: 1 };
+                break;
+
+            case "priceHigh":
+                sortQuery = { price: -1 };
+                break;
+
+            case "rating":
+                sortQuery = { ratingAverage: -1 };
+                break;
+
+            case "newest":
+                sortQuery = { createdAt: -1 };
+                break;
+
+            default:
+                sortQuery = { createdAt: -1 };
+        }
+
+        // 4. Fetch data (مرة واحدة فقط)
+        const [products, total] = await Promise.all([
+            Product.find(query)
+                .populate("categoryId")
+                .populate("vendorId")
+                .sort(sortQuery)
+                .limit(limitNum)
+                .skip((pageNum - 1) * limitNum),
+            Product.countDocuments(query),
+        ]);
+
+        // 5. Pagination data
+        const totalPages = Math.ceil(total / limitNum);
+
+        console.log('✅ Sending Response:', { 
+          productsCount: products.length, 
+          total, 
+          page: pageNum, 
+          limit: limitNum, 
+          pages: totalPages,
+          hasNextPage: pageNum < totalPages,
+          hasPrevPage: pageNum > 1,
+        });
+
+        return res.status(200).json({
+            success: true,
             data: products,
             pagination: {
                 total,
-                page: Number(page),
+                page: pageNum,
+                limit: limitNum,
                 pages: totalPages,
-                hasNextPage: Number(page) < totalPages,
-                hasPrevPage: Number(page) > 1
-            }
+                hasNextPage: pageNum < totalPages,
+                hasPrevPage: pageNum > 1,
+            },
         });
     } catch (error: any) {
-        res.status(500).json({ message: "Error" });
+        return res.status(500).json({
+            success: false,
+            message: error?.message || "Internal Server Error",
+        });
     }
 };
 
 export const show = async (req: Request, res: Response) => {
     try {
         const product = await showProductService(req);
+
         if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Product not found",
+            });
         }
-        return res.status(200).json({ success: true, data: product });
+
+        return res.status(200).json({
+            success: true,
+            data: product,
+        });
     } catch (error: any) {
-        return res.status(500).json({ 
-            message: error?.message ?? "no message",
-            name: error?.name ?? "no name",
-            str: String(error)
+        return res.status(500).json({
+            success: false,
+            message: error?.message || "Error",
         });
     }
 };
@@ -73,26 +171,44 @@ export const show = async (req: Request, res: Response) => {
 export const store = async (req: Request, res: Response) => {
     try {
         const product = await createProductService(req);
-        res.status(201).json(product);
+
+        return res.status(201).json({
+            success: true,
+            data: product,
+        });
     } catch (error: any) {
-        res.status(500).json({ message: "Error" });
+        return res.status(500).json({
+            success: false,
+            message: "Error creating product",
+        });
     }
 };
 
 export const update = async (req: Request, res: Response) => {
     try {
         const product = await updateProductService(req);
-        res.status(200).json(product);
+
+        return res.status(200).json({
+            success: true,
+            data: product,
+        });
     } catch (error: any) {
-        res.status(500).json({ message: "Error" });
+        return res.status(500).json({
+            success: false,
+            message: "Error updating product",
+        });
     }
 };
 
 export const destroy = async (req: Request, res: Response) => {
     try {
         await deleteProductService(req);
-        res.status(204).send();
+
+        return res.status(204).send();
     } catch (error: any) {
-        res.status(500).json({ message: "Error" });
+        return res.status(500).json({
+            success: false,
+            message: "Error deleting product",
+        });
     }
 };

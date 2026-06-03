@@ -3,9 +3,14 @@ import { ChatroomInterface } from "../../../../interfaces/models/ChatroomInterfa
 import { getChatroomRepo, indexChatroomsRepo } from "../../../repositories/users/consultation/chatroomRepo.js";
 import { resolveFiles } from "../../../utils/resolveFiles.js";
 import { MessageInterface } from "../../../../interfaces/models/MessageInterface.js";
+import { getNextCursor, getQueryCursor } from "../../../utils/cursorPagination.js";
 
-export const indexChatroomsService = async (req: Request): Promise<{recentMessages:MessageInterface[],chatrooms:ChatroomInterface[]}> => {
-    const { chatrooms, recentMessages } = await indexChatroomsRepo(req.user?._id as string);
+export const indexChatroomsService = async (
+    req: Request,
+): Promise<{ recentMessages: MessageInterface[]; chatrooms: ChatroomInterface[] ,metadata:object}> => {
+    const limit = 10;
+    const { query, sortField } = getQueryCursor(req, "createdAt");
+    const { chatrooms, recentMessages } = await indexChatroomsRepo(req.user?._id as string, query, limit);
 
     await Promise.all(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,7 +34,7 @@ export const indexChatroomsService = async (req: Request): Promise<{recentMessag
                 if (msg.files?.length) {
                     msg.files = await resolveFiles(msg.files, "public");
                 }
-                
+
                 if (msg.sender?.image) {
                     const fileObj =
                         typeof msg.sender.image === "string" ? { s3Key: msg.sender.image } : msg.sender.image;
@@ -40,7 +45,9 @@ export const indexChatroomsService = async (req: Request): Promise<{recentMessag
         );
     }
 
-    return { recentMessages, chatrooms};
+    const { hasMore, nextCursor, results } = getNextCursor(chatrooms, limit, sortField);
+
+    return { recentMessages,metadata:{hasMore,nextCursor} ,chatrooms: results };
 };
 
 export const getChatroomService = async (req: Request): Promise<ChatroomInterface> => {

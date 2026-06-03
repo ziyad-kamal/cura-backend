@@ -8,3 +8,4 @@ chatroomRoutes.use(jwtVerify);
 chatroomRoutes.get("", index);
 
 export default chatroomRoutes;
+

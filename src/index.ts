@@ -25,6 +25,8 @@ import wishlistRoutes from "./routes/marketplace/wishlistRoutes.js";
 import { createServer } from "http";
 import { initSocket } from "./config/socket.js";
 import chatroomRoutes from "./routes/users/consultation/chatroomRoutes.js";
+import paymentRoutes from "./routes/marketplace/paymentRoutes.js";
+
 
 const app = express();
 const httpServer = createServer(app); // ← use http server not express directly
@@ -40,6 +42,9 @@ async function bootstrap() {
     app.use(httpLogger);
 
     app.use(globalLimiter);
+
+    // Register payments route BEFORE global express.json() for webhook raw body parsing
+    app.use(`${appConfig.apiPrefix}/payments`, paymentRoutes);
 
     app.use(express.json());
 
