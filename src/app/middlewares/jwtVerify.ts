@@ -15,7 +15,7 @@ export const jwtVerify = async (req: Request, res: Response, next: NextFunction)
     }
 
     try {
-        const user = jwt.verify(accessToken as string, jwtConfig.accessTokenSecret as string) as JwtPayload;
+        const user = jwt.verify(accessToken as string, jwtConfig.accessTokenSecret as string) as jwt.JwtPayload & { _id: string; email: string; role: string };
         req.user = user;
 
         return next();
@@ -28,10 +28,10 @@ export const jwtVerify = async (req: Request, res: Response, next: NextFunction)
             }
 
             try {
-                const userData = jwt.verify(refreshToken, jwtConfig.refreshTokenSecret as string) as JwtPayload;
+                const userData = jwt.verify(refreshToken, jwtConfig.refreshTokenSecret as string) as jwt.JwtPayload & { _id: string; email: string; role: string };
 
                 const newAccessToken = jwt.sign(
-                    { _id: userData._id, email: userData.email },
+                    { _id: userData._id, email: userData.email, role: userData.role },
                     jwtConfig.accessTokenSecret as string,
                     {
                         expiresIn: jwtConfig.accessExpireTime,
