@@ -21,7 +21,7 @@ export const loginService = async (req: Request, res: Response): Promise<object>
         throw new NotFoundError("incorrect password or email");
     }
 
-    const userData = { _id: user._id, email: user.contact.email };
+    const userData = { _id: user._id, email: user.contact.email, role: user.role };
 
     const tokens = sendToken(userData, res);
     return { tokens, user };
@@ -46,6 +46,7 @@ export const googleLoginService = async (req: Request, res: Response): Promise<o
         {
             _id: user?._id,
             email: user?.contact.email,
+            role: user?.role,
         },
         res,
     );
@@ -74,7 +75,7 @@ export const signupService = async (req: SignupRequestInterface, res: Response):
         },
     });
 
-    const userData = { _id: user._id, email };
+    const userData = { _id: user._id, email, role: user.role };
 
     const tokens = sendToken(userData, res);
 

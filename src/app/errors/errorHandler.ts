@@ -9,6 +9,7 @@ import UnknownError from './UnknownError.js';
 import CustomError from './CustomError.js';
 
 const errorHandler = (err: ErrorInterface, req: Request, res: Response, next: NextFunction): Response | void => {
+    console.error("Error caught in errorHandler:", err);
     let statusCode = err.statusCode || 500;
     let message = err.message || "Internal Server Error";
 

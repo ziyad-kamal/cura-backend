@@ -74,6 +74,22 @@ export const createReviewService = async (req: Request) => {
     const userId = req.user?.id || req.user?._id;
     const { productId, rating, comment } = req.body;
 
+    const product = await Product.findById(productId);
+    if (!product) {
+        const error: any = new Error("Product not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    // Check if the user is a vendor and owns the product
+    const { default: Vendor } = await import("../../models/Vendor.js");
+    const vendor = await Vendor.findOne({ userId });
+    if (vendor && product.vendorId.toString() === vendor._id.toString()) {
+        const error: any = new Error("You cannot review your own product");
+        error.statusCode = 400;
+        throw error;
+    }
+
     // If user is submitting a rating, check if they already rated this product
     if (rating != null) {
         const existingRating = await Review.findOne({
@@ -106,6 +122,21 @@ export const createReviewService = async (req: Request) => {
 };
 
 export const updateReviewService = async (req: Request) => {
+    const userId = req.user?.id || req.user?._id;
+    const review = await Review.findById(req.params.id);
+
+    if (!review) {
+        const error: any = new Error("Review not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    if (review.userId.toString() !== userId?.toString()) {
+        const error: any = new Error("Unauthorized: You do not own this review");
+        error.statusCode = 403;
+        throw error;
+    }
+
     const updatedReview = await Review.findByIdAndUpdate(req.params.id, req.body, {
         returnDocument: "after",
     });
@@ -121,8 +152,15 @@ export const updateReviewService = async (req: Request) => {
 };
 
 export const deleteReviewService = async (req: Request) => {
+    const userId = req.user?.id || req.user?._id;
     const review = await Review.findById(req.params.id);
     if (!review) return null;
+
+    if (review.userId.toString() !== userId?.toString()) {
+        const error: any = new Error("Unauthorized: You do not own this review");
+        error.statusCode = 403;
+        throw error;
+    }
 
     const deletedReview = await Review.findByIdAndDelete(req.params.id);
 
