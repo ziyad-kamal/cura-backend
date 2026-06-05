@@ -30,7 +30,10 @@ export const addToCartService = async (req: Request) => {
     if (!product) {
         throw new Error("Product not found");
     }
-    const { price, vendorId } = product;
+    const price = (product.discountPrice && product.discountPrice > 0 && product.discountPrice < product.price) 
+        ? product.discountPrice 
+        : product.price;
+    const { vendorId } = product;
 
     let cart = await Cart.findOne({ userId: finalUserId });
 
@@ -152,7 +155,9 @@ export const syncCartService = async (req: Request) => {
         }
 
         const qty = Math.max(1, parseInt(item.quantity) || 1);
-        const price = product.price;
+        const price = (product.discountPrice && product.discountPrice > 0 && product.discountPrice < product.price)
+            ? product.discountPrice
+            : product.price;
         const vendorId = product.vendorId;
 
         cartItems.push({

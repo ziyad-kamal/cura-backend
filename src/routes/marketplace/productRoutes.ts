@@ -7,13 +7,15 @@ import {
     store,
     update,
 } from "../../app/controllers/products/productController.js";
+import { jwtVerify, requireRole } from "../../app/middlewares/index.js";
+import { UserRoles } from "../../enums/UserRoles.js";
 
 const router = express.Router();
 
 router.get("/", index);
-router.post("/", store);
+router.post("/", jwtVerify, requireRole(UserRoles.VENDOR), store);
 router.get("/:id", show);
-router.patch("/:id", update);
-router.delete("/:id", destroy);
+router.patch("/:id", jwtVerify, requireRole(UserRoles.VENDOR), update);
+router.delete("/:id", jwtVerify, requireRole(UserRoles.VENDOR), destroy);
 
 export default router;

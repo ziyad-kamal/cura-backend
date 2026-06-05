@@ -112,19 +112,23 @@ export const showOrderService = async (req: Request) => {
 };
 
 export const cancelOrderService = async (req: Request) => {
-    const updatedOrder = await Order.findByIdAndUpdate(
-        req.params.id,
-        {
-            orderStatus: "cancelled",
-        },
-        {
-            new: true,
-        }
-    );
-
-    if (!updatedOrder) {
+    const userId = req.user?.id || req.user?._id;
+    const order = await Order.findById(req.params.id);
+    
+    if (!order) {
         throw new Error("Order not found");
     }
+
+    if (order.userId.toString() !== userId?.toString()) {
+        throw new Error("Unauthorized: You do not own this order");
+    }
+
+    if (order.orderStatus !== "pending") {
+        throw new Error("Cannot cancel order unless it is pending");
+    }
+
+    order.orderStatus = "cancelled";
+    await order.save();
 
     // Restore stock for all order items
     const orderItems = await OrderItem.find({ orderId: req.params.id });
@@ -139,7 +143,7 @@ export const cancelOrderService = async (req: Request) => {
         })
     );
 
-    return await mapOrderForFrontend(updatedOrder);
+    return await mapOrderForFrontend(order);
 };
 
 export const updateOrderStatusService = async (req: Request) => {
