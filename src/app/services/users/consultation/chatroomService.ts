@@ -2,12 +2,17 @@ import { Request } from "express";
 import { ChatroomInterface } from "../../../../interfaces/models/ChatroomInterface.js";
 import { getChatroomRepo, indexChatroomsRepo } from "../../../repositories/users/consultation/chatroomRepo.js";
 import { resolveFiles } from "../../../utils/resolveFiles.js";
-import { MessageInterface } from "../../../../interfaces/models/MessageInterface.js";
 import { getNextCursor, getQueryCursor } from "../../../utils/cursorPagination.js";
+import { PaginationType } from "../../../../types/PaginationType.js";
+import { MessageInterface } from "../../../../interfaces/models/MessageInterface.js";
 
 export const indexChatroomsService = async (
     req: Request,
-): Promise<{ recentMessages: MessageInterface[]; chatrooms: ChatroomInterface[] ,metadata:object}> => {
+): Promise<
+    PaginationType<ChatroomInterface, "chatrooms"> & {
+        recentMessages: MessageInterface[];
+    }
+> => {
     const limit = 10;
     const { query, sortField } = getQueryCursor(req, "createdAt");
     const { chatrooms, recentMessages } = await indexChatroomsRepo(req.user?._id as string, query, limit);
@@ -47,7 +52,7 @@ export const indexChatroomsService = async (
 
     const { hasMore, nextCursor, results } = getNextCursor(chatrooms, limit, sortField);
 
-    return { recentMessages,metadata:{hasMore,nextCursor} ,chatrooms: results };
+    return { recentMessages, metadata: { hasMore, nextCursor }, chatrooms: results };
 };
 
 export const getChatroomService = async (req: Request): Promise<ChatroomInterface> => {

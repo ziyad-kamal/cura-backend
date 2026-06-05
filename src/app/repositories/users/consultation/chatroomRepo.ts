@@ -50,8 +50,6 @@ export const indexChatroomsRepo = async (
             .populate("sender", "name.first name.last image")
             .limit(10)
             .lean();
-
-        recentMessages.reverse();
     }
 
     return { recentMessages: recentMessages as MessageInterface[], chatrooms };

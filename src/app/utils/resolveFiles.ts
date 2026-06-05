@@ -1,22 +1,21 @@
 import { getSignedFileUrl } from "./getSignedFileUrl.js";
 
-export const resolveFiles = async (files: { s3Key: string;}[] | undefined, visibility: string) => {
+export const resolveFiles = async <T extends { s3Key: string }>(
+    files: T[] | undefined,
+    visibility: string,
+): Promise<(T & { url: string })[]> => {
     if (!files?.length) return [];
 
     if (visibility === "public") {
-        return files.filter((file) => file.s3Key)
-        .map((file) => {
-            const s3Key = file.s3Key.replace("public/", "");
-
-            return {
+        return files
+            .filter((file) => file.s3Key)
+            .map((file) => ({
                 ...file,
-                url: `http://d25j70azqw5p5x.cloudfront.net/${s3Key}`,
-            };
-        });
+                url: `http://d25j70azqw5p5x.cloudfront.net/${file.s3Key.replace("public/", "")}`,
+            }));
     }
 
-    // Private — generate presigned URLs
-    return await Promise.all(
+    return Promise.all(
         files
             .filter((file) => file.s3Key)
             .map(async (file) => ({

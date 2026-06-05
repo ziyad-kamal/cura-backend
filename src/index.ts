@@ -1,18 +1,12 @@
 import express from "express";
-
 import errorHandler from "./app/errors/errorHandler.js";
-
-//community
 import { attachHelpers } from "./app/middlewares/helpers.js";
-import { globalLimiter } from "./app/middlewares/rateLimiter.js";
 import { applyCors } from "./config/cors.js";
 import { appConfig, connectDB } from "./config/index.js";
 import { httpLogger } from "./config/logger.js";
 import { connectRedis } from "./config/redis.js";
 import fileRoutes from "./routes/users/fileRoutes.js";
 import { authRoutes, postRoutes, profileRoutes, repostRoutes, commentRoutes } from "./routes/users/index.js";
-
-// marketplace
 import { EventEmitter } from "events";
 import cartRoutes from "./routes/marketplace/cartRoutes.js";
 import categoryRoutes from "./routes/marketplace/categoryRoutes.js";
@@ -26,10 +20,10 @@ import { createServer } from "http";
 import { initSocket } from "./config/socket.js";
 import chatroomRoutes from "./routes/users/consultation/chatroomRoutes.js";
 import paymentRoutes from "./routes/marketplace/paymentRoutes.js";
-
+import messageRoutes from "./routes/users/consultation/messageRoutes.js";
 
 const app = express();
-const httpServer = createServer(app); // ← use http server not express directly
+const httpServer = createServer(app); 
 
 async function bootstrap() {
     EventEmitter.defaultMaxListeners = 15;
@@ -41,10 +35,7 @@ async function bootstrap() {
 
     app.use(httpLogger);
 
-    app.use(globalLimiter);
-
-    // Register payments route BEFORE global express.json() for webhook raw body parsing
-    app.use(`${appConfig.apiPrefix}/payments`, paymentRoutes);
+    // app.use(globalLimiter);
 
     app.use(express.json());
 
@@ -52,11 +43,13 @@ async function bootstrap() {
 
     app.use(attachHelpers);
 
-    //community
     app.use(`${appConfig.apiPrefix}`, authRoutes);
+    app.use(`${appConfig.apiPrefix}/file`, fileRoutes);
+    app.use(`${appConfig.apiPrefix}/payments`, paymentRoutes);
+
+    //community
     app.use(`${appConfig.apiPrefix}/post`, postRoutes);
     app.use(`${appConfig.apiPrefix}/repost`, repostRoutes);
-    app.use(`${appConfig.apiPrefix}/file`, fileRoutes);
     app.use(`${appConfig.apiPrefix}/comment`, commentRoutes);
     app.use(`${appConfig.apiPrefix}/profile`, profileRoutes);
 
@@ -72,6 +65,7 @@ async function bootstrap() {
 
     // consultation
     app.use(`${appConfig.apiPrefix}/chatrooms`, chatroomRoutes);
+    app.use(`${appConfig.apiPrefix}/messages`, messageRoutes);
 
     app.use(errorHandler);
 

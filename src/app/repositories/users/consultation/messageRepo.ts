@@ -8,22 +8,34 @@ export const storeMessageRepo = async (
     sender: string,
     content: string,
     chatroom: string,
-):Promise<MessageInterface> => {
-    await findRecord(Chatroom,{receiver,sender});
-
-    return (await Message.create({
-        content,
-        sender,
-        receiver,
-        chatroom,
-    })).populate("sender", "name.first name.last image");
+): Promise<MessageInterface> => {
+    return (
+        await Message.create({
+            content,
+            sender,
+            receiver,
+            chatroom,
+        })
+    ).populate("sender", "name.first name.last image");
 };
 
-export const markMessageAsReadRepo = async (
-    chatroom: string,
-): Promise<void> => {
-    Message.updateMany(
-        { chatroom, isRead: false },
-        {  isRead: true  },
-    );
+export const showMessageRepo = async (
+    _id: string,
+    query: {
+        [key: string]: unknown;
+    },
+    limit: number,
+): Promise<MessageInterface[]> => {
+    await findRecord(Chatroom, { _id });
+
+    return await Message.find({ ...query, chatroom: _id })
+        .select("content files chatroom sender createdAt")
+        .populate("sender", "name.first name.last image")
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .lean();
+};
+
+export const markMessageAsReadRepo = async (chatroom: string): Promise<void> => {
+    Message.updateMany({ chatroom, isRead: false }, { isRead: true });
 };
