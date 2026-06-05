@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
-import { jwtConfig } from '../../config/jwt.js';
-import { returnError } from '../utils/returnJson.js';
+import { jwtConfig } from "../../config/jwt.js";
+import { returnError } from "../utils/returnJson.js";
 
 export const jwtVerify = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     // const accessToken = req.cookies?.accessToken;
@@ -15,7 +15,11 @@ export const jwtVerify = async (req: Request, res: Response, next: NextFunction)
     }
 
     try {
-        const user = jwt.verify(accessToken as string, jwtConfig.accessTokenSecret as string) as jwt.JwtPayload & { _id: string; email: string; role: string };
+        const user = jwt.verify(accessToken as string, jwtConfig.accessTokenSecret as string) as jwt.JwtPayload & {
+            _id: string;
+            email: string;
+            role: string;
+        };
         req.user = user;
 
         return next();
@@ -28,7 +32,11 @@ export const jwtVerify = async (req: Request, res: Response, next: NextFunction)
             }
 
             try {
-                const userData = jwt.verify(refreshToken, jwtConfig.refreshTokenSecret as string) as jwt.JwtPayload & { _id: string; email: string; role: string };
+                const userData = jwt.verify(refreshToken, jwtConfig.refreshTokenSecret as string) as jwt.JwtPayload & {
+                    _id: string;
+                    email: string;
+                    role: string;
+                };
 
                 const newAccessToken = jwt.sign(
                     { _id: userData._id, email: userData.email, role: userData.role },
