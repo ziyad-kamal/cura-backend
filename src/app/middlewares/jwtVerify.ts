@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import { jwtConfig } from "../../config/jwt.js";
 import { returnError } from "../utils/returnJson.js";
 
