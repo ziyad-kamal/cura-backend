@@ -4,7 +4,7 @@ import {
     index,
     show,
     updateStatus,
-} from "../../app/controllers/orders/orderItemController.js";
+} from "../../../app/controllers/orders/orderItemController.js";
 
 const router = express.Router();
 

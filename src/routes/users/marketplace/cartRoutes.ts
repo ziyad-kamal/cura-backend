@@ -6,9 +6,9 @@ import {
     index,
     store,
     sync,
-} from "../../app/controllers/carts/cartController.js";
-import { jwtVerify } from "../../app/middlewares/index.js";
-import { syncCartValidator, storeCartValidator } from "../../app/validators/cartValidator.js";
+} from "../../../app/controllers/carts/cartController.js";
+import { jwtVerify } from "../../../app/middlewares/index.js";
+import { syncCartValidator, storeCartValidator } from "../../../app/validators/cartValidator.js";
 
 const router = express.Router();
 

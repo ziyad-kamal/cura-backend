@@ -6,7 +6,7 @@ import {
     show,
     store,
     update,
-} from "../../app/controllers/categories/categoryController.js";
+} from "../../../app/controllers/categories/categoryController.js";
 
 const router = express.Router();
 

@@ -4,8 +4,8 @@ import {
     destroy,
     index,
     store,
-} from "../../app/controllers/wishlists/wishlistController.js";
-import { jwtVerify } from "../../app/middlewares/index.js";
+} from "../../../app/controllers/wishlists/wishlistController.js";
+import { jwtVerify } from "../../../app/middlewares/index.js";
 
 const router = express.Router();
 

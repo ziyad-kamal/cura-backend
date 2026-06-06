@@ -4,8 +4,8 @@ import {
     createPaymentIntent,
     confirmOrder,
     handleWebhook,
-} from "../../app/controllers/payments/paymentController.js";
-import { jwtVerify } from "../../app/middlewares/index.js";
+} from "../../../app/controllers/payments/paymentController.js";
+import { jwtVerify } from "../../../app/middlewares/index.js";
 
 const router = express.Router();
 

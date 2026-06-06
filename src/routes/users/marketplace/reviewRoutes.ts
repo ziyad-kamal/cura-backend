@@ -6,8 +6,8 @@ import {
     index,
     store,
     update,
-} from "../../app/controllers/reviews/reviewController.js";
-import { jwtVerify } from "../../app/middlewares/index.js";
+} from "../../../app/controllers/reviews/reviewController.js";
+import { jwtVerify } from "../../../app/middlewares/index.js";
 
 const router = express.Router();    
 

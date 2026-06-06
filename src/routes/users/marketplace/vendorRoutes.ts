@@ -11,9 +11,9 @@ import {
     myProducts,
     myOrders,
     updateMyOrderItemStatus,
-} from "../../app/controllers/vendors/vendorController.js";
-import { jwtVerify, requireRole } from "../../app/middlewares/index.js";
-import { UserRoles } from "../../enums/UserRoles.js";
+} from "../../../app/controllers/vendors/vendorController.js";
+import { jwtVerify, requireRole } from "../../../app/middlewares/index.js";
+import { UserRoles } from "../../../enums/UserRoles.js";
 
 const router = express.Router();
 

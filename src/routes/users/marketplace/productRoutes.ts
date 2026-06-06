@@ -6,9 +6,9 @@ import {
     show,
     store,
     update,
-} from "../../app/controllers/products/productController.js";
-import { jwtVerify, requireRole } from "../../app/middlewares/index.js";
-import { UserRoles } from "../../enums/UserRoles.js";
+} from "../../../app/controllers/products/productController.js";
+import { jwtVerify, requireRole } from "../../../app/middlewares/index.js";
+import { UserRoles } from "../../../enums/UserRoles.js";
 
 const router = express.Router();
 
