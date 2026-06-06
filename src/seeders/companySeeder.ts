@@ -4,7 +4,7 @@ import Company from '../app/models/Company.js';
 import { Types } from "mongoose";
 import { CompanyInterface } from '../interfaces/models/CompanyInterface.js';
 
-const seedCompanies = async (count: number = 30, adminIds: Array<Types.ObjectId> = []):Promise<CompanyInterface[]> => {
+const seedCompanies = async (count: number = 30, adminIds: Array<Types.ObjectId> = []): Promise<CompanyInterface[]> => {
     try {
         await Company.deleteMany({});
         console.log("🗑️  Cleared existing companies");

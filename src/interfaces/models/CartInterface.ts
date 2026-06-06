@@ -1,7 +1,19 @@
 import mongoose from "mongoose";
-import { ProductInterface } from './ProductInterface.js';
 
 export interface CartInterface {
-    user: mongoose.Types.ObjectId;
-    products: ProductInterface[];
+    userId: mongoose.Types.ObjectId;
+
+    items: {
+        productId: mongoose.Types.ObjectId;
+        vendorId: mongoose.Types.ObjectId;
+
+        quantity: number;
+
+        price: number;
+    }[];
+
+    totalPrice: number;
+
+    createdAt?: Date;
+    updatedAt?: Date;
 }

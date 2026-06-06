@@ -1,55 +1,85 @@
-import mongoose, { Model, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { ProductInterface } from "../../interfaces/models/ProductInterface.js";
-import "./Comment.js";
-import "./User.js";
 
 const productSchema = new Schema<ProductInterface>(
     {
-        name: {
+        vendorId: {
+            type: Schema.Types.ObjectId,
+            ref: "Vendor",
+            required: true,
+        },
+
+        title: {
             type: String,
             required: true,
-            maxLength: 40,
             trim: true,
+            minlength: 3,
+            maxlength: 120,
         },
+
         description: {
             type: String,
-            required: true,
-            maxLength: 500,
             trim: true,
+            maxlength: 2000,
         },
+
         price: {
             type: Number,
             required: true,
-            maxLength: 5,
-            trim: true,
+            min: 0,
         },
-        tags: {
-            type: [String],
+
+        discountPrice: {
+            type: Number,
+            min: 0,
+        },
+
+        stock: {
+            type: Number,
             required: true,
+            min: 0,
+            default: 0,
         },
+
         images: {
             type: [String],
-            required: true,
+            default: [],
         },
+
+        categoryId: {
+            type: Schema.Types.ObjectId,
+            ref: "Category"
+        },
+
+        brand: {
+            type: String,
+            trim: true,
+        },
+
+        ratingAverage: {
+            type: Number,
+            default: 0,
+        },
+
+        totalReviews: {
+            type: Number,
+            default: 0,
+        },
+
         isActive: {
             type: Boolean,
-            default: false,
+            default: true,
         },
-        admin: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-        company: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Company",
-        },
-        createdAt: Date,
     },
     {
+        timestamps: true,
         versionKey: false,
-    },
+    }
 );
 
-const Product: Model<ProductInterface> = mongoose.model<ProductInterface>("Product", productSchema);
+const Product = mongoose.model<ProductInterface>(
+    "Product",
+    productSchema
+);
 
-export { Product, productSchema };
+export default Product;

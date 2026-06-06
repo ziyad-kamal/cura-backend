@@ -4,28 +4,31 @@ import Message from '../app/models/Message.js';
 import { Types } from "mongoose";
 import { MessageInterface } from '../interfaces/models/MessageInterface.js';
 
-const seedMessages = async (count: number = 30, adminIds: Array<Types.ObjectId> = []): Promise<MessageInterface[]> => {
+const seedMessages = async (
+    authId: Types.ObjectId,
+    userIds: Array<Types.ObjectId> = [],
+    chatroomIds: Array<Types.ObjectId>,
+): Promise<MessageInterface[]> => {
     try {
         await Message.deleteMany({});
         console.log("🗑️  Cleared existing messages");
 
         const messages = [];
-        const image = faker.image.urlPicsumPhotos({
-            width: 800,
-            height: 600,
-        });
-        
-        for (let i = 0; i < count; i++) {
+        const image = "public/posts/86381e92c4a401687272bdd2ddd157f5.png";
+
+        for (const userId of userIds) {
             const randomDate = faker.date.past({ years: 1 });
 
             messages.push({
                 content: faker.lorem.paragraph({ min: 2, max: 5 }),
                 files: [
-                    { url: image, type: "image" },
-                    { url: image, type: "image" },
+                    { s3Key: image, type: "image" },
+                    { s3Key: image, type: "image" },
                 ],
-                receiver: faker.helpers.arrayElement(adminIds),
-                sender: faker.helpers.arrayElement(adminIds),
+                chatroom: faker.helpers.arrayElement(chatroomIds),
+                isRead: faker.datatype.boolean({ probability: 0.5 }),
+                receiver: userId,
+                sender: authId,
                 createdAt: randomDate,
             });
         }

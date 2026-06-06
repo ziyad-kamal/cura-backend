@@ -1,14 +1,38 @@
-import { UserRoles } from '../../../enums/UserRoles.js';
-import { UserInterface } from '../../../interfaces/models/UserInterface.js';
-import RecordExistError from '../../errors/RecordExistError.js';
-import User from '../../models/User.js';
+import { UserRoles } from "../../../enums/UserRoles.js";
+import { UserInterface } from "../../../interfaces/models/UserInterface.js";
+import RecordExistError from "../../errors/RecordExistError.js";
+import User from "../../models/User.js";
 
 export const loginRepo = (email: string): Promise<UserInterface | null> => {
     return User.findOne({
-        contact: {
-            email,
-        },
+        "contact.email": email,
     }).select("+password");
+};
+
+export const googleLoginRepo = async (payload: {
+    email: string;
+    given_name: string;
+    family_name: string;
+}): Promise<UserInterface | null> => {
+    let user = await User.findOne({
+        "contact.email": payload.email,
+    });
+
+    if (!user) {
+        user = await User.create({
+            contact: {
+                email: payload.email,
+            },
+            provider: "google",
+            isVerified: true,
+            name: {
+                first: payload.given_name,
+                last: payload.family_name || "",
+            },
+        });
+    }
+
+    return user;
 };
 
 export const signupRepo = async (
@@ -28,7 +52,7 @@ export const signupRepo = async (
         throw new RecordExistError("this email is used");
     }
 
-    return User.create({
+    const createdUser = await User.create({
         name: {
             first: firstName,
             last: lastName,
@@ -39,4 +63,6 @@ export const signupRepo = async (
         },
         role,
     });
+
+    return createdUser.toJSON();
 };

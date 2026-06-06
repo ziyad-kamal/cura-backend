@@ -23,5 +23,5 @@ export const applyCors = cors({
     origin: process.env.NODE_ENV === "production" ? allowedOrigins : (origin, callback) => callback(null, true),
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-refresh-token"],
 });

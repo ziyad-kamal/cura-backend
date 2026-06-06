@@ -3,6 +3,8 @@ import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
 import Post from '../app/models/Post.js';
 import { PostInterface } from '../interfaces/models/PostInterface.js';
+import { PostVisibility } from "../enums/PostVisibility.js";
+import { PostTag } from "../enums/PostTag.js";
 
 const seedPosts = async (userIds: Array<Types.ObjectId> = []): Promise<PostInterface[]> => {
     try {
@@ -14,25 +16,18 @@ const seedPosts = async (userIds: Array<Types.ObjectId> = []): Promise<PostInter
         }
 
         const posts = [];
-        const image = faker.image.urlPicsumPhotos({
-            width: 800,
-            height: 600,
-        });
 
         for (let userId of userIds) {
             const randomDate = faker.date.past({ years: 1 });
             posts.push({
-                visibility: faker.helpers.arrayElement(["public", "private"]),
+                visibility: faker.helpers.arrayElement(Object.values(PostVisibility)),
                 content: faker.lorem.paragraphs({ min: 2, max: 5 }),
                 user: userId,
                 files: [
-                    { url: image, type: "image" },
-                    { url: image, type: "image" },
+                    { s3Key: 'staging/039d157188b33ce23e5b96def8bf2093.png', type: "image" },
+                    { s3Key: 'staging/039d157188b33ce23e5b96def8bf2093.png', type: "image" },
                 ],
-                tags: faker.helpers.arrayElements(["High Blood Pressure", "Low Blood Pressure", "Weight Gain"], {
-                    min: 1,
-                    max: 3,
-                }),
+                tags: faker.helpers.arrayElements(Object.values(PostTag), { min: 1, max: 2 }),
                 createdAt: randomDate,
                 updatedAt: randomDate,
             });

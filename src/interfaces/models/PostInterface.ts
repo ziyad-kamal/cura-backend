@@ -4,9 +4,9 @@ export interface PostInterface {
     _id?: Types.ObjectId;
     id?: string;
     content: string;
-    files?: { url: string; type: string }[];
+    files?: { s3Key: string; type?: string }[];
     tags: string[];
-    visibility?: string;
+    visibility: string;
     user: mongoose.Types.ObjectId;
     admin: mongoose.Types.ObjectId;
     createdAt: Date;

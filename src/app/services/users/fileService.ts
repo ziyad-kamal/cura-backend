@@ -1,25 +1,65 @@
-import {Request} from "express";
-import {uploadFile} from '../../utils/index.js';
+import { Request } from "express";
+import NotFoundError from "../../errors/NotFoundError.js";
+import path from "path";
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { awsConfig, s3Client } from "../../../config/aws.js";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import crypto from "crypto";
+import { getSignedFileUrl } from "../../utils/getSignedFileUrl.js";
 
-export const uploadFileService = async (req: Request): Promise<string> => {
-    const file = req.file;
+export const uploadFileService = async (req: Request): Promise<object> => {
+    const { fileType, fileName } = req.body;
 
-    if (!file) {
-        throw new Error("No file uploaded");
+    const extension = path.extname(fileName);
+
+    const uniqueFileName = `${crypto.randomBytes(16).toString("hex")}${extension}`;
+    const s3Key = `staging/${uniqueFileName}`;
+
+    const command = new PutObjectCommand({
+        Bucket: awsConfig.s3_bucket_name,
+        Key: s3Key,
+        ContentType: fileType,
+        ChecksumAlgorithm: undefined,
+    });
+
+    let tmpUploadUrl = await getSignedUrl(s3Client, command, {
+        expiresIn: 900,
+    });
+
+    const url = await getSignedFileUrl(s3Key);
+
+    return { tmpUploadUrl, s3Key, url };
+};
+
+export const downloadFileService = async (req: Request): Promise<string> => {
+    const { s3Key } = req.body;
+
+    if (!s3Key) {
+        throw new NotFoundError("Missing required s3Key.");
     }
 
-    const imageTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
-    const videoTypes = ["video/mp4", "video/mpeg", "video/quicktime"];
+    const command = new GetObjectCommand({
+        Bucket: awsConfig.s3_bucket_name,
+        Key: s3Key,
+        ResponseContentDisposition: `attachment; filename="${s3Key.split("/").pop()}"`,
+    });
 
-    let uploadedUrl: string;
+    const url = await getSignedUrl(s3Client, command, { expiresIn: 60 }); // 1 min is enough for download
 
-    if (videoTypes.includes(file.mimetype)) {
-        uploadedUrl = await uploadFile(req, "public/videos");
-    } else if (imageTypes.includes(file.mimetype)) {
-        uploadedUrl = await uploadFile(req, "public/images", 300);
-    } else {
-        uploadedUrl = await uploadFile(req, "public/documents");
+    return url;
+};
+
+export const destroyFileService = async (req: Request): Promise<void> => {
+    const { s3Key } = req.query;
+
+    if (!s3Key) {
+        throw new NotFoundError("File not found");
     }
 
-    return uploadedUrl;
+    await s3Client.send(
+        new DeleteObjectCommand({
+            Bucket: awsConfig.s3_bucket_name,
+            Key: s3Key as string,
+        }),
+    );
 };

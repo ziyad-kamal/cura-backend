@@ -1,23 +1,58 @@
-import mongoose, { Model, Schema } from "mongoose";
-import "./Comment.js";
-import "./User.js";
-import { productSchema } from './Product.js';
-import { CartInterface } from '../../interfaces/models/CartInterface.js';
+import mongoose, { Schema } from "mongoose";
+import { CartInterface } from "../../interfaces/models/CartInterface.js";
 
 const cartSchema = new Schema<CartInterface>(
     {
-        products: [productSchema],
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
+        userId: {
+            type: Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            required: true, 
+            unique: true,
+        },
+
+        items: [
+            {
+                productId: {
+                    type: Schema.Types.ObjectId,
+                    ref: "Product",
+                    required: true,
+                },
+
+                vendorId: {
+                    type: Schema.Types.ObjectId,
+                    ref: "Vendor",
+                    required: true,
+                },
+
+                quantity: {
+                    type: Number,
+                    required: true,
+                    min: 1,
+                    default: 1,
+                },
+
+                price: {
+                    type: Number,
+                    required: true,
+                    min: 0,
+                },
+            },
+        ],
+
+        totalPrice: {
+            type: Number,
+            default: 0,
         },
     },
     {
+        timestamps: true,
         versionKey: false,
-    },
+    }
 );
 
-const Cart: Model<CartInterface> = mongoose.model<CartInterface>("Cart", cartSchema);
+const Cart = mongoose.model<CartInterface>(
+    "Cart",
+    cartSchema
+);
 
 export default Cart;

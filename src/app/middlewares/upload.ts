@@ -18,7 +18,7 @@ export const uploadMulter = multer({
     storage,
 
     limits: {
-        files: 10,
+        files: 1,
         fileSize: fileConfig.maxVideoSize, 
     },
 });

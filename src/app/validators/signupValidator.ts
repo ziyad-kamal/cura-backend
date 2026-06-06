@@ -8,15 +8,15 @@ export const signupValidator: (ValidationChain | RequestHandler)[] = [
         .trim()
         .notEmpty()
         .withMessage("firstName is required")
-        .isLength({ min: 3, max: 30 })
-        .withMessage("firstName must be between 3 and 30 characters"),
+        .isLength({ min: 2, max: 30 })
+        .withMessage("firstName must be between 2 and 30 characters"),
 
     body("lastName")
         .trim()
         .notEmpty()
         .withMessage("lastName is required")
-        .isLength({ min: 3, max: 30 })
-        .withMessage("lastName must be between 3 and 30 characters"),
+        .isLength({ min: 2, max: 30 })
+        .withMessage("lastName must be between 2 and 30 characters"),
 
     body("role")
         .trim()

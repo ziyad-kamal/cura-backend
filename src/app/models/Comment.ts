@@ -17,15 +17,29 @@ const commentSchema = new Schema<CommentInterface>(
         post: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Post",
-            required: true,
+        },
+        repost: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Repost",
         },
     },
     {
         timestamps: true,
+        versionKey: false,
+        id: false,
+        toJSON: { virtuals: true },
     },
 );
 
 commentSchema.index({ post: 1, createdAt: -1 });
+commentSchema.index({ repost: 1, createdAt: -1 });
+
+commentSchema.virtual("likesCount", {
+    ref: "Like",
+    localField: "_id",
+    foreignField: "comment",
+    count: true,
+});
 
 const Comment: Model<CommentInterface> = mongoose.model<CommentInterface>("Comment", commentSchema);
 

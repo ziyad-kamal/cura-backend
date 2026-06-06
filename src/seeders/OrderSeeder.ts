@@ -3,12 +3,13 @@ import { faker } from "@faker-js/faker";
 import { Types } from "mongoose";
 import Order from '../app/models/Order.js';
 import { OrderInterface } from '../interfaces/models/OrderInterface.js';
-import { ProductInterface } from '../interfaces/models/ProductInterface.js';
+import { ProductInterface } from '../interfaces/models/ProductInterface.js'; // Keep this import for the interface definition
+import { HydratedDocument } from "mongoose"; // Import HydratedDocument
 
 const seedOrders = async (
     count: number = 30,
     userIds: Array<Types.ObjectId> = [],
-    products: ProductInterface[] = [],
+    products: HydratedDocument<ProductInterface>[] = [],
 ): Promise<OrderInterface[]> => {
     try {
         await Order.deleteMany({});
@@ -26,12 +27,17 @@ const seedOrders = async (
             }));
 
             orders.push({
-                totalPrice: faker.number.int({ min: 1000, max: 5000 }),
-                city: faker.location.city(),
-                street: faker.location.street(),
-                status: faker.helpers.arrayElement(["pending", "shipped", "in transit", "delivered", "cancelled"]),
-                user: faker.helpers.arrayElement(userIds),
-                products: orderItems,
+                userId: faker.helpers.arrayElement(userIds),
+                totalPrice: faker.number.int({ min: 500, max: 5000 }),
+                shippingAddress: {
+                    city: faker.location.city(),
+                    street: faker.location.street(),
+                    name: faker.person.fullName(),
+                    email: faker.internet.email(),
+                    phone: faker.phone.number(),
+                },
+                orderStatus: faker.helpers.arrayElement(["pending", "confirmed", "shipped", "delivered", "cancelled"]),
+                paymentStatus: faker.helpers.arrayElement(["pending", "paid", "failed"]),
                 createdAt: randomDate,
             });
         }

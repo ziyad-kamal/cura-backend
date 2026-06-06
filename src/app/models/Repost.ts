@@ -1,6 +1,7 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { RepostInterface } from "../../interfaces/models/RepostInterface.js";
 import "./Comment.js";
+import "./Post.js";
 import "./User.js";
 
 const repostSchema = new Schema<RepostInterface>(
@@ -19,12 +20,21 @@ const repostSchema = new Schema<RepostInterface>(
             ref: "Post",
             required: true,
         },
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        },
     },
     {
         versionKey: false,
     },
 );
 
+repostSchema.index({ user: 1, createdAt: -1 });
+repostSchema.index({ post: 1 });
+
 const Repost: Model<RepostInterface> = mongoose.model<RepostInterface>("Repost", repostSchema);
 
 export default Repost;
+
+

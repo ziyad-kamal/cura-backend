@@ -13,13 +13,22 @@ const messageSchema = new Schema<MessageInterface>(
         },
         files: [
             {
-                url: String,
+                s3Key: String,
                 type: {
                     type: String,
                     enum: ["video", "image", "document"],
                 },
             },
         ],
+        isRead: {
+            type: Boolean,
+            default: false,
+        },
+        chatroom: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Chatroom",
+            required: true,
+        },
         sender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

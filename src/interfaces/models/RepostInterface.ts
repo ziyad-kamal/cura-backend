@@ -5,4 +5,5 @@ export interface RepostInterface {
     content: string;
     user: mongoose.Types.ObjectId;
     post: mongoose.Types.ObjectId;
+    createdAt?: Date;
 }

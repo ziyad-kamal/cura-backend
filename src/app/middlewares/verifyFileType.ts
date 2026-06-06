@@ -6,7 +6,7 @@ import { returnError } from "../utils/returnJson.js";
 const allowedTypeMap = {
     image: ["jpg", "jpeg", "png", "webp"],
     video: ["mp4", "mpeg", "mov"],
-    document: ["pdf", "doc", "docx"],
+    document: ["pdf", "doc", "docx","xls", "xlsx", "ppt", "pptx"],
 } as const;
 
 type FileCategory = keyof typeof allowedTypeMap;

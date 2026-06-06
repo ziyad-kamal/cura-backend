@@ -1,17 +1,17 @@
 /* eslint-disable no-console */
 import { faker } from "@faker-js/faker";
-import User from '../app/models/User.js';
-import { UserRoles } from '../enums/UserRoles.js';
-import { UserInterface } from '../interfaces/models/UserInterface.js';
+import User from "../app/models/User.js";
+import { UserRoles } from "../enums/UserRoles.js";
+import { UserInterface } from "../interfaces/models/UserInterface.js";
+import { HydratedDocument } from "mongoose";
+import { PostTag } from "../enums/PostTag.js";
+import bcrypt from "bcryptjs";
 
 const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterface> => {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const isDoctor = role === "doctor";
-    const image = faker.image.urlPicsumPhotos({
-        width: 800,
-        height: 600,
-    });
+    const image = "public/posts/86381e92c4a401687272bdd2ddd157f5.png";
 
     return {
         name: {
@@ -26,7 +26,7 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
                 street: faker.location.streetAddress(),
             },
         },
-        password: "13131313",
+        password: bcrypt.hashSync("12121212", 10),
         isVerified: faker.datatype.boolean({ probability: 0.6 }),
         isActive: faker.datatype.boolean({ probability: 0.9 }),
 
@@ -43,11 +43,15 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
         }),
 
         userInfo: {
+            bio: faker.lorem.sentence(2),
+            job: faker.person.jobTitle(),
             age: faker.number.int({ min: 18, max: 65 }),
-            weight: Number(faker.string.numeric(2)),
-            height: Number(faker.string.numeric(2)),
+            weight: faker.number.int({ min: 40, max: 150 }),
+            height: faker.number.int({ min: 150, max: 200 }),
             gender: faker.helpers.arrayElement(["male", "female"]),
             diseases: "Diabetes and High Blood Pressure",
+            medications: "Metformin and augmentin",
+            tags: faker.helpers.arrayElements(Object.values(PostTag), { min: 1, max: 2 }),
         },
 
         cardPayment: {
@@ -62,7 +66,12 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
     };
 };
 
-export const seedUsers = async (count: number = 30): Promise<UserInterface[]> => {
+export const seedUsers = async (
+    count: number = 30,
+): Promise<{
+    createdUsers: UserInterface[];
+    authUser: HydratedDocument<UserInterface>;
+}> => {
     try {
         await User.deleteMany({});
         console.log("🗑️  Cleared existing users");
@@ -77,17 +86,8 @@ export const seedUsers = async (count: number = 30): Promise<UserInterface[]> =>
             users.push(generateFakeUser(UserRoles.DOCTOR));
         }
 
-        await User.create({
-            name: {
-                first: faker.person.firstName(),
-                last: faker.person.lastName(),
-            },
-            contact: {
-                email: "user@gmail.com",
-            },
-            password: "12121212",
-            role: UserRoles.USER,
-        });
+        const firstName = faker.person.firstName();
+        const lastName = faker.person.lastName();
 
         await User.create({
             name: {
@@ -97,15 +97,95 @@ export const seedUsers = async (count: number = 30): Promise<UserInterface[]> =>
             contact: {
                 email: "doctor@gmail.com",
             },
+            isVerified: true,
+            isActive: true,
+            cardPayment: {
+                number: faker.finance.creditCardNumber("visa").replace(/\D/g, ""),
+                name: `${firstName} ${lastName}`,
+                cvv: faker.finance.creditCardCVV(),
+                expDate: faker.date
+                    .future({ years: 5 })
+                    .toLocaleDateString("en", { month: "2-digit", year: "2-digit" }),
+            },
             password: "12121212",
             role: UserRoles.DOCTOR,
+            image: "public/posts/86381e92c4a401687272bdd2ddd157f5.png",
+            coverImage: "public/posts/86381e92c4a401687272bdd2ddd157f5.png",
         });
 
-        const createdUsers = await User.insertMany(users);
-    
+        const authUser = await User.create({
+            name: {
+                first: faker.person.firstName(),
+                last: faker.person.lastName(),
+            },
+            contact: {
+                email: "user@gmail.com",
+            },
+            userInfo: {
+                bio: faker.lorem.sentence({ min: 5, max: 10 }),
+                job: faker.person.jobTitle(),
+                age: faker.number.int({ min: 18, max: 65 }),
+                weight: Number(faker.string.numeric(2)),
+                height: Number(faker.string.numeric(2)),
+                diseases: "Diabetes and High Blood Pressure",
+                medications: "Metformin and augmentin",
+                tags: ["diabetes", "hypertension"],
+            },
+            isVerified: true,
+            isActive: true,
+            cardPayment: {
+                number: faker.finance.creditCardNumber("visa").replace(/\D/g, ""),
+                name: `${firstName} ${lastName}`,
+                cvv: faker.finance.creditCardCVV(),
+                expDate: faker.date
+                    .future({ years: 5 })
+                    .toLocaleDateString("en", { month: "2-digit", year: "2-digit" }),
+            },
+            password: "12121212",
+            role: UserRoles.USER,
+            image: "public/posts/86381e92c4a401687272bdd2ddd157f5.png",
+            coverImage: "public/posts/86381e92c4a401687272bdd2ddd157f5.png",
+        });
+
+        await User.create({
+            name: {
+                first: faker.person.firstName(),
+                last: faker.person.lastName(),
+            },
+            contact: {
+                email: "user2@gmail.com",
+            },
+            userInfo: {
+                bio: faker.lorem.sentence({ min: 5, max: 10 }),
+                job: faker.person.jobTitle(),
+                age: faker.number.int({ min: 18, max: 65 }),
+                weight: Number(faker.string.numeric(2)),
+                height: Number(faker.string.numeric(2)),
+                diseases: "Diabetes and High Blood Pressure",
+                medications: "Metformin and augmentin",
+                tags: ["diabetes", "hypertension"],
+            },
+            isVerified: true,
+            isActive: true,
+            cardPayment: {
+                number: faker.finance.creditCardNumber("visa").replace(/\D/g, ""),
+                name: `${firstName} ${lastName}`,
+                cvv: faker.finance.creditCardCVV(),
+                expDate: faker.date
+                    .future({ years: 5 })
+                    .toLocaleDateString("en", { month: "2-digit", year: "2-digit" }),
+            },
+            password: "12121212",
+            role: UserRoles.USER,
+            image: "public/posts/86381e92c4a401687272bdd2ddd157f5.png",
+            coverImage: "public/posts/86381e92c4a401687272bdd2ddd157f5.png",
+        });
+
+        const createdUsers = (await User.insertMany(users)) as UserInterface[];
+
         console.log(`✅ Successfully seeded ${createdUsers.length} users!`);
 
-        return createdUsers as UserInterface[];
+        return { createdUsers, authUser };
     } catch (err: unknown) {
         console.error("Posts seeding failed:", err instanceof Error ? err.message : String(err));
         throw err;

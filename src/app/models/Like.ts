@@ -13,22 +13,24 @@ const likeSchema = new Schema<LikeInterface>(
         post: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Post",
-            required: true,
+        },
+        repost: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Repost",
         },
         comment: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Comment",
-        },
-        type: {
-            type: String,
-            enum: ["post", "comment"],
-            required: true,
         },
     },
     {
         versionKey: false,
     },
 );
+
+likeSchema.index({ user: 1, post: 1 });
+likeSchema.index({ user: 1, repost: 1 });
+likeSchema.index({ user: 1, comment: 1 });
 
 const Like: Model<LikeInterface> = mongoose.model<LikeInterface>("Like", likeSchema);
 

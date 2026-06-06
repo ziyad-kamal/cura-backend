@@ -20,8 +20,6 @@ export interface UserInterface {
 
     password: string;
 
-    image?: string;
-
     isVerified?: boolean;
     isActive?: boolean;
 
@@ -36,11 +34,15 @@ export interface UserInterface {
     };
 
     userInfo?: {
+        bio: string;
+        job: string;
         age: number;
         weight: number;
         height: number;
         gender: "male" | "female";
         diseases: string;
+        medications: string;
+        tags: string[];
     };
 
     cardPayment?: {
@@ -51,6 +53,10 @@ export interface UserInterface {
     };
 
     role: UserRoles;
+    image?: string;
+    coverImage?: string;
+
+    provider:string;
 
     createdAt?: Date;
     updatedAt?: Date;

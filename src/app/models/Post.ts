@@ -1,9 +1,9 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { PostInterface } from '../../interfaces/models/PostInterface.js';
+import { PostInterface } from "../../interfaces/models/PostInterface.js";
 import "../models/Comment.js";
-import "../models/User.js";
 import "../models/Like.js";
 import "../models/Repost.js";
+import "../models/User.js";
 
 const postSchema = new Schema<PostInterface>(
     {
@@ -15,13 +15,13 @@ const postSchema = new Schema<PostInterface>(
         files: [
             new Schema(
                 {
-                    url: String,
+                    s3Key: String,
                     type: {
                         type: String,
                         enum: ["video", "document", "image"],
                     },
                 },
-                { id: false }, 
+                { id: false },
             ),
         ],
         tags: {
@@ -46,7 +46,7 @@ const postSchema = new Schema<PostInterface>(
     {
         timestamps: true,
         versionKey: false,
-        id:false,
+        id: false,
         toJSON: {
             virtuals: true,
         },
@@ -80,8 +80,8 @@ postSchema.virtual("repostsCount", {
     count: true,
 });
 
-postSchema.index({ title: "text", content: "text" });
-postSchema.index({ createdAt: -1 });
+postSchema.index({ user: 1, createdAt: -1 });
+postSchema.index({ visibility: 1, createdAt: -1 });
 
 const Post: Model<PostInterface> = mongoose.model<PostInterface>("Post", postSchema);
 
