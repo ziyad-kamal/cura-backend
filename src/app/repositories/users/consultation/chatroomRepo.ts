@@ -56,5 +56,5 @@ export const indexChatroomsRepo = async (
 };
 
 export const getChatroomRepo = async (receiver: string, sender: string): Promise<ChatroomInterface> => {
-    return await findRecord(Chatroom, { receiver, sender });
+    return await findRecord(Chatroom, { $or: [{ sender, receiver }, { sender: receiver, receiver: sender }] });
 };

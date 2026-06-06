@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Server as HttpServer } from "http";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Server, Socket } from "socket.io";
@@ -6,6 +5,7 @@ import { jwtConfig } from "./jwt.js";
 import "dotenv/config";
 import { getChatroomRepo } from "../app/repositories/users/consultation/chatroomRepo.js";
 import { markMessageAsReadRepo, storeMessageRepo } from "../app/repositories/users/consultation/messageRepo.js";
+import { RedisService } from "../app/services/users/consultation/onlineUserService.js";
 
 // track online users — senderId -> socketId
 const onlineUsers = new Map<string, string>();
@@ -13,7 +13,8 @@ const onlineUsers = new Map<string, string>();
 export const initSocket = (httpServer: HttpServer): Server => {
     const io = new Server(httpServer, {
         cors: {
-            origin: ['*'],
+            origin: "http://localhost:5173",
+            methods: ["GET", "POST"],
             credentials: true,
         },
     });
@@ -35,15 +36,27 @@ export const initSocket = (httpServer: HttpServer): Server => {
         }
     });
 
-    io.on("connection", (socket: Socket) => {
+    io.on("connection", async (socket: Socket) => {
         const senderId = (socket as Socket & { senderId: string }).senderId;
 
-        // register user as online
-        onlineUsers.set(senderId, socket.id);
-        console.log(`✅ User connected: ${senderId}`);
+        await RedisService.setUserOnline(senderId, 60);
 
-        // notify others that user is online
+        // 2. Broadcast to other active channels that this user came online
         socket.broadcast.emit("user:online", { senderId });
+
+        // 3. Optional: Setup a recurring heartbeat interval from client to keep TTL alive
+        socket.on("heartbeat", async () => {
+            await RedisService.setUserOnline(senderId, 60);
+        });
+
+        // 4. Handle Disconnection
+        socket.on("disconnect", async () => {
+            // Remove user from active status
+            await RedisService.setUserOffline(senderId);
+
+            // Broadcast status change across the network cluster
+            socket.broadcast.emit("user:offline", { senderId });
+        });
 
         // join personal room for direct messages
         socket.join(senderId);
@@ -55,16 +68,15 @@ export const initSocket = (httpServer: HttpServer): Server => {
 
                 // get or create chatroom
                 const chatroom = await getChatroomRepo(receiverId, senderId);
+
                 const chatroomId = String(chatroom._id);
 
                 // save message to db
                 const message = await storeMessageRepo(receiverId, senderId, content, chatroomId);
 
                 // send to receiver if online
-                const receiverSocketId = onlineUsers.get(receiverId);
-                if (receiverSocketId) {
-                    io.to(receiverId).emit("message:receive", {...message });
-                }
+
+                io.to(receiverId).emit("message:receive", { ...message });
 
                 // confirm to sender
                 socket.emit("message:sent", { ...message });
@@ -74,22 +86,16 @@ export const initSocket = (httpServer: HttpServer): Server => {
         });
 
         // mark messages as read
-        socket.on(
-            "message:read",
-            async ({ chatroomId, senderId }: { chatroomId: string; senderId: string }) => {
-                try {
-                    await markMessageAsReadRepo(chatroomId);
+        socket.on("message:read", async ({ chatroomId, senderId }: { chatroomId: string; senderId: string }) => {
+            try {
+                await markMessageAsReadRepo(chatroomId);
 
-                    // notify sender that messages were read
-                    const senderSocketId = onlineUsers.get(senderId);
-                    if (senderSocketId) {
-                        io.to(senderId).emit("message:read:ack", { chatroomId });
-                    }
-                } catch (err) {
-                    socket.emit("message:error", err);
-                }
-            },
-        );
+                // notify sender that messages were read
+                io.to(senderId).emit("message:read:ack", { chatroomId });
+            } catch (err) {
+                socket.emit("message:error", err);
+            }
+        });
 
         // typing indicator
         socket.on("typing:start", ({ receiverId }: { receiverId: string }) => {
@@ -98,13 +104,6 @@ export const initSocket = (httpServer: HttpServer): Server => {
 
         socket.on("typing:stop", ({ receiverId }: { receiverId: string }) => {
             io.to(receiverId).emit("typing:stop", { senderId });
-        });
-
-        // handle disconnect
-        socket.on("disconnect", () => {
-            onlineUsers.delete(senderId);
-            socket.broadcast.emit("user:offline", { senderId });
-            console.log(`❌ User disconnected: ${senderId}`);
         });
     });
 

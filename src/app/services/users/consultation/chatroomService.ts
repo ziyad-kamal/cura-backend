@@ -5,6 +5,7 @@ import { resolveFiles } from "../../../utils/resolveFiles.js";
 import { getNextCursor, getQueryCursor } from "../../../utils/cursorPagination.js";
 import { PaginationType } from "../../../../types/PaginationType.js";
 import { MessageInterface } from "../../../../interfaces/models/MessageInterface.js";
+import { RedisService } from "./onlineUserService.js";
 
 export const indexChatroomsService = async (
     req: Request,
@@ -57,4 +58,13 @@ export const indexChatroomsService = async (
 
 export const getChatroomService = async (req: Request): Promise<ChatroomInterface> => {
     return await getChatroomRepo(req.params.receiverId as string, req.user?._id as string);
+};
+
+
+export const checkUsersStatusService = async (req: Request): Promise<Record<string, boolean>> => {
+    const { userIds } = req.body;
+
+    const onlineStatusMap = await RedisService.getUsersOnlineStatus(userIds);
+
+    return onlineStatusMap;
 };

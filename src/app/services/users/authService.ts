@@ -11,6 +11,7 @@ import { findRecord, sendToken, verifyToken } from "../../utils/index.js";
 import { emailQueue } from "../../queues/emailQueue.js";
 import { appConfig } from "../../../config/app.js";
 import { verifyGoogleToken } from "../../../config/googleAuth.js";
+import { resolveFiles } from "../../utils/resolveFiles.js";
 
 export const loginService = async (req: Request, res: Response): Promise<object> => {
     const { email, password } = req.body;
@@ -19,6 +20,19 @@ export const loginService = async (req: Request, res: Response): Promise<object>
     const isMatch = await user?.comparePassword(password);
     if (!isMatch || !user) {
         throw new NotFoundError("incorrect password or email");
+    }
+
+    if (user) {
+        const filesToResolve = [];
+        if (user.image) filesToResolve.push({ type: "image", s3Key: user.image });
+        if (user.coverImage) filesToResolve.push({ type: "coverImage", s3Key: user.coverImage });
+
+        const resolvedFiles = await resolveFiles(filesToResolve, "public");
+
+        resolvedFiles.forEach((file) => {
+            if (file.type === "image") user.image = file.url;
+            if (file.type === "coverImage") user.coverImage = file.url;
+        });
     }
 
     const userData = { _id: user._id, email: user.contact.email, role: user.role };

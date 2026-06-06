@@ -8,15 +8,21 @@ export const storeMessageRepo = async (
     sender: string,
     content: string,
     chatroom: string,
-): Promise<MessageInterface> => {
-    return (
+): Promise<MessageInterface> => { 
+    const message=await (
         await Message.create({
             content,
             sender,
             receiver,
             chatroom,
+            createdAt: new Date(),
         })
     ).populate("sender", "name.first name.last image");
+
+    const chatroomRecord = await findRecord(Chatroom, { _id: chatroom });
+    await chatroomRecord.updateOne({ lastMessage: message._id }); 
+
+    return message.toObject();
 };
 
 export const showMessageRepo = async (
@@ -37,5 +43,5 @@ export const showMessageRepo = async (
 };
 
 export const markMessageAsReadRepo = async (chatroom: string): Promise<void> => {
-    Message.updateMany({ chatroom, isRead: false }, { isRead: true });
+    await Message.updateMany({ chatroom, isRead: false }, { isRead: true });
 };

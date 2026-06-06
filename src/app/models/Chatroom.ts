@@ -15,6 +15,10 @@ const chatroomSchema = new Schema<ChatroomInterface>(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Message",
         },
+        isRead: {
+            type: Boolean,
+            default: false,
+        },
         sender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
