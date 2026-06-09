@@ -6,7 +6,7 @@ import { UserInterface } from '../../interfaces/models/UserInterface.js';
 const userSchema = new Schema<UserInterface>(
     {
         name: {
-            first: {
+            first: { 
                 type: String,
                 required: true,
                 minlength: 2,
