@@ -63,7 +63,10 @@ export const initSocket = (httpServer: HttpServer): Server => {
 
         // send message
         socket.on("message:send", async ({ receiverId, content, files }) => {
+            console.log('files: ', files);
+            console.log('content: ', content);
             try {
+
                 if (!content?.trim() && files?.length === 0) return;
 
                 const chatroom = await getChatroomRepo(receiverId, senderId);

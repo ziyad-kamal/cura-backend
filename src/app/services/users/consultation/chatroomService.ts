@@ -22,7 +22,6 @@ export const indexChatroomsService = async (
     await Promise.all(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         chatrooms.map(async (room: any) => {
-            // 🛑 Check if it's already a full URL before resolving
             if (room.sender?.image && !room.sender.image.startsWith("http")) {
                 const resolved = await resolveFiles([{ s3Key: room.sender.image }], "public");
                 room.sender.image = resolved[0]?.url || room.sender.image;
@@ -43,7 +42,6 @@ export const indexChatroomsService = async (
                     msg.files = await resolveFiles(msg.files, "private");
                 }
 
-                // 🛑 Check if it's already a full URL before resolving
                 if (msg.sender?.image && !msg.sender.image.startsWith("http")) {
                     const resolved = await resolveFiles([{ s3Key: msg.sender.image }], "public");
                     msg.sender.image = resolved[0]?.url || msg.sender.image;
