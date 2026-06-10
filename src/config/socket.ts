@@ -13,7 +13,7 @@ import { UserInterface } from "../interfaces/models/UserInterface.js";
 export const initSocket = (httpServer: HttpServer): Server => {
     const io = new Server(httpServer, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: ["http://localhost:5173", "http://ec2-16-112-217-167.ap-south-2.compute.amazonaws.com"],
             methods: ["GET", "POST"],
             credentials: true,
         },
@@ -22,7 +22,6 @@ export const initSocket = (httpServer: HttpServer): Server => {
     // authenticate socket connection
     io.use((socket: Socket, next) => {
         const token = socket.handshake.auth.token as string;
-        console.log('token: ', token);  
 
         if (!token) {
             return next(new Error("Authentication error: token missing"));
@@ -39,7 +38,6 @@ export const initSocket = (httpServer: HttpServer): Server => {
 
     io.on("connection", async (socket: Socket) => {
         const senderId = (socket as Socket & { senderId: string }).senderId;
-        console.log('senderId: ', senderId);
 
         await RedisService.setUserOnline(senderId, 60);
 
@@ -65,7 +63,6 @@ export const initSocket = (httpServer: HttpServer): Server => {
 
         // send message
         socket.on("message:send", async ({ receiverId, content, files }) => {
-            console.log('content: ', content);
             try {
 
                 if (!content?.trim() && files?.length === 0) return;
