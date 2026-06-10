@@ -37,7 +37,9 @@ export const initSocket = (httpServer: HttpServer): Server => {
     });
 
     io.on("connection", async (socket: Socket) => {
+
         const senderId = (socket as Socket & { senderId: string }).senderId;
+        console.log('senderId: ', senderId);
 
         await RedisService.setUserOnline(senderId, 60);
 
