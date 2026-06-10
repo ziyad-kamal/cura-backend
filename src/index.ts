@@ -21,6 +21,7 @@ import { createServer } from "http";
 import { initSocket } from "./config/socket.js";
 import chatroomRoutes from "./routes/users/consultation/chatroomRoutes.js";
 import messageRoutes from "./routes/users/consultation/messageRoutes.js";
+import doctorRoutes from "./routes/users/consultation/doctorRoutes.js";
 
 const app = express();
 const httpServer = createServer(app); 
@@ -66,6 +67,7 @@ async function bootstrap() {
     // consultation
     app.use(`${appConfig.apiPrefix}/chatrooms`, chatroomRoutes);
     app.use(`${appConfig.apiPrefix}/messages`, messageRoutes);
+    app.use(`${appConfig.apiPrefix}/doctors`, doctorRoutes);
 
     app.use(errorHandler);
 
