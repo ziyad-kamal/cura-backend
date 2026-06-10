@@ -22,6 +22,7 @@ export const initSocket = (httpServer: HttpServer): Server => {
     // authenticate socket connection
     io.use((socket: Socket, next) => {
         const token = socket.handshake.auth.token as string;
+        console.log('token: ', token);  
 
         if (!token) {
             return next(new Error("Authentication error: token missing"));
@@ -64,7 +65,6 @@ export const initSocket = (httpServer: HttpServer): Server => {
 
         // send message
         socket.on("message:send", async ({ receiverId, content, files }) => {
-            console.log('files: ', files);
             console.log('content: ', content);
             try {
 
