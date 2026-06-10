@@ -119,7 +119,13 @@ const userSchema = new Schema<UserInterface>(
         image: String,
         coverImage: String,
     },
-    { timestamps: true, versionKey: false },
+    {
+        timestamps: true,
+        versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 userSchema.pre("save", async function () {

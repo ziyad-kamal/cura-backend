@@ -20,7 +20,10 @@ const wishlistSchema = new Schema<WishlistInterface>(
     {
         timestamps: true,
         versionKey: false,
-    }
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 const Wishlist = mongoose.model<WishlistInterface>(

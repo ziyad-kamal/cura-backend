@@ -53,8 +53,12 @@ export const updateProfileService = async (req: Request): Promise<UserInterface 
     const { coverImage, image } = req.body;
 
     const [updatedImage, updatedCoverImage] = await Promise.all([
-        image ? handleS3Files([{ s3Key: image }]).then((res) => res[0]?.s3Key) : Promise.resolve(image),
-        coverImage ? handleS3Files([{ s3Key: coverImage }]).then((res) => res[0]?.s3Key) : Promise.resolve(coverImage),
+        image
+            ? handleS3Files([{ s3Key: image }], "public/profile/").then((res) => res[0]?.s3Key)
+            : Promise.resolve(image),
+        coverImage
+            ? handleS3Files([{ s3Key: coverImage }], "public/profile/").then((res) => res[0]?.s3Key)
+            : Promise.resolve(coverImage),
     ]);
 
     const user = await updateProfileRepo(
@@ -72,7 +76,7 @@ export const updateProfileService = async (req: Request): Promise<UserInterface 
     ]);
 
     return {
-        ...user?.toObject(),
+        ...user,
         ...(resolvedImage && { image: resolvedImage }),
         ...(resolvedCoverImage && { coverImage: resolvedCoverImage }),
     } as UserInterface;

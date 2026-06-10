@@ -23,13 +23,7 @@ const orderSchema = new Schema<OrderInterface>(
 
         orderStatus: {
             type: String,
-            enum: [
-                "pending",
-                "confirmed",
-                "shipped",
-                "delivered",
-                "cancelled",
-            ],
+            enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"],
             default: "pending",
         },
 
@@ -73,7 +67,10 @@ const orderSchema = new Schema<OrderInterface>(
     {
         timestamps: true,
         versionKey: false,
-    }
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 const Order = mongoose.model<OrderInterface>(

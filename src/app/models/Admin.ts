@@ -33,7 +33,13 @@ const adminSchema = new Schema<AdminInterface>(
             required: true,
         },
     },
-    { timestamps: true, versionKey: false },
+    {
+        timestamps: true,
+        versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 adminSchema.pre("save", async function () {

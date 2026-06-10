@@ -35,6 +35,9 @@ const consultationSchema = new Schema<ConsultationInterface>(
     },
     {
         versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

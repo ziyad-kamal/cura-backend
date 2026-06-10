@@ -16,7 +16,12 @@ const logSchema = new Schema(
         message: { type: String },
         error: { type: String },
     },
-    { timestamps: true },
+    {
+        timestamps: true,
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 logSchema.index({ createdAt: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });

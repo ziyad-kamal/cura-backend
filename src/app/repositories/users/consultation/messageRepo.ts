@@ -2,17 +2,20 @@ import { findRecord } from "../../../utils/findRecord.js";
 import Chatroom from "../../../models/Chatroom.js";
 import Message from "../../../models/Message.js";
 import { MessageInterface } from "../../../../interfaces/models/MessageInterface.js";
+import { Types } from "mongoose";
 
 export const storeMessageRepo = async (
     receiver: string,
     sender: string,
     content: string,
+    files: { s3Key: string }[],
     chatroom: string,
-): Promise<MessageInterface> => { 
-    const message=await (
+): Promise<MessageInterface> => {
+    const message = await (
         await Message.create({
             content,
-            sender,
+            files,
+            sender: new Types.ObjectId(sender),
             receiver,
             chatroom,
             createdAt: new Date(),
@@ -20,9 +23,9 @@ export const storeMessageRepo = async (
     ).populate("sender", "name.first name.last image");
 
     const chatroomRecord = await findRecord(Chatroom, { _id: chatroom });
-    await chatroomRecord.updateOne({ lastMessage: message._id }); 
+    await chatroomRecord.updateOne({ lastMessage: message._id, lastMessageAt: message.createdAt });
 
-    return message.toObject();
+    return message.toJSON();
 };
 
 export const showMessageRepo = async (

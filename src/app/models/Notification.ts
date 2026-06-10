@@ -34,6 +34,9 @@ const notificationSchema = new Schema<NotificationInterface>(
     },
     {
         versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

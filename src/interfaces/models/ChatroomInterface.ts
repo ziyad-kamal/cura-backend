@@ -4,6 +4,7 @@ export interface ChatroomInterface {
     _id?: Types.ObjectId;
     lastMessage?: Types.ObjectId;
     activeUntil: Date;
+    lastMessageAt:Date;
     isActive: boolean;
     isRead:boolean
     sender: mongoose.Types.ObjectId;

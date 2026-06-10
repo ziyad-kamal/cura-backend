@@ -7,7 +7,6 @@ const messageSchema = new Schema<MessageInterface>(
     {
         content: {
             type: String,
-            required: true,
             maxLength: 500,
             trim: true,
         },
@@ -16,7 +15,7 @@ const messageSchema = new Schema<MessageInterface>(
                 s3Key: String,
                 type: {
                     type: String,
-                    enum: ["video", "image", "document"],
+                    enum: ["video", "image", "document",'application'],
                 },
             },
         ],
@@ -43,6 +42,9 @@ const messageSchema = new Schema<MessageInterface>(
     },
     {
         versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

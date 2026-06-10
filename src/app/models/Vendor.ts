@@ -86,7 +86,10 @@ const vendorSchema = new Schema<VendorInterface>(
     {
         timestamps: true,
         versionKey: false,
-    }
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 const Vendor = mongoose.model<VendorInterface>(

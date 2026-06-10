@@ -1,4 +1,4 @@
-import { HydratedDocument, Types } from "mongoose";
+import { Types } from "mongoose";
 import { UserDataInterface } from "../../../../interfaces/data/UserDataInterface.js";
 import { UserInterface } from "../../../../interfaces/models/UserInterface.js";
 import Connection from "../../../models/Connection.js";
@@ -228,9 +228,9 @@ export const indexProfileRepo = async (
 };
 
 export const updateProfileRepo = async (
-    { bio, job, firstName, lastName }: UserDataInterface,
+    { bio, job, firstName, lastName,image,coverImage }: UserDataInterface,
     authId: string,
-): Promise<HydratedDocument<UserInterface> | null> => {
+): Promise<UserInterface | null> => {
     await findRecord(User, { _id: authId });
 
     return User.findByIdAndUpdate(
@@ -240,9 +240,13 @@ export const updateProfileRepo = async (
             "userInfo.job": job,
             "name.first": firstName,
             "name.last": lastName,
+            image,
+            coverImage
         },
         { returnDocument: "after" },
-    ).select("name userInfo.bio userInfo.job");
+    ).select("name userInfo.bio userInfo.job")
+    .lean();
+
 };
 
 export const connectProfileRepo = async (_id: string, authId: string): Promise<void> => {

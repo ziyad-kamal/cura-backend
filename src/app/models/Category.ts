@@ -22,7 +22,7 @@ const categorySchema = new Schema<CategoryInterface>(
             required: true,
             unique: true,
             lowercase: true,
-            trim: true, 
+            trim: true,
         },
 
         image: String,
@@ -40,7 +40,10 @@ const categorySchema = new Schema<CategoryInterface>(
     {
         timestamps: true,
         versionKey: false,
-    }
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 const Category = mongoose.model<CategoryInterface>(

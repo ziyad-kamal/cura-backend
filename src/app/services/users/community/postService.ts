@@ -23,7 +23,7 @@ export const indexPostsService = async (req: Request) => {
 export const storePostService = async (req: Request): Promise<PostInterface> => {
     const { files, visibility } = req.body;
 
-    let updatedFiles = await handleS3Files(files);
+    let updatedFiles = await handleS3Files(files, "public/posts/");
 
     const post = await storePostRepo({ ...req.body, files: updatedFiles, user: req.user?._id });
 
@@ -32,7 +32,7 @@ export const storePostService = async (req: Request): Promise<PostInterface> => 
         return { ...post, files: resolvedFiles } as PostInterface;
     }
 
-    return post
+    return post;
 };
 
 export const repostPostService = async (req: Request): Promise<boolean> => {
@@ -42,7 +42,7 @@ export const repostPostService = async (req: Request): Promise<boolean> => {
 export const updatePostService = async (req: Request): Promise<PostInterface | null> => {
     const { files, visibility } = req.body;
 
-    let updatedFiles = await handleS3Files(files);
+    let updatedFiles = await handleS3Files(files, "public/posts/");
 
     const post = await updatePostRepo({ ...req.body, files: updatedFiles, ...req.params });
 

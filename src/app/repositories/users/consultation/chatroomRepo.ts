@@ -25,8 +25,7 @@ export const indexChatroomsRepo = async (
         .populate("sender", "name.first name.last image")
         .populate("receiver", "name.first name.last image")
         .sort({
-            isActive: -1,
-            createdAt: -1,
+            lastMessageAt: -1,
         })
         .limit(limit + 1)
         .lean();

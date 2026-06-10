@@ -11,6 +11,7 @@ export const index = asyncHandler(async (req: Request, res: Response): Promise<R
 export const get = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const chatroom = await getChatroomService(req);
     return returnSuccess(res, "", 200, chatroom);
+    
 });
 
 export const checkUsersStatus = asyncHandler(async (req: Request, res: Response): Promise<Response> => {

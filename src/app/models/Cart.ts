@@ -6,7 +6,7 @@ const cartSchema = new Schema<CartInterface>(
         userId: {
             type: Schema.Types.ObjectId,
             ref: "User",
-            required: true, 
+            required: true,
             unique: true,
         },
 
@@ -47,7 +47,10 @@ const cartSchema = new Schema<CartInterface>(
     {
         timestamps: true,
         versionKey: false,
-    }
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 const Cart = mongoose.model<CartInterface>(

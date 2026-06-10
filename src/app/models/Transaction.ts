@@ -22,6 +22,9 @@ const transactionSchema = new Schema<TransactionInterface>(
     },
     {
         versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

@@ -15,36 +15,37 @@ export const indexChatroomsService = async (
     }
 > => {
     const limit = 10;
-    const { query, sortField } = getQueryCursor(req, "createdAt");
+    const { query, sortField } = getQueryCursor(req, "lastMessageAt");
     const { chatrooms, recentMessages } = await indexChatroomsRepo(req.user?._id as string, query, limit);
 
+    // 1. Resolve chatroom profile images safely
     await Promise.all(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         chatrooms.map(async (room: any) => {
-            if (room.sender?.image) {
-                const resolved = await resolveFiles([{ s3Key: room.sender.image }], "public"); // Adjust visibility ("public"/"private") based on your bucket policy
+            // 🛑 Check if it's already a full URL before resolving
+            if (room.sender?.image && !room.sender.image.startsWith("http")) {
+                const resolved = await resolveFiles([{ s3Key: room.sender.image }], "public");
                 room.sender.image = resolved[0]?.url || room.sender.image;
             }
-            if (room.receiver?.image) {
+            if (room.receiver?.image && !room.receiver.image.startsWith("http")) {
                 const resolved = await resolveFiles([{ s3Key: room.receiver.image }], "public");
                 room.receiver.image = resolved[0]?.url || room.receiver.image;
             }
         }),
     );
 
-    // 2. Resolve files and sender images for the recent messages
+    // 2. Resolve files and sender images for recent messages safely
     if (recentMessages && recentMessages.length > 0) {
         await Promise.all(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             recentMessages.map(async (msg: any) => {
                 if (msg.files?.length) {
-                    msg.files = await resolveFiles(msg.files, "public");
+                    msg.files = await resolveFiles(msg.files, "private");
                 }
 
-                if (msg.sender?.image) {
-                    const fileObj =
-                        typeof msg.sender.image === "string" ? { s3Key: msg.sender.image } : msg.sender.image;
-                    const resolved = await resolveFiles([fileObj], "public");
+                // 🛑 Check if it's already a full URL before resolving
+                if (msg.sender?.image && !msg.sender.image.startsWith("http")) {
+                    const resolved = await resolveFiles([{ s3Key: msg.sender.image }], "public");
                     msg.sender.image = resolved[0]?.url || msg.sender.image;
                 }
             }),
@@ -59,7 +60,6 @@ export const indexChatroomsService = async (
 export const getChatroomService = async (req: Request): Promise<ChatroomInterface> => {
     return await getChatroomRepo(req.params.receiverId as string, req.user?._id as string);
 };
-
 
 export const checkUsersStatusService = async (req: Request): Promise<Record<string, boolean>> => {
     const { userIds } = req.body;
