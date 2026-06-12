@@ -5,6 +5,8 @@ import Connection from "../../../models/Connection.js";
 import Post from "../../../models/Post.js";
 import User from "../../../models/User.js";
 import { findRecord } from "../../../utils/findRecord.js";
+import RecordExistError from "../../../errors/RecordExistError.js";
+
 
 export const indexProfileRepo = async (
     query: {
@@ -95,6 +97,7 @@ export const indexProfileRepo = async (
                         },
                         {
                             $project: {
+                                _id: 1, // Already projected here! Correct.
                                 status: 1,
                                 sender: 1,
                             },
@@ -120,6 +123,12 @@ export const indexProfileRepo = async (
                     followingCount: {
                         $ifNull: [{ $arrayElemAt: ["$following.count", 0] }, 0],
                     },
+
+                    // 1. EXTRACT CONNECTION ID (Returns string Id or null if no connection exists)
+                    connectionId: {
+                        $ifNull: [{ $arrayElemAt: ["$connectionMeta._id", 0] }, null],
+                    },
+
                     // "pending" | "accepted" | "rejected" | null
                     connectionStatus: {
                         $ifNull: [{ $arrayElemAt: ["$connectionMeta.status", 0] }, null],
@@ -141,17 +150,14 @@ export const indexProfileRepo = async (
                 ...query,
             },
         },
-
         {
             $sort: {
                 createdAt: -1,
             },
         },
-
         {
             $limit: limit + 1,
         },
-
         {
             $lookup: {
                 from: "likes",
@@ -160,7 +166,6 @@ export const indexProfileRepo = async (
                 as: "likes",
             },
         },
-
         {
             $lookup: {
                 from: "comments",
@@ -169,7 +174,6 @@ export const indexProfileRepo = async (
                 as: "comments",
             },
         },
-
         {
             $lookup: {
                 from: "reposts",
@@ -178,31 +182,15 @@ export const indexProfileRepo = async (
                 as: "reposts",
             },
         },
-
         {
             $addFields: {
-                likesCount: {
-                    $size: "$likes",
-                },
-
-                commentsCount: {
-                    $size: "$comments",
-                },
-
-                repostsCount: {
-                    $size: "$reposts",
-                },
-
-                isLiked: {
-                    $in: [new Types.ObjectId(authId), "$likes.user"],
-                },
-
-                isReposted: {
-                    $in: [new Types.ObjectId(authId), "$reposts.user"],
-                },
+                likesCount: { $size: "$likes" },
+                commentsCount: { $size: "$comments" },
+                repostsCount: { $size: "$reposts" },
+                isLiked: { $in: [new Types.ObjectId(authId), "$likes.user"] },
+                isReposted: { $in: [new Types.ObjectId(authId), "$reposts.user"] },
             },
         },
-
         {
             $project: {
                 content: 1,
@@ -210,11 +198,9 @@ export const indexProfileRepo = async (
                 tags: 1,
                 visibility: 1,
                 createdAt: 1,
-
                 likesCount: 1,
                 commentsCount: 1,
                 repostsCount: 1,
-
                 isLiked: 1,
                 isReposted: 1,
             },
@@ -228,12 +214,12 @@ export const indexProfileRepo = async (
 };
 
 export const updateProfileRepo = async (
-    { bio, job, firstName, lastName,image,coverImage }: UserDataInterface,
+    { bio, job, firstName, lastName, image, coverImage }: UserDataInterface,
     authId: string,
 ): Promise<UserInterface | null> => {
     await findRecord(User, { _id: authId });
 
-    return User.findByIdAndUpdate(
+    return await User.findByIdAndUpdate(
         authId,
         {
             "userInfo.bio": bio,
@@ -241,31 +227,33 @@ export const updateProfileRepo = async (
             "name.first": firstName,
             "name.last": lastName,
             image,
-            coverImage
+            coverImage,
         },
         { returnDocument: "after" },
-    ).select("name userInfo.bio userInfo.job")
-    .lean();
-
+    )
+        .select("name userInfo.bio userInfo.job")
+        .lean();
 };
 
 export const connectProfileRepo = async (_id: string, authId: string): Promise<void> => {
-    await findRecord(User, { _id });
+    await findRecord(User,{_id})
+    const connection=await Connection.findOne({ $or:[{sender:authId,receiver:_id},{receiver:authId,sender:_id}]});
 
-    Connection.create({
+    if (connection) {
+        throw new RecordExistError('you already connected with this user');
+    }
+
+    await Connection.create({
         sender: authId,
         receiver: _id,
         status: "pending",
     });
 };
 
-export const acceptProfileRepo = async (_id: string, authId: string): Promise<void> => {
-    await findRecord(User, { _id });
-
-    Connection.findOneAndUpdate(
+export const acceptProfileRepo = async (_id: string): Promise<void> => {
+    await Connection.findOneAndUpdate(
         {
-            sender: _id,
-            receiver: authId,
+            _id,
         },
         {
             status: "accepted",
@@ -273,16 +261,19 @@ export const acceptProfileRepo = async (_id: string, authId: string): Promise<vo
     );
 };
 
-export const ignoreProfileRepo = async (_id: string, authId: string): Promise<void> => {
-    await findRecord(User, { _id });
-
-    Connection.findOneAndUpdate(
+export const ignoreProfileRepo = async (_id: string): Promise<void> => {
+    await Connection.findOneAndUpdate(
         {
-            sender: _id,
-            receiver: authId,
+            _id,
         },
         {
             status: "ignored",
         },
     );
+};
+
+export const cancelProfileRepo = async (_id: string): Promise<void> => {
+    await Connection.deleteOne({
+        _id
+    });
 };

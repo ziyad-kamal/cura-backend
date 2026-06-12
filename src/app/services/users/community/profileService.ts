@@ -2,6 +2,8 @@ import { Request } from "express";
 import { PostInterface } from "../../../../interfaces/models/PostInterface.js";
 import { UserInterface } from "../../../../interfaces/models/UserInterface.js";
 import {
+    acceptProfileRepo,
+    cancelProfileRepo,
     connectProfileRepo,
     ignoreProfileRepo,
     indexProfileRepo,
@@ -87,9 +89,13 @@ export const connectProfileService = async (req: Request): Promise<void> => {
 };
 
 export const acceptProfileService = async (req: Request): Promise<void> => {
-    await connectProfileRepo(req.params.userId as string, req.user?._id);
+    await acceptProfileRepo(req.params.connectionId as string);
 };
 
 export const ignoreProfileService = async (req: Request): Promise<void> => {
-    await ignoreProfileRepo(req.params.userId as string, req.user?._id);
+    await ignoreProfileRepo(req.params.connectionId as string);
+};
+
+export const cancelProfileService = async (req: Request): Promise<void> => {
+    await cancelProfileRepo(req.params.connectionId as string);
 };

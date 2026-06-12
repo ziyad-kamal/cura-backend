@@ -1,18 +1,16 @@
-import { NextFunction, Request, Response } from "express";
 import { Model } from "mongoose";
+import UnknownError from "../errors/UnknownError.js";
 import { findRecord } from "../utils/findRecord.js";
-import { OwnerInterface } from "../../interfaces/data/OwnerInterface.js";
-import { returnError } from "../utils/returnJson.js";
+import { NextFunction, Request, Response } from "express";
 
-export const authorize = <T extends OwnerInterface>(model: Model<T>, param: string, field: keyof T='user') => {
+export const authorize = <T>(model: Model<T>, param: string, fields: (keyof T)[] = ["user" as keyof T]) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         const id = req.params[param] as string;
         const record = await findRecord(model, { _id: id });
+        const authorized = fields.some((field) => record[field]?.toString() === req.user?._id);
 
-        const ownerId = record[field];
-
-        if (ownerId?.toString() !== req.user?._id) {
-            returnError(res, "something went wrong", 500);
+        if (!authorized) {
+            throw new UnknownError();
         }
 
         next();

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
     acceptProfileService,
+    cancelProfileService,
     connectProfileService,
     ignoreProfileService,
     indexProfileService,
@@ -32,4 +33,9 @@ export const accept = asyncHandler(async (req: Request, res: Response): Promise<
 export const ignore = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     await ignoreProfileService(req);
     return returnSuccess(res, "you ignored request successfully", 200);
+});
+
+export const cancel = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    await cancelProfileService(req);
+    return returnSuccess(res, "you cancel request successfully", 200);
 });
