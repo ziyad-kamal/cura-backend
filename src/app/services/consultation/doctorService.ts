@@ -2,12 +2,26 @@ import User from "../../models/User.js";
 import { UserRoles } from "../../../enums/UserRoles.js";
 
 export const findAllDoctors = async () => {
-
-    return await User.find({ role: UserRoles.DOCTOR });
+    const doctors = await User.find({ role: UserRoles.DOCTOR });
+    for (const doc of doctors) {
+        if (doc.doctorInfo && (!doc.doctorInfo.experienceYears || doc.doctorInfo.experienceYears === 0)) {
+            const age = doc.userInfo?.age;
+            if (age && age > 25) {
+                doc.doctorInfo.experienceYears = age - 25;
+            }
+        }
+    }
+    return doctors;
 };
 
 export const findDoctorById = async (id: string) => {
     const doctor = await User.findOne({ _id: id, role: UserRoles.DOCTOR });
+    if (doctor && doctor.doctorInfo && (!doctor.doctorInfo.experienceYears || doctor.doctorInfo.experienceYears === 0)) {
+        const age = doctor.userInfo?.age;
+        if (age && age > 25) {
+            doctor.doctorInfo.experienceYears = age - 25;
+        }
+    }
     return doctor;
 };
 
@@ -25,6 +39,13 @@ export const registerAsDoctor = async (userId: string, data: any) => {
                 frontIdImage: data.frontIdImage,
                 backIdImage: data.backIdImage,
                 certImage: data.certImage,
+                workingDays: data.workingDays || [],
+                workingHoursStart: data.workingHoursStart || "09:00",
+                workingHoursEnd: data.workingHoursEnd || "17:00",
+                specialization: data.specialization || "",
+                experienceYears: data.experienceYears || 0,
+                ratingAverage: 0,
+                totalReviews: 0,
             },
             "userInfo.bio": data.bio,
             "userInfo.job": "Doctor"
@@ -41,6 +62,11 @@ export const updateDoctorData = async (userId: string, data: any) => {
                 "doctorInfo.shortConsultPrice": data.shortConsultPrice,
                 "doctorInfo.normalConsultPrice": data.normalConsultPrice,
                 "doctorInfo.LongConsultPrice": data.LongConsultPrice,
+                "doctorInfo.workingDays": data.workingDays,
+                "doctorInfo.workingHoursStart": data.workingHoursStart,
+                "doctorInfo.workingHoursEnd": data.workingHoursEnd,
+                "doctorInfo.specialization": data.specialization,
+                "doctorInfo.experienceYears": data.experienceYears,
                 "userInfo.bio": data.bio
             }
         },

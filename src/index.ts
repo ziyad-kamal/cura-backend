@@ -22,6 +22,8 @@ import { initSocket } from "./config/socket.js";
 import chatroomRoutes from "./routes/users/consultation/chatroomRoutes.js";
 import messageRoutes from "./routes/users/consultation/messageRoutes.js";
 import doctorRoutes from "./routes/users/consultation/doctorRoutes.js";
+import consultationRoutes from "./routes/users/consultation/consultationRoutes.js";
+import doctorReviewRoutes from "./routes/users/consultation/doctorReviewRoutes.js";
 
 const app = express();
 const httpServer = createServer(app); 
@@ -47,7 +49,7 @@ async function bootstrap() {
     app.use(`${appConfig.apiPrefix}`, authRoutes);
     app.use(`${appConfig.apiPrefix}/file`, fileRoutes);
     app.use(`${appConfig.apiPrefix}/payments`, paymentRoutes);
-
+ 
     //community
     app.use(`${appConfig.apiPrefix}/post`, postRoutes);
     app.use(`${appConfig.apiPrefix}/repost`, repostRoutes);
@@ -68,6 +70,8 @@ async function bootstrap() {
     app.use(`${appConfig.apiPrefix}/chatrooms`, chatroomRoutes);
     app.use(`${appConfig.apiPrefix}/messages`, messageRoutes);
     app.use(`${appConfig.apiPrefix}/doctors`, doctorRoutes);
+    app.use(`${appConfig.apiPrefix}/consultations`, consultationRoutes);
+    app.use(`${appConfig.apiPrefix}/doctor-reviews`, doctorReviewRoutes);
 
     app.use(errorHandler);
 

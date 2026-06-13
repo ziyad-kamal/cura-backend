@@ -78,6 +78,19 @@ const userSchema = new Schema<UserInterface>(
             frontIdImage: String,
             backIdImage: String,
             certImage: String,
+            workingDays: [String],
+            workingHoursStart: String,
+            workingHoursEnd: String,
+            specialization: String,
+            experienceYears: Number,
+            ratingAverage: {
+                type: Number,
+                default: 0,
+            },
+            totalReviews: {
+                type: Number,
+                default: 0,
+            },
         },
 
         userInfo: {

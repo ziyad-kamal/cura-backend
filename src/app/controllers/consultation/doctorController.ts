@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as doctorService from "../../services/consultation/doctorService.js";
 import { returnSuccess, returnError } from "../../utils/returnJson.js";
+import User from "../../models/User.js";
 
 export const index = async (req: Request, res: Response) => {
     try {
@@ -25,7 +26,8 @@ export const show = async (req: Request, res: Response) => {
 
 export const store = async (req: Request, res: Response) => {
     try {
-        if (req.user?.role === "doctor") {
+        const existingUser = await User.findById(req.user?._id);
+        if (existingUser?.role === "doctor" && existingUser?.doctorInfo?.specialization) {
             return returnError(res, "You are already registered as a doctor", 400);
         }
 
