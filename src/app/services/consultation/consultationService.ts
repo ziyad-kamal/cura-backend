@@ -3,6 +3,7 @@ import Consultation from "../../models/Consultation.js";
 import Chatroom from "../../models/Chatroom.js";
 import User from "../../models/User.js";
 import { UserRoles } from "../../../enums/UserRoles.js";
+import { log } from "console";
 
 export const createConsultation = async (userId: string, data: {
     doctorId: string;
@@ -70,7 +71,7 @@ export const createConsultation = async (userId: string, data: {
     const consultationId = new mongoose.Types.ObjectId();
     const chatroomId = new mongoose.Types.ObjectId();
 
-    // Create Chatroom first
+    console.log(userId);    // Create Chatroom first
     const chatroom = await Chatroom.create({
         _id: chatroomId,
         sender: new mongoose.Types.ObjectId(userId),

@@ -14,4 +14,5 @@ export const s3Client = new S3Client({
         secretAccessKey: process.env.SECRET_KEY || "",
     },
     requestChecksumCalculation: "WHEN_REQUIRED",
+    signingEscapePath: false,
 });
