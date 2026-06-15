@@ -14,7 +14,7 @@ export const createProductService = async (req: Request) => {
     const vendor = await Vendor.findOne({ userId });
     if (!vendor) {
         throw new NotFoundError("Vendor profile not found. Please register as a vendor first.");
-    }
+    }           
 
     const productData = {
         ...req.body,

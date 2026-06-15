@@ -6,6 +6,7 @@ import Post from "../../../models/Post.js";
 import User from "../../../models/User.js";
 import { findRecord } from "../../../utils/findRecord.js";
 import RecordExistError from "../../../errors/RecordExistError.js";
+import { ConnectionInterface } from "../../../../interfaces/models/ConnectionInterface.js";
 
 
 export const indexProfileRepo = async (
@@ -183,6 +184,30 @@ export const indexProfileRepo = async (
             },
         },
         {
+            $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                pipeline: [
+                    {
+                        $project: {
+                            "name.first": 1,
+                            "name.last": 1,
+                            image: 1,
+                            "userInfo.job": 1,
+                        },
+                    },
+                ],
+                as: "user",
+            },
+        },
+        {
+            $unwind: {
+                path: "$user",
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
             $addFields: {
                 likesCount: { $size: "$likes" },
                 commentsCount: { $size: "$comments" },
@@ -197,6 +222,7 @@ export const indexProfileRepo = async (
                 files: 1,
                 tags: 1,
                 visibility: 1,
+                user:1,
                 createdAt: 1,
                 likesCount: 1,
                 commentsCount: 1,
@@ -211,6 +237,15 @@ export const indexProfileRepo = async (
         user,
         posts,
     };
+};
+
+export const getConnectionsProfileRepo = async (
+    authId: string,
+): Promise<ConnectionInterface[]> => {
+    return await Connection.find({receiver:authId,status:'pending'})
+    .select('sender')
+    .populate('sender','name.first name.last image userInfo.job')
+    .lean()
 };
 
 export const updateProfileRepo = async (
@@ -246,7 +281,6 @@ export const connectProfileRepo = async (_id: string, authId: string): Promise<v
     await Connection.create({
         sender: authId,
         receiver: _id,
-        status: "pending",
     });
 };
 

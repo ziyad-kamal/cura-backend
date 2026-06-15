@@ -3,6 +3,7 @@ import {
     accept,
     cancel,
     connect,
+    getConnections,
     ignore,
     index,
     update,
@@ -17,11 +18,13 @@ const profileRoutes = express.Router();
 
 profileRoutes.use(jwtVerify);
 profileRoutes.get("/:userId", validateId("userId"), index);
+profileRoutes.get("/get/connections", getConnections);
 profileRoutes.put(
     "/update",
     profileValidator,
     update,
 );
+
 profileRoutes.post("/connect/:userId", validateId("userId"), connect);
 profileRoutes.put(
     "/accept/:connectionId",

@@ -10,12 +10,82 @@ import {
 } from "../../../repositories/users/community/postRepository.js";
 import { handleS3Files } from "../../../utils/handleS3Files.js";
 import { resolveFiles } from "../../../utils/resolveFiles.js";
+import { CommentInterface } from "../../../../interfaces/models/CommentInterface.js";
+import { UserInterface } from "../../../../interfaces/models/UserInterface.js";
 
 export const indexPostsService = async (req: Request) => {
     const authId = req.user?._id as string;
     const cursor = req.query.cursor as string | undefined;
 
-    const { feed, hasMore, nextCursor } = await indexPostsRepo(authId, cursor);
+    let { feed, hasMore, nextCursor } = await indexPostsRepo(authId, cursor);
+
+    feed = await Promise.all(
+        feed.map(async (item) => {
+            const userImageUrl =
+                item.user?.image && !item.user.image.startsWith("http")
+                    ? await resolveFiles([{ s3Key: item.user.image }], "public").then((res) => res[0]?.url)
+                    : item.user?.image;
+
+            const originalPostUserImageUrl =
+                item.post?.user?.image && !item.post.user.image.startsWith("http")
+                    ? await resolveFiles([{ s3Key: item.post.user.image }], "public").then((res) => res[0]?.url)
+                    : item.post?.user?.image;
+
+            const resolvedComments = await Promise.all(
+                (item.comments || []).map(async (comment: CommentInterface) => {
+                    const user = comment.user as unknown as UserInterface;
+                    const commentUserImageUrl =
+                        user?.image && !user.image.startsWith("http")
+                            ? await resolveFiles([{ s3Key: user.image }], "public").then((res) => res[0]?.url)
+                            : user?.image;
+
+                    return {
+                        ...comment,
+                        user: comment.user
+                            ? {
+                                  ...comment.user,
+                                  ...(commentUserImageUrl && {
+                                      image: commentUserImageUrl,
+                                  }),
+                              }
+                            : comment.user,
+                    };
+                }),
+            );
+
+            return {
+                ...item,
+                files: await resolveFiles(item.files, item.visibility),
+
+                comments: resolvedComments,
+
+                user: item.user
+                    ? {
+                          ...item.user,
+                          ...(userImageUrl && { image: userImageUrl }),
+                      }
+                    : item.user,
+
+                ...(item.post
+                    ? {
+                          post: {
+                              ...item.post,
+                              files: await resolveFiles(item.post.files, item.post.visibility),
+
+                              user: item.post.user
+                                  ? {
+                                        ...item.post.user,
+                                        ...(originalPostUserImageUrl && {
+                                            image: originalPostUserImageUrl,
+                                        }),
+                                    }
+                                  : item.post.user,
+                          },
+                      }
+                    : {}),
+            };
+        }),
+    );
 
     return { metadata: { hasMore, nextCursor }, posts: feed };
 };

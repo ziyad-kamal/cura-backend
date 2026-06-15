@@ -26,6 +26,7 @@ export const indexChatroomsService = async (
                 const resolved = await resolveFiles([{ s3Key: room.sender.image }], "public");
                 room.sender.image = resolved[0]?.url || room.sender.image;
             }
+            
             if (room.receiver?.image && !room.receiver.image.startsWith("http")) {
                 const resolved = await resolveFiles([{ s3Key: room.receiver.image }], "public");
                 room.receiver.image = resolved[0]?.url || room.receiver.image;

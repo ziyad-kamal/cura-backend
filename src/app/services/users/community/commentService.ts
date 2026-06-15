@@ -15,6 +15,8 @@ import {
     updateCommentRepo,
 } from "../../../repositories/users/community/commentRepository.js";
 import { getNextCursor, getQueryCursor } from "../../../utils/cursorPagination.js";
+import { resolveFiles } from "../../../utils/resolveFiles.js";
+import { UserInterface } from "../../../../interfaces/models/UserInterface.js";
 
 export const indexCommentService = async (req: Request): Promise<PaginationType<CommentInterface, "comments">> => {
     const limit = 10;
@@ -26,7 +28,21 @@ export const indexCommentService = async (req: Request): Promise<PaginationType<
 
     const { hasMore, nextCursor, results } = getNextCursor(comments, limit, sortField);
 
-    return { metadata: { hasMore, nextCursor }, comments: results };
+    const resolvedComments = await Promise.all(
+        results.map(async (comment) => {
+            const user = comment.user as unknown as UserInterface;
+
+            if (user?.image && !user.image.startsWith("http")) {
+                const [image] = await resolveFiles([{ s3Key: user.image }], "public");
+
+                user.image = image.url ?? user.image;
+            }
+
+            return comment;
+        }),
+    );
+
+    return { metadata: { hasMore, nextCursor }, comments: resolvedComments };
 };
 
 export const storeCommentService = async (req: Request): Promise<CommentInterface> => {
@@ -35,7 +51,17 @@ export const storeCommentService = async (req: Request): Promise<CommentInterfac
         key: string;
     } = req.params.type === "post" ? { model: Post, key: "post" } : { model: Repost, key: "repost" };
 
-    return await storeCommentRepo({ ...req.body }, req.user?._id, post, req.params._id as string);
+    const comment = await storeCommentRepo({ ...req.body }, req.user?._id, post, req.params._id as string);
+
+    const user = comment.user as unknown as UserInterface;
+    if (user.image) {
+        const [image] = await resolveFiles([{ s3Key: user.image }], "public");
+
+        if (image?.url) {
+            user.image = image.url;
+        }
+    }
+    return comment;
 };
 
 export const updateCommentService = async (req: Request): Promise<CommentInterface | null> => {
