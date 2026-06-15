@@ -97,7 +97,10 @@ jobs:
 
   trigger-deploy:
     needs: [build-and-push]
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: |
+      always() &&
+      startsWith(github.ref, 'refs/tags/v') &&
+      needs.build-and-push.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 2
 
