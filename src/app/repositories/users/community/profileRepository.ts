@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-import { UserDataInterface } from "../../../../interfaces/data/UserDataInterface.js";
 import { UserInterface } from "../../../../interfaces/models/UserInterface.js";
 import Connection from "../../../models/Connection.js";
 import Post from "../../../models/Post.js";
@@ -7,7 +6,6 @@ import User from "../../../models/User.js";
 import { findRecord } from "../../../utils/findRecord.js";
 import RecordExistError from "../../../errors/RecordExistError.js";
 import { ConnectionInterface } from "../../../../interfaces/models/ConnectionInterface.js";
-
 
 export const indexProfileRepo = async (
     query: {
@@ -249,11 +247,13 @@ export const getConnectionsProfileRepo = async (
 };
 
 export const updateProfileRepo = async (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any,
     authId: string,
 ): Promise<UserInterface | null> => {
     await findRecord(User, { _id: authId });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateFields: any = {};
     if (data.bio !== undefined) updateFields["userInfo.bio"] = data.bio;
     if (data.job !== undefined) updateFields["userInfo.job"] = data.job;

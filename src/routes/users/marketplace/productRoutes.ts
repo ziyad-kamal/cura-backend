@@ -1,12 +1,6 @@
 import express from "express";
 
-import {
-    destroy,
-    index,
-    show,
-    store,
-    update,
-} from "../../../app/controllers/products/productController.js";
+import { destroy, index, show, store, update } from "../../../app/controllers/users/marketplace/productController.js";
 import { jwtVerify, requireRole } from "../../../app/middlewares/index.js";
 import { UserRoles } from "../../../enums/UserRoles.js";
 

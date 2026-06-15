@@ -4,10 +4,10 @@ import {
     indexOrderItemsService,
     showOrderItemService,
     updateOrderItemStatusService,
-} from "../../services/orders/orderItemService.js";
+} from "../../../services/users/marketplace/orderItemService.js";
 
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { returnSuccess } from "../../utils/returnJson.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { returnSuccess } from "../../../utils/returnJson.js";
 
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const items = await indexOrderItemsService(req);

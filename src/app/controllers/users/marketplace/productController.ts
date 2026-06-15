@@ -1,33 +1,22 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
-import Product from "../../models/Product.js";
+import Product from "../../../models/Product.js";
 
 import {
     createProductService,
     deleteProductService,
     showProductService,
     updateProductService,
-} from "../../services/products/productService.js";
+} from "../../../services/users/marketplace/productService.js";
 
 export const index = async (req: Request, res: Response) => {
     try {
-        const {
-            page = 1,
-            limit = 15,
-            search,
-            category,
-            minPrice,
-            maxPrice,
-            sortBy,
-            inStock,
-            minRating,
-        } = req.query;
+        const { page = 1, limit = 15, search, category, minPrice, maxPrice, sortBy, inStock, minRating } = req.query;
 
         // 1. Pagination values
         const pageNum = Math.max(1, Number(page) || 1);
         const limitNum = Math.max(1, Number(limit) || 15);
-        
-        console.log('🔍 Backend Query:', { pageNum, limitNum, page, limit, search, category, inStock, minRating });
-
         // 2. Build query object
         const query: any = {};
 
@@ -41,9 +30,7 @@ export const index = async (req: Request, res: Response) => {
 
         // Category
         if (category && category !== "All Products") {
-            const { default: Category } = await import(
-                "../../models/Category.js"
-            );
+            const { default: Category } = await import("../../../models/Category.js");
 
             const categoryDoc = await Category.findOne({
                 name: category as string,
@@ -114,16 +101,6 @@ export const index = async (req: Request, res: Response) => {
 
         // 5. Pagination data
         const totalPages = Math.ceil(total / limitNum);
-
-        console.log('✅ Sending Response:', { 
-          productsCount: products.length, 
-          total, 
-          page: pageNum, 
-          limit: limitNum, 
-          pages: totalPages,
-          hasNextPage: pageNum < totalPages,
-          hasPrevPage: pageNum > 1,
-        });
 
         return res.status(200).json({
             success: true,

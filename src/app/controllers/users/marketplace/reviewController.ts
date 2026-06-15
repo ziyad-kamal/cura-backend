@@ -6,10 +6,10 @@ import {
     deleteReviewService,
     indexReviewsService,
     updateReviewService,
-} from "../../services/reviews/reviewService.js";
+} from "../../../services/users/marketplace/reviewService.js";
 
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { returnSuccess } from "../../utils/returnJson.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { returnSuccess } from "../../../utils/returnJson.js";
 
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const reviews = await indexReviewsService(req);

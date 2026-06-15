@@ -1,6 +1,6 @@
 import { Request } from "express";
-import Cart from "../../models/Cart.js";
-import Product from "../../models/Product.js";
+import Cart from "../../../models/Cart.js";
+import Product from "../../../models/Product.js";
 
 export const getCartService = async (req: Request) => {
     const userId = req.user?._id;
@@ -9,8 +9,8 @@ export const getCartService = async (req: Request) => {
         return null;
     }
     const cart = await Cart.findOne({ userId }).populate({
-        path: 'items.productId',
-        select: 'title name price images image category vendorId',
+        path: "items.productId",
+        select: "title name price images image category vendorId",
     });
 
     return cart ?? { items: [], totalPrice: 0, _id: null };
@@ -30,9 +30,10 @@ export const addToCartService = async (req: Request) => {
     if (!product) {
         throw new Error("Product not found");
     }
-    const price = (product.discountPrice && product.discountPrice > 0 && product.discountPrice < product.price) 
-        ? product.discountPrice 
-        : product.price;
+    const price =
+        product.discountPrice && product.discountPrice > 0 && product.discountPrice < product.price
+            ? product.discountPrice
+            : product.price;
     const { vendorId } = product;
 
     let cart = await Cart.findOne({ userId: finalUserId });
@@ -41,14 +42,14 @@ export const addToCartService = async (req: Request) => {
         cart = await Cart.create({
             userId: finalUserId,
             items: [{ productId, vendorId, quantity, price }],
-            totalPrice: quantity * price
+            totalPrice: quantity * price,
         });
         await cart.populate({
-            path: 'items.productId',
-            select: 'title name price images image category vendorId',
-        })
+            path: "items.productId",
+            select: "title name price images image category vendorId",
+        });
     } else {
-        const itemIndex = cart.items.findIndex(item => item.productId?.toString() === productId);
+        const itemIndex = cart.items.findIndex((item) => item.productId?.toString() === productId);
 
         if (itemIndex > -1) {
             cart.items[itemIndex].quantity += quantity;
@@ -61,15 +62,15 @@ export const addToCartService = async (req: Request) => {
         // A more robust solution might re-fetch all product prices here.
         cart.totalPrice = cart.items.reduce((total, item) => {
             // Ensure item.price is used, or re-fetch if product price can change frequently
-            return total + (item.quantity * item.price);
+            return total + item.quantity * item.price;
         }, 0);
     }
     await cart.save();
 
     // Always return a fully populated cart
     return await Cart.findOne({ userId: finalUserId }).populate({
-        path: 'items.productId',
-        select: 'title name price images image category vendorId', // Select necessary fields for frontend
+        path: "items.productId",
+        select: "title name price images image category vendorId", // Select necessary fields for frontend
     });
 };
 
@@ -89,10 +90,10 @@ export const removeFromCartService = async (req: Request) => {
             new: true,
             // Ensure the returned document is populated
             populate: {
-                path: 'items.productId',
-                select: 'title name price images image category vendorId',
+                path: "items.productId",
+                select: "title name price images image category vendorId",
             },
-        }
+        },
     );
 };
 
@@ -108,7 +109,7 @@ export const clearCartService = async (req: Request) => {
         {
             new: true, // Return the modified document
             // No need for populate as items array is empty
-        }
+        },
     );
 };
 
@@ -136,11 +137,11 @@ export const syncCartService = async (req: Request) => {
     }
 
     // Extract product IDs
-    const productIds = items.map(item => item.productId);
+    const productIds = items.map((item) => item.productId);
 
     // Fetch all products from DB to get verified price and vendorId
     const products = await Product.find({ _id: { $in: productIds } });
-    const productMap = new Map(products.map(p => [p._id.toString(), p]));
+    const productMap = new Map(products.map((p) => [p._id.toString(), p]));
 
     const cartItems = [];
     let totalPrice = 0;
@@ -155,9 +156,10 @@ export const syncCartService = async (req: Request) => {
         }
 
         const qty = Math.max(1, parseInt(item.quantity) || 1);
-        const price = (product.discountPrice && product.discountPrice > 0 && product.discountPrice < product.price)
-            ? product.discountPrice
-            : product.price;
+        const price =
+            product.discountPrice && product.discountPrice > 0 && product.discountPrice < product.price
+                ? product.discountPrice
+                : product.price;
         const vendorId = product.vendorId;
 
         cartItems.push({
@@ -173,19 +175,20 @@ export const syncCartService = async (req: Request) => {
     let cart = await Cart.findOne({ userId });
 
     if (!cart) {
-        cart = await Cart.create({
+        await Cart.create({
             userId,
             items: cartItems,
             totalPrice,
         });
     } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cart.items = cartItems as any;
         cart.totalPrice = totalPrice;
         await cart.save();
     }
 
     return await Cart.findOne({ userId }).populate({
-        path: 'items.productId',
-        select: 'title name price images image category vendorId',
+        path: "items.productId",
+        select: "title name price images image category vendorId",
     });
 };

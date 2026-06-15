@@ -1,5 +1,5 @@
-import User from "../../models/User.js";
-import { UserRoles } from "../../../enums/UserRoles.js";
+import { UserRoles } from "../../../../enums/UserRoles.js";
+import User from "../../../models/User.js";
 
 export const findAllDoctors = async () => {
     const doctors = await User.find({ role: UserRoles.DOCTOR });
@@ -16,7 +16,11 @@ export const findAllDoctors = async () => {
 
 export const findDoctorById = async (id: string) => {
     const doctor = await User.findOne({ _id: id, role: UserRoles.DOCTOR });
-    if (doctor && doctor.doctorInfo && (!doctor.doctorInfo.experienceYears || doctor.doctorInfo.experienceYears === 0)) {
+    if (
+        doctor &&
+        doctor.doctorInfo &&
+        (!doctor.doctorInfo.experienceYears || doctor.doctorInfo.experienceYears === 0)
+    ) {
         const age = doctor.userInfo?.age;
         if (age && age > 25) {
             doctor.doctorInfo.experienceYears = age - 25;
@@ -26,7 +30,6 @@ export const findDoctorById = async (id: string) => {
 };
 
 export const registerAsDoctor = async (userId: string, data: any) => {
-
     return await User.findByIdAndUpdate(
         userId,
         {
@@ -48,9 +51,9 @@ export const registerAsDoctor = async (userId: string, data: any) => {
                 totalReviews: 0,
             },
             "userInfo.bio": data.bio,
-            "userInfo.job": "Doctor"
+            "userInfo.job": "Doctor",
         },
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
     );
 };
 
@@ -67,18 +70,18 @@ export const updateDoctorData = async (userId: string, data: any) => {
                 "doctorInfo.workingHoursEnd": data.workingHoursEnd,
                 "doctorInfo.specialization": data.specialization,
                 "doctorInfo.experienceYears": data.experienceYears,
-                "userInfo.bio": data.bio
-            }
+                "userInfo.bio": data.bio,
+            },
         },
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
     );
 };
 
 export const removeDoctorRole = async (userId: string) => {
     // العودة لدور المستخدم العادي وإزالة بيانات الطبيب
-    return await User.findByIdAndUpdate(userId, { 
-        $set: { role: UserRoles.USER }, 
+    return await User.findByIdAndUpdate(userId, {
+        $set: { role: UserRoles.USER },
         $unset: { doctorInfo: 1 },
-        "userInfo.job": "Unemployed" 
+        "userInfo.job": "Unemployed",
     });
 };

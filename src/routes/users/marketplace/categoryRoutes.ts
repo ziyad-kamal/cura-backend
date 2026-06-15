@@ -1,12 +1,6 @@
 import express from "express";
 
-import {
-    destroy,
-    index,
-    show,
-    store,
-    update,
-} from "../../../app/controllers/categories/categoryController.js";
+import { destroy, index, show, store, update } from "../../../app/controllers/users/marketplace/categoryController.js";
 
 const router = express.Router();
 

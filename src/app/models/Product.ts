@@ -41,10 +41,18 @@ const productSchema = new Schema<ProductInterface>(
             default: 0,
         },
 
-        images: {
-            type: [String],
-            default: [],
-        },
+        images: [
+            new Schema(
+                {
+                    s3Key: String,
+                    type: {
+                        type: String,
+                        enum: ["image"],
+                    },
+                },
+                { id: false },
+            ),
+        ],
 
         categoryId: {
             type: Schema.Types.ObjectId,

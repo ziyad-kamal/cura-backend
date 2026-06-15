@@ -5,12 +5,12 @@ import {
     createOrderService,
     indexOrdersService,
     showOrderService,
-    updateOrderStatusService,
     updateOrderItemStatusService,
-} from "../../services/orders/orderService.js";
+    updateOrderStatusService,
+} from "../../../services/users/marketplace/orderService.js";
 
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { returnSuccess } from "../../utils/returnJson.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { returnSuccess } from "../../../utils/returnJson.js";
 
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const orders = await indexOrdersService(req);

@@ -8,7 +8,6 @@ import { MessageInterface } from "../../../../interfaces/models/MessageInterface
 import { RedisService } from "./onlineUserService.js";
 import Chatroom from "../../../models/Chatroom.js";
 import Consultation from "../../../models/Consultation.js";
-import { getIO } from "../../../../config/socket.js";
 import mongoose from "mongoose";
 
 export const indexChatroomsService = async (
@@ -94,14 +93,6 @@ export const endChatroomService = async (chatroomId: string, userId: string): Pr
             { chatroom: new mongoose.Types.ObjectId(chatroomId) },
             { status: "completed" }
         );
-    }
-
-    // Broadcast live socket event to both participants
-    const io = getIO();
-    if (io) {
-        const otherUserId = String(chatroom.sender) === userId ? String(chatroom.receiver) : String(chatroom.sender);
-        io.to(otherUserId).emit("chatroom:ended", { chatroomId });
-        io.to(userId).emit("chatroom:ended", { chatroomId });
     }
 
     return chatroom;

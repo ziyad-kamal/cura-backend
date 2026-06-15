@@ -1,12 +1,20 @@
 import { Request } from "express";
-import Product from "../../models/Product.js";
-import Vendor from "../../models/Vendor.js";
-import NotFoundError from "../../errors/NotFoundError.js";
+import { ProductInterface } from "../../../../interfaces/models/ProductInterface.js";
+import NotFoundError from "../../../errors/NotFoundError.js";
+import Product from "../../../models/Product.js";
+import Vendor from "../../../models/Vendor.js";
+import { handleS3Files } from "../../../utils/handleS3Files.js";
+import { resolveFiles } from "../../../utils/resolveFiles.js";
 
 export const indexProductsService = async (req: Request) => {
-    return await Product.find()
-        .populate("vendorId")
-        .populate("categoryId");
+    const products = await Product.find().populate("vendorId").populate("categoryId").lean();
+
+    return Promise.all(
+        products.map(async (product) => ({
+            ...product,
+            images: await resolveFiles(product.images, "public"),
+        })),
+    );
 };
 
 export const createProductService = async (req: Request) => {
@@ -14,24 +22,27 @@ export const createProductService = async (req: Request) => {
     const vendor = await Vendor.findOne({ userId });
     if (!vendor) {
         throw new NotFoundError("Vendor profile not found. Please register as a vendor first.");
-    }           
+    }
+
+    let updatedFiles = await handleS3Files(req.body.images, "public/products/");
 
     const productData = {
         ...req.body,
-        vendorId: vendor._id
+        vendorId: vendor._id,
     };
 
     const product = await Product.create(productData);
-    
-    return await Product.findById(product._id)
-        .populate("vendorId")
-        .populate("categoryId");
+
+    if (updatedFiles.length > 0) {
+        const resolvedFiles = await resolveFiles(updatedFiles, "public");
+        return { ...product, files: resolvedFiles } as ProductInterface;
+    }
+
+    return await Product.findById(product._id).populate("vendorId").populate("categoryId");
 };
 
 export const showProductService = async (req: Request) => {
-    const populated = await Product.findById(req.params.id)
-        .populate("vendorId")
-        .populate("categoryId");
+    const populated = await Product.findById(req.params.id).populate("vendorId").populate("categoryId");
 
     return populated;
 };
@@ -56,9 +67,7 @@ export const updateProductService = async (req: Request) => {
         returnDocument: "after",
     });
 
-    return await Product.findById(updatedProduct?._id)
-        .populate("vendorId")
-        .populate("categoryId");
+    return await Product.findById(updatedProduct?._id).populate("vendorId").populate("categoryId");
 };
 
 export const deleteProductService = async (req: Request) => {

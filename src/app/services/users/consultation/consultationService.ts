@@ -1,18 +1,20 @@
 import mongoose from "mongoose";
-import Consultation from "../../models/Consultation.js";
-import Chatroom from "../../models/Chatroom.js";
-import User from "../../models/User.js";
-import { UserRoles } from "../../../enums/UserRoles.js";
-import { log } from "console";
+import { UserRoles } from "../../../../enums/UserRoles.js";
+import Chatroom from "../../../models/Chatroom.js";
+import Consultation from "../../../models/Consultation.js";
+import User from "../../../models/User.js";
 
-export const createConsultation = async (userId: string, data: {
-    doctorId: string;
-    planType: string; // 'weekly' | 'monthly' | 'six_months'
-    paymentIntentId?: string;
-    scheduledDay: string;
-    startTime: string;
-    endTime: string;
-}) => {
+export const createConsultation = async (
+    userId: string,
+    data: {
+        doctorId: string;
+        planType: string; // 'weekly' | 'monthly' | 'six_months'
+        paymentIntentId?: string;
+        scheduledDay: string;
+        startTime: string;
+        endTime: string;
+    },
+) => {
     const { doctorId, planType, paymentIntentId, scheduledDay, startTime, endTime } = data;
 
     // 1. Get Doctor Info
@@ -23,7 +25,7 @@ export const createConsultation = async (userId: string, data: {
 
     // 2. Validate schedule if doctor has schedule defined
     if (doctor.doctorInfo?.workingDays && doctor.doctorInfo.workingDays.length > 0) {
-        const selectedDays = scheduledDay.split(",").map(d => d.trim());
+        const selectedDays = scheduledDay.split(",").map((d) => d.trim());
         for (const day of selectedDays) {
             const isWorkingDay = doctor.doctorInfo.workingDays.includes(day);
             if (!isWorkingDay) {
@@ -37,20 +39,30 @@ export const createConsultation = async (userId: string, data: {
         const start = doctor.doctorInfo.workingHoursStart;
         const end = doctor.doctorInfo.workingHoursEnd;
         if (startTime < start || endTime > end || startTime >= endTime) {
-            throw new Error(`Selected hours (${startTime} - ${endTime}) are outside doctor's working hours (${start} - ${end})`);
+            throw new Error(
+                `Selected hours (${startTime} - ${endTime}) are outside doctor's working hours (${start} - ${end})`,
+            );
         }
     }
 
     // Determine price based on plan type
-    let price = 0;
-    if (planType === "weekly") {
-        price = doctor.doctorInfo?.shortConsultPrice || 0;
-    } else if (planType === "monthly") {
-        price = doctor.doctorInfo?.normalConsultPrice || 0;
-    } else if (planType === "six_months") {
-        price = doctor.doctorInfo?.LongConsultPrice || 0;
-    } else {
-        throw new Error("Invalid plan type");
+    let price: number;
+
+    switch (planType) {
+        case "weekly":
+            price = doctor.doctorInfo?.shortConsultPrice || 0;
+            break;
+
+        case "monthly":
+            price = doctor.doctorInfo?.normalConsultPrice || 0;
+            break;
+
+        case "six_months":
+            price = doctor.doctorInfo?.LongConsultPrice || 0;
+            break;
+
+        default:
+            throw new Error("Invalid plan type");
     }
 
     // Determine chatroom active period
@@ -71,7 +83,6 @@ export const createConsultation = async (userId: string, data: {
     const consultationId = new mongoose.Types.ObjectId();
     const chatroomId = new mongoose.Types.ObjectId();
 
-    console.log(userId);    // Create Chatroom first
     const chatroom = await Chatroom.create({
         _id: chatroomId,
         sender: new mongoose.Types.ObjectId(userId),

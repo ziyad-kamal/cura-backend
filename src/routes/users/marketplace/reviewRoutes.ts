@@ -6,10 +6,10 @@ import {
     index,
     store,
     update,
-} from "../../../app/controllers/reviews/reviewController.js";
+} from "../../../app/controllers/users/marketplace/reviewController.js";
 import { jwtVerify } from "../../../app/middlewares/index.js";
 
-const router = express.Router();    
+const router = express.Router();
 
 router.get("/", index);
 router.get("/check-rating", jwtVerify, checkRating);

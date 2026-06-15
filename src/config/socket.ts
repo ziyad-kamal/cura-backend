@@ -2,17 +2,12 @@ import { Server as HttpServer } from "http";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Server, Socket } from "socket.io";
 import { jwtConfig } from "./jwt.js";
-import "dotenv/config";
 import { getChatroomRepo } from "../app/repositories/users/consultation/chatroomRepo.js";
 import { markMessageAsReadRepo, storeMessageRepo } from "../app/repositories/users/consultation/messageRepo.js";
 import { RedisService } from "../app/services/users/consultation/onlineUserService.js";
 import { handleS3Files } from "../app/utils/handleS3Files.js";
 import { resolveFiles } from "../app/utils/resolveFiles.js";
 import { UserInterface } from "../interfaces/models/UserInterface.js";
-
-let ioInstance: Server | null = null;
-
-export const getIO = (): Server | null => ioInstance;
 
 export const initSocket = (httpServer: HttpServer): Server => {
     const io = new Server(httpServer, {
@@ -22,7 +17,6 @@ export const initSocket = (httpServer: HttpServer): Server => {
             credentials: true,
         },
     });
-    ioInstance = io;
 
     // authenticate socket connection
     io.use((socket: Socket, next) => {

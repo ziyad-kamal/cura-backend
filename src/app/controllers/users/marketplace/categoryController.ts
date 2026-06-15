@@ -6,10 +6,10 @@ import {
     indexCategoriesService,
     showCategoryService,
     updateCategoryService,
-} from "../../services/categories/categoryService.js";
+} from "../../../services/users/marketplace/categoryService.js";
 
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { returnSuccess } from "../../utils/returnJson.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { returnSuccess } from "../../../utils/returnJson.js";
 
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const categories = await indexCategoriesService(req);
