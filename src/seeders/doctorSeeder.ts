@@ -4,24 +4,49 @@ import { Types } from "mongoose";
 import User from "../app/models/User.js";
 import { UserRoles } from "../enums/UserRoles.js";
 
+const NUTRITION_SPECIALIZATIONS = [
+    "General Nutritionist",
+    "Sports Nutritionist",
+    "Pediatric Dietitian",
+    "Clinical Dietitian",
+    "Weight Management Specialist",
+    "Ketogenic Diet Specialist",
+    "Diabetes Care Dietitian",
+];
+
+const DEFAULT_IMAGE = "public/posts/86381e92c4a401687272bdd2ddd157f5.png";
+
 const seedDoctors = async (userIds: Types.ObjectId[]): Promise<Types.ObjectId[]> => {
     try {
         console.log("👨‍⚕️ Converting selected users to doctors...");
 
         for (const userId of userIds) {
+            const specialization = faker.helpers.arrayElement(NUTRITION_SPECIALIZATIONS);
+            const experienceYears = faker.number.int({ min: 1, max: 20 });
+
             await User.findByIdAndUpdate(userId, {
                 role: UserRoles.DOCTOR,
                 doctorInfo: {
-                    shortConsultPrice: faker.number.int({ min: 50, max: 150 }),
-                    normalConsultPrice: faker.number.int({ min: 151, max: 300 }),
-                    LongConsultPrice: faker.number.int({ min: 301, max: 600 }),
-                    isCertified: faker.datatype.boolean(0.8), // 80% chances of being certified
-                    frontIdImage: faker.image.url(),
-                    backIdImage: faker.image.url(),
-                    certImage: faker.image.url(),
+                    shortConsultPrice: faker.number.int({ min: 150, max: 400 }),
+                    normalConsultPrice: faker.number.int({ min: 400, max: 800 }),
+                    LongConsultPrice: faker.number.int({ min: 800, max: 1500 }),
+                    isCertified: faker.datatype.boolean({ probability: 0.85 }),
+                    frontIdImage: DEFAULT_IMAGE,
+                    backIdImage: DEFAULT_IMAGE,
+                    certImage: DEFAULT_IMAGE,
+                    specialization,
+                    experienceYears,
+                    workingDays: faker.helpers.arrayElements(
+                        ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
+                        { min: 3, max: 6 }
+                    ),
+                    workingHoursStart: faker.helpers.arrayElement(["08:00", "09:00", "10:00"]),
+                    workingHoursEnd: faker.helpers.arrayElement(["16:00", "17:00", "18:00"]),
+                    ratingAverage: parseFloat(faker.number.float({ min: 3.5, max: 5, fractionDigits: 1 }).toFixed(1)),
+                    totalReviews: faker.number.int({ min: 5, max: 200 }),
                 },
-                "userInfo.bio": faker.lorem.paragraph(),
-                "userInfo.job": "Medical Specialist",
+                "userInfo.bio": `Experienced ${specialization} with ${experienceYears} years of clinical practice. ${faker.lorem.sentence()}`,
+                "userInfo.job": specialization,
             });
         }
 

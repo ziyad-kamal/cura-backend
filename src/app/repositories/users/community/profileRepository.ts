@@ -249,25 +249,35 @@ export const getConnectionsProfileRepo = async (
 };
 
 export const updateProfileRepo = async (
-    { bio, job, firstName, lastName, image, coverImage }: UserDataInterface,
+    data: any,
     authId: string,
 ): Promise<UserInterface | null> => {
     await findRecord(User, { _id: authId });
 
+    const updateFields: any = {};
+    if (data.bio !== undefined) updateFields["userInfo.bio"] = data.bio;
+    if (data.job !== undefined) updateFields["userInfo.job"] = data.job;
+    if (data.firstName !== undefined) updateFields["name.first"] = data.firstName;
+    if (data.lastName !== undefined) updateFields["name.last"] = data.lastName;
+    if (data.image !== undefined) updateFields.image = data.image;
+    if (data.coverImage !== undefined) updateFields.coverImage = data.coverImage;
+
+    // Seeker profile fields
+    if (data.phone !== undefined) updateFields["contact.phone"] = data.phone;
+    if (data.city !== undefined) updateFields["contact.address.city"] = data.city;
+    if (data.street !== undefined) updateFields["contact.address.street"] = data.street;
+    if (data.age !== undefined) updateFields["userInfo.age"] = data.age;
+    if (data.weight !== undefined) updateFields["userInfo.weight"] = data.weight;
+    if (data.height !== undefined) updateFields["userInfo.height"] = data.height;
+    if (data.gender !== undefined) updateFields["userInfo.gender"] = data.gender;
+    if (data.diseases !== undefined) updateFields["userInfo.diseases"] = data.diseases;
+    if (data.medications !== undefined) updateFields["userInfo.medications"] = data.medications;
+
     return await User.findByIdAndUpdate(
         authId,
-        {
-            "userInfo.bio": bio,
-            "userInfo.job": job,
-            "name.first": firstName,
-            "name.last": lastName,
-            image,
-            coverImage,
-        },
-        { returnDocument: "after" },
-    )
-        .select("name userInfo.bio userInfo.job")
-        .lean();
+        { $set: updateFields },
+        { returnDocument: "after" }
+    ).lean();
 };
 
 export const connectProfileRepo = async (_id: string, authId: string): Promise<void> => {

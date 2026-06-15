@@ -6,6 +6,10 @@ import { getNextCursor, getQueryCursor } from "../../../utils/cursorPagination.j
 import { PaginationType } from "../../../../types/PaginationType.js";
 import { MessageInterface } from "../../../../interfaces/models/MessageInterface.js";
 import { RedisService } from "./onlineUserService.js";
+import Chatroom from "../../../models/Chatroom.js";
+import Consultation from "../../../models/Consultation.js";
+import { getIO } from "../../../../config/socket.js";
+import mongoose from "mongoose";
 
 export const indexChatroomsService = async (
     req: Request,
@@ -66,4 +70,39 @@ export const checkUsersStatusService = async (req: Request): Promise<Record<stri
     const onlineStatusMap = await RedisService.getUsersOnlineStatus(userIds);
 
     return onlineStatusMap;
+};
+
+export const endChatroomService = async (chatroomId: string, userId: string): Promise<ChatroomInterface> => {
+    const chatroom = await Chatroom.findById(chatroomId);
+    if (!chatroom) {
+        throw new Error("Chatroom not found");
+    }
+
+    if (String(chatroom.sender) !== userId && String(chatroom.receiver) !== userId) {
+        throw new Error("Unauthorized to end this session");
+    }
+
+    chatroom.isActive = false;
+    await chatroom.save();
+
+    if (chatroom.consultation) {
+        await Consultation.findByIdAndUpdate(chatroom.consultation, {
+            status: "completed",
+        });
+    } else {
+        await Consultation.findOneAndUpdate(
+            { chatroom: new mongoose.Types.ObjectId(chatroomId) },
+            { status: "completed" }
+        );
+    }
+
+    // Broadcast live socket event to both participants
+    const io = getIO();
+    if (io) {
+        const otherUserId = String(chatroom.sender) === userId ? String(chatroom.receiver) : String(chatroom.sender);
+        io.to(otherUserId).emit("chatroom:ended", { chatroomId });
+        io.to(userId).emit("chatroom:ended", { chatroomId });
+    }
+
+    return chatroom;
 };

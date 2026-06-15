@@ -10,6 +10,10 @@ import { handleS3Files } from "../app/utils/handleS3Files.js";
 import { resolveFiles } from "../app/utils/resolveFiles.js";
 import { UserInterface } from "../interfaces/models/UserInterface.js";
 
+let ioInstance: Server | null = null;
+
+export const getIO = (): Server | null => ioInstance;
+
 export const initSocket = (httpServer: HttpServer): Server => {
     const io = new Server(httpServer, {
         cors: {
@@ -18,6 +22,7 @@ export const initSocket = (httpServer: HttpServer): Server => {
             credentials: true,
         },
     });
+    ioInstance = io;
 
     // authenticate socket connection
     io.use((socket: Socket, next) => {

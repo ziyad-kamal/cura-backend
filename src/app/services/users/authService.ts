@@ -60,7 +60,7 @@ export const googleLoginService = async (req: Request, res: Response): Promise<o
         {
             _id: user?._id,
             email: user?.contact.email,
-            role: user?.role,
+            role: user?.role ?? "user",
         },
         res,
     );
