@@ -1,5 +1,5 @@
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import mongoose, {  PipelineStage } from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
 import { awsConfig, s3Client } from "../../../../config/aws.js";
 import { PostDataInterface } from "../../../../interfaces/data/PostDataInterface.js";
 import { RepostDataInterface } from "../../../../interfaces/data/RepostDataInterface.js";
@@ -693,11 +693,11 @@ export const storePostRepo = async ({
     tags,
     visibility,
 }: PostDataInterface): Promise<PostInterface> => {
-    const post= await (
+    const post = await (
         await Post.create({ user, content, files, tags, visibility })
     ).populate("user", "name.first name.last image userInfo.job");
 
-    return post.toObject();
+    return post.toJSON();
 };
 
 export const repostPostRepo = async ({ content, post }: RepostDataInterface, authId: string): Promise<boolean> => {
@@ -722,16 +722,16 @@ export const updatePostRepo = async ({
 }: PostDataInterface): Promise<PostInterface | null> => {
     await findRecord(Post, { _id });
 
-    const post= await Post.findByIdAndUpdate(
+    return await Post.findByIdAndUpdate(
         _id,
         { content, files, visibility, tags },
         {
             returnDocument: "after",
             runValidators: true,
         },
-    ).populate("user", "name.first name.last image userInfo.job");
-
-    return post?.toObject() || null;
+    )
+        .populate("user", "name.first name.last image userInfo.job")
+        .lean();
 };
 
 export const likePostRepo = async (_id: string, authId: string): Promise<boolean> => {

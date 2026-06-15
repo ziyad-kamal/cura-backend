@@ -20,6 +20,9 @@ const companySchema = new Schema<CompanyInterface>(
     },
     {
         versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

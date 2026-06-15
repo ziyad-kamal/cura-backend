@@ -25,6 +25,9 @@ const likeSchema = new Schema<LikeInterface>(
     },
     {
         versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

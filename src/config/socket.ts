@@ -6,18 +6,23 @@ import "dotenv/config";
 import { getChatroomRepo } from "../app/repositories/users/consultation/chatroomRepo.js";
 import { markMessageAsReadRepo, storeMessageRepo } from "../app/repositories/users/consultation/messageRepo.js";
 import { RedisService } from "../app/services/users/consultation/onlineUserService.js";
+import { handleS3Files } from "../app/utils/handleS3Files.js";
+import { resolveFiles } from "../app/utils/resolveFiles.js";
+import { UserInterface } from "../interfaces/models/UserInterface.js";
 
-// track online users — senderId -> socketId
-const onlineUsers = new Map<string, string>();
+let ioInstance: Server | null = null;
+
+export const getIO = (): Server | null => ioInstance;
 
 export const initSocket = (httpServer: HttpServer): Server => {
     const io = new Server(httpServer, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: ["http://localhost:5173", "http://ec2-16-112-217-167.ap-south-2.compute.amazonaws.com"],
             methods: ["GET", "POST"],
             credentials: true,
         },
     });
+    ioInstance = io;
 
     // authenticate socket connection
     io.use((socket: Socket, next) => {
@@ -62,26 +67,35 @@ export const initSocket = (httpServer: HttpServer): Server => {
         socket.join(senderId);
 
         // send message
-        socket.on("message:send", async ({ receiverId, content }: { receiverId: string; content: string }) => {
+        socket.on("message:send", async ({ receiverId, content, files }) => {
             try {
-                if (!content?.trim()) return;
 
-                // get or create chatroom
+                if (!content?.trim() && files?.length === 0) return;
+
                 const chatroom = await getChatroomRepo(receiverId, senderId);
-
                 const chatroomId = String(chatroom._id);
 
-                // save message to db
-                const message = await storeMessageRepo(receiverId, senderId, content, chatroomId);
+                const updatedFiles = await handleS3Files(files, "chats/");
 
-                // send to receiver if online
+                const message = await storeMessageRepo(receiverId, senderId, content, updatedFiles, chatroomId);
 
-                io.to(receiverId).emit("message:receive", { ...message });
+                let finalMessage = { ...message };
+                if (updatedFiles.length > 0) {
+                    const resolvedFiles = await resolveFiles(updatedFiles, "private");
+                    finalMessage = { ...message, files: resolvedFiles };
+                }
 
-                // confirm to sender
-                socket.emit("message:sent", { ...message });
+                const senderObj = finalMessage.sender as UserInterface;
+
+                if (senderObj?.image && !senderObj.image.startsWith("http")) {
+                    const resolvedSenderImg = await resolveFiles([{ s3Key: senderObj.image }], "public");
+                    senderObj.image = resolvedSenderImg[0]?.url || senderObj.image;
+                }
+
+                io.to(receiverId).emit("message:receive", finalMessage);
+                socket.emit("message:sent", finalMessage);
             } catch (err) {
-                socket.emit("message:error", { msg: err });
+                socket.emit("message:error", { msg: String(err) });
             }
         });
 
@@ -109,6 +123,3 @@ export const initSocket = (httpServer: HttpServer): Server => {
 
     return io;
 };
-
-// helper to get online users list
-export const getOnlineUsers = (): string[] => Array.from(onlineUsers.keys());

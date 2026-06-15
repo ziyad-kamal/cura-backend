@@ -15,6 +15,8 @@ const chatroomSchema = new Schema<ChatroomInterface>(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Message",
         },
+        lastMessageAt:Date,
+
         isRead: {
             type: Boolean,
             default: false,
@@ -38,6 +40,9 @@ const chatroomSchema = new Schema<ChatroomInterface>(
     },
     {
         versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

@@ -48,6 +48,9 @@ const treatmentPlanSchema = new Schema<TreatmentPlanInterface>(
     },
     {
         versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

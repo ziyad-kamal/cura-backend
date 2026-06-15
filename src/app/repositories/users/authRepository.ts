@@ -52,7 +52,7 @@ export const signupRepo = async (
         throw new RecordExistError("this email is used");
     }
 
-    const createdUser = await User.create({
+    return await User.create({
         name: {
             first: firstName,
             last: lastName,
@@ -63,6 +63,4 @@ export const signupRepo = async (
         },
         role,
     });
-
-    return createdUser.toJSON();
 };

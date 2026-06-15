@@ -20,6 +20,7 @@ import { VendorInterface } from "../interfaces/models/VendorInterface.js";
 import seedChatrooms from "./chatroomSeeder.js";
 import seedMessages from "./messageSeeder.js";
 import seedConsultations from "./consultationSeeder.js";
+import seedDoctors from "./doctorSeeder.js";
 
 const seedAll = async () => {
     try {
@@ -49,7 +50,14 @@ const seedAll = async () => {
         await seedLikes(3, 3, postIds, commentIds, userIds);
         await seedReposts(5, postIds, userIds);
         await seedConnections(10, userIds, authUser._id);
-        const createdConsultations = await seedConsultations(50, userIds);
+
+        // =====================
+        // DOCTOR SYSTEM
+        // =====================
+        const doctorSubset = userIds.slice(0, 20); // لنأخذ أول 20 مستخدم كأطباء
+        const doctorIds = await seedDoctors(doctorSubset);
+
+        const createdConsultations = await seedConsultations(50, userIds, doctorIds);
 
         const consultationIds = createdConsultations
             .map((consult) => consult._id)

@@ -30,7 +30,10 @@ const reviewSchema = new Schema<ReviewInterface>(
     {
         timestamps: true,
         versionKey: false,
-    }
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 const Review = mongoose.model<ReviewInterface>(

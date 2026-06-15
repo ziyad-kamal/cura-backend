@@ -27,6 +27,9 @@ const repostSchema = new Schema<RepostInterface>(
     },
     {
         versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

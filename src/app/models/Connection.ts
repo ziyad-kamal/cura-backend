@@ -19,7 +19,12 @@ const connectionSchema = new Schema<ConnectionInterface>(
             required: true,
         },
     },
-    { timestamps: true },
+    {
+        timestamps: true,
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 connectionSchema.index({ sender: 1, receiver: 1 }, { unique: true });

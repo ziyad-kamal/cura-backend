@@ -35,20 +35,17 @@ const orderItemSchema = new Schema<OrderItemInterface>(
 
         status: {
             type: String,
-            enum: [
-                "pending",
-                "confirmed",
-                "shipped",
-                "delivered",
-                "cancelled",
-            ],
+            enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"],
             default: "pending",
         },
     },
     {
         timestamps: true,
         versionKey: false,
-    }
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 const OrderItem = mongoose.model<OrderItemInterface>(

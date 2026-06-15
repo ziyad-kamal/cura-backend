@@ -6,7 +6,7 @@ import { UserInterface } from '../../interfaces/models/UserInterface.js';
 const userSchema = new Schema<UserInterface>(
     {
         name: {
-            first: {
+            first: { 
                 type: String,
                 required: true,
                 minlength: 2,
@@ -78,6 +78,19 @@ const userSchema = new Schema<UserInterface>(
             frontIdImage: String,
             backIdImage: String,
             certImage: String,
+            workingDays: [String],
+            workingHoursStart: String,
+            workingHoursEnd: String,
+            specialization: String,
+            experienceYears: Number,
+            ratingAverage: {
+                type: Number,
+                default: 0,
+            },
+            totalReviews: {
+                type: Number,
+                default: 0,
+            },
         },
 
         userInfo: {
@@ -119,7 +132,13 @@ const userSchema = new Schema<UserInterface>(
         image: String,
         coverImage: String,
     },
-    { timestamps: true, versionKey: false },
+    {
+        timestamps: true,
+        versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 userSchema.pre("save", async function () {

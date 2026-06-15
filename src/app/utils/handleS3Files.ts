@@ -2,10 +2,11 @@ import { CopyObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import CustomError from "../errors/CustomError.js";
 import { awsConfig, s3Client } from "../../config/aws.js";
 
-export const handleS3Files = async (files: { s3Key: string }[]) => {
+export const handleS3Files = async (files: { s3Key: string }[],path:string) => {
     let updatedFiles = files || [];
 
     if (files.length > 0) {
+
         updatedFiles = await Promise.all(
             files.map(async (file) => {
                 if (!file.s3Key) {
@@ -15,7 +16,7 @@ export const handleS3Files = async (files: { s3Key: string }[]) => {
                 let finalKey = file.s3Key;
 
                 if (file.s3Key.startsWith("staging/")) {
-                    finalKey = file.s3Key.replace("staging/", "public/posts/");
+                    finalKey = file.s3Key.replace("staging/", path);
 
                     const bucketName = awsConfig.s3_bucket_name;
 
@@ -40,6 +41,7 @@ export const handleS3Files = async (files: { s3Key: string }[]) => {
                     s3Key: finalKey,
                 };
             }),
+            
         );
     }
 

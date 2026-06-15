@@ -31,6 +31,13 @@ export interface UserInterface {
         frontIdImage: string;
         backIdImage: string;
         certImage: string;
+        workingDays?: string[];
+        workingHoursStart?: string;
+        workingHoursEnd?: string;
+        specialization?: string;
+        experienceYears?: number;
+        ratingAverage?: number;
+        totalReviews?: number;
     };
 
     userInfo?: {

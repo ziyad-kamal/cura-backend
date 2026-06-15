@@ -48,7 +48,7 @@ const productSchema = new Schema<ProductInterface>(
 
         categoryId: {
             type: Schema.Types.ObjectId,
-            ref: "Category"
+            ref: "Category",
         },
 
         brand: {
@@ -74,7 +74,10 @@ const productSchema = new Schema<ProductInterface>(
     {
         timestamps: true,
         versionKey: false,
-    }
+        toJSON: {
+            virtuals: true,
+        },
+    },
 );
 
 const Product = mongoose.model<ProductInterface>(

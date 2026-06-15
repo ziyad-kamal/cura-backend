@@ -12,7 +12,7 @@ const consultationSchema = new Schema<ConsultationInterface>(
         },
         type: {
             type: String,
-            enum: ["short term", "medium term", "long term"],
+            enum: ["weekly", "monthly", "six_months", "short term", "medium term", "long term"],
             required: true,
         },
         status: {
@@ -30,11 +30,33 @@ const consultationSchema = new Schema<ConsultationInterface>(
             ref: "User",
             required: true,
         },
+        chatroom: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Chatroom",
+        },
+        scheduledDay: {
+            type: String,
+        },
+        startTime: {
+            type: String,
+        },
+        endTime: {
+            type: String,
+        },
+        paymentIntentId: {
+            type: String,
+        },
 
-        createdAt: Date,
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        },
     },
     {
         versionKey: false,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
 

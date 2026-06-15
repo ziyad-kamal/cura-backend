@@ -7,6 +7,7 @@ import { ConsultationInterface } from '../interfaces/models/ConsultationInterfac
 const seedConsultations = async (
     count: number = 30,
     userIds: Array<Types.ObjectId> = [],
+    doctorIds: Array<Types.ObjectId> = [],
 ): Promise<ConsultationInterface[]> => {
     try {
         await Consultation.deleteMany({});
@@ -22,7 +23,7 @@ const seedConsultations = async (
                 type: faker.helpers.arrayElement(["short term", "medium term", "long term"]), // Added missing 'type' field
                 status: faker.helpers.arrayElement(["pending", "started", "in progress", "completed"]),
                 user: faker.helpers.arrayElement(userIds),
-                doctor: faker.helpers.arrayElement(userIds),
+                doctor: faker.helpers.arrayElement(doctorIds),
                 createdAt: randomDate,
             });
         }
