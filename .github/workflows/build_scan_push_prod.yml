@@ -3,13 +3,18 @@ name: Build and Push to ECR (Prod)
 on:
   push:
     branches: ["master"]
-    tags: ['v*']
+    tags: ["v*"]
     paths-ignore: ['**.md', 'docs/**', '.vscode/**', '.env.example', '.gitignore', '.dockerignore', '.prettierrc', 'eslint.config.mjs']
 
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   sonar:
+    if: github.ref == 'refs/heads/master'
     uses: cura-fitness/cura-devops/.github/workflows/sonar.yml@master
     with:
       fail_on_gate: true
@@ -18,24 +23,35 @@ jobs:
       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   build-and-push:
-    needs: sonar
+    # On master: wait for Sonar. On tag: skip Sonar and run immediately.
+    needs: [sonar]
+    if: |
+      always() &&
+      (
+        (github.ref == 'refs/heads/master' && needs.sonar.result == 'success') ||
+        startsWith(github.ref, 'refs/tags/v')
+      )
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    outputs:
+      image_tag: ${{ steps.tags.outputs.SEMVER }}
 
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
 
-      - id: aws-setup
+      - name: AWS setup
+        id: aws-setup
         uses: cura-fitness/cura-devops/.github/actions/aws-setup@master
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-
       - name: Set short SHA
         id: sha
-        run: |
-          echo "SHORT=$(echo "$GITHUB_SHA" | cut -c1-7)" >> $GITHUB_OUTPUT
+        run: echo "SHORT=$(echo "$GITHUB_SHA" | cut -c1-7)" >> $GITHUB_OUTPUT
 
       - name: Compute image tags
         id: tags
@@ -46,13 +62,17 @@ jobs:
           VERSION: ${{ github.ref_name }}
         run: |
           BASE="$REGISTRY/$REPO"
-          TAGS="$BASE:master-sha-$SHORT"
 
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            TAGS="$TAGS,$BASE:${VERSION#v},$BASE:latest"
+            SEMVER="${VERSION#v}"
+            TAGS="$BASE:$SEMVER,$BASE:latest"
+          else
+            SEMVER="master-sha-$SHORT"
+            TAGS="$BASE:$SEMVER"
           fi
 
-          echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
+          echo "TAGS=$TAGS"         >> $GITHUB_OUTPUT
+          echo "SEMVER=$SEMVER"     >> $GITHUB_OUTPUT
 
       - name: Build, cache, and push
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
@@ -65,14 +85,31 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Trigger DevOps Workflow
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Summary
+        run: |
+          echo "### ✅ Build complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| | |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Image tag** | \`${{ steps.tags.outputs.SEMVER }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Triggered by** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+
+  trigger-deploy:
+    needs: [build-and-push]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Trigger deploy_prod.yml in cura-devops
         env:
           PAT: ${{ secrets.PAT }}
+          IMAGE_TAG: ${{ needs.build-and-push.outputs.image_tag }}
         run: |
           curl -X POST \
             --fail-with-body \
             -H "Authorization: Bearer ${PAT}" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/cura-fitness/cura-devops/actions/workflows/deploy_prod.yml/dispatches \
-            -d '{"ref":"master"}'
+            -d "{\"ref\":\"master\",\"inputs\":{\"image_tag\":\"${IMAGE_TAG}\"}}"
