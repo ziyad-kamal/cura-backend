@@ -4,11 +4,7 @@ import fs from "fs";
 import Handlebars from "handlebars";
 import nodemailer from "nodemailer";
 import path from "path";
-import { fileURLToPath } from "url";
-import { EmailOptionsInterface } from '../interfaces/config/EmailOptionsInterface.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { EmailOptionsInterface } from "../interfaces/config/EmailOptionsInterface.js";
 
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -29,7 +25,8 @@ transporter.verify((error) => {
 });
 
 const sendEmail = async (options: EmailOptionsInterface): Promise<void> => {
-    const templatePath = path.join(__dirname, "..", "emails", `${options.templateName}.hbs`);
+    const __dirname = process.cwd();
+    const templatePath = path.join(__dirname, "..", "emails", `${options.templateName}.hps`);
 
     const templateSource = fs.readFileSync(templatePath, "utf-8");
     const compiledTemplate = Handlebars.compile(templateSource);

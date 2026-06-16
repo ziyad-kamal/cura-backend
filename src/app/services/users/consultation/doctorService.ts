@@ -1,9 +1,21 @@
 import { UserRoles } from "../../../../enums/UserRoles.js";
 import User from "../../../models/User.js";
+import { resolveFiles } from "../../../utils/resolveFiles.js";
 
 export const findAllDoctors = async () => {
-    const doctors = await User.find({ role: UserRoles.DOCTOR });
-    for (const doc of doctors) {
+    const doctors = await User.find({ role: UserRoles.DOCTOR }).lean();
+    const doctorsWithFiles = await Promise.all(
+        doctors.map(async (doctor) => {
+            const resolvedImage = doctor.image ? (await resolveFiles([{ s3Key: doctor.image }], "public"))[0] : null;
+
+            return {
+                ...doctor,
+                image: resolvedImage,
+            };
+        }),
+    );
+
+    for (const doc of doctorsWithFiles) {
         if (doc.doctorInfo && (!doc.doctorInfo.experienceYears || doc.doctorInfo.experienceYears === 0)) {
             const age = doc.userInfo?.age;
             if (age && age > 25) {
@@ -11,7 +23,8 @@ export const findAllDoctors = async () => {
             }
         }
     }
-    return doctors;
+    
+    return doctorsWithFiles;
 };
 
 export const findDoctorById = async (id: string) => {

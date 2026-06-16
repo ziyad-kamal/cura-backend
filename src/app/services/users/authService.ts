@@ -84,7 +84,7 @@ export const signupService = async (req: SignupRequestInterface, res: Response):
         templateName: "verifyEmail",
         context: {
             name: user.name.first,
-            verificationLink: `${appConfig.frontendUrl}/seeker?email=${userEmail}&token=${token}`,
+            verificationLink: `${appConfig.frontendUrl}/verify-email?email=${userEmail}&token=${token}`,
             app: appConfig.appName,
         },
     });

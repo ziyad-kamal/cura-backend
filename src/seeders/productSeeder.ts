@@ -1,6 +1,4 @@
 import Product from "../app/models/Product.js";
-import Vendor from "../app/models/Vendor.js";
-import Category from "../app/models/Category.js";
 import { Types } from "mongoose";
 
 export const seedProducts = async (vendorIds: Types.ObjectId[], categoryIds: Types.ObjectId[]) => {
