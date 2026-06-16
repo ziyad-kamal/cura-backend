@@ -1,6 +1,7 @@
 import { Request } from "express";
 import Cart from "../../../models/Cart.js";
 import Product from "../../../models/Product.js";
+import { resolveFiles } from "../../../utils/resolveFiles.js";
 
 export const getCartService = async (req: Request) => {
     const userId = req.user?._id;
@@ -11,7 +12,25 @@ export const getCartService = async (req: Request) => {
     const cart = await Cart.findOne({ userId }).populate({
         path: "items.productId",
         select: "title name price images image category vendorId",
-    });
+    }).lean();
+
+    // if (cart) {
+    //     cart.items = await Promise.all(
+    //         cart.items.map(async (item) => {
+    //             if (!item.productId) return item;
+
+    //             return {
+    //                 ...item,
+    //                 productId: {
+    //                     ...item.productId,
+    //                     images: await resolveFiles(item.productId.images || [], "public"),
+    //                 },
+    //             };
+    //         }),
+    //     );
+    // }
+
+
 
     return cart ?? { items: [], totalPrice: 0, _id: null };
 };
