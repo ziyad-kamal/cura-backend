@@ -26,7 +26,7 @@ transporter.verify((error) => {
 
 const sendEmail = async (options: EmailOptionsInterface): Promise<void> => {
     const __dirname = process.cwd();
-    const templatePath = path.join(__dirname, "src", "emails", `${options.templateName}.hbs`);
+    const templatePath = path.join(__dirname, "..", "emails", `${options.templateName}.hbs`);
 
     const templateSource = fs.readFileSync(templatePath, "utf-8");
     const compiledTemplate = Handlebars.compile(templateSource);
