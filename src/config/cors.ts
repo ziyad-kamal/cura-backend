@@ -1,4 +1,5 @@
 import cors from "cors";
+import "dotenv/config";
 
 const allowedOrigins = [
     "http://localhost:5173",

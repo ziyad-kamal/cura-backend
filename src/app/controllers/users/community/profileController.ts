@@ -10,6 +10,8 @@ import {
 } from "../../../services/users/community/profileService.js";
 import { asyncHandler } from "../../../utils/asyncHandler.js";
 import { returnSuccess } from "../../../utils/returnJson.js";
+import User from "../../../models/User.js";
+import { userInfo } from "node:os";
 
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const profile = await indexProfileService(req);
@@ -45,4 +47,21 @@ export const ignore = asyncHandler(async (req: Request, res: Response): Promise<
 export const cancel = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     await cancelProfileService(req);
     return returnSuccess(res, "you canceled request successfully", 200);
+});
+
+export const edit = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const { age, gender, weight, height, tags } = req.body;
+    await User.updateOne(
+        { _id: req.user._id },
+        {
+            userInfo: {
+                age,
+                gender,
+                weight,
+                height,
+                tags,
+            },
+        },
+    );
+    return returnSuccess(res, "you updated profile successfully", 200);
 });

@@ -8,6 +8,7 @@ import { RedisService } from "../app/services/users/consultation/onlineUserServi
 import { handleS3Files } from "../app/utils/handleS3Files.js";
 import { resolveFiles } from "../app/utils/resolveFiles.js";
 import { UserInterface } from "../interfaces/models/UserInterface.js";
+import "dotenv/config";
 
 export const initSocket = (httpServer: HttpServer): Server => {
     const io = new Server(httpServer, {
@@ -17,6 +18,7 @@ export const initSocket = (httpServer: HttpServer): Server => {
                 "http://ec2-16-112-217-167.ap-south-2.compute.amazonaws.com",
                 "http://localhost:4000",
                 "doo5n7tiet2x7.cloudfront.net",
+                'https://cura.ecocity.info',
             ],
             methods: ["GET", "POST"],
             credentials: true,

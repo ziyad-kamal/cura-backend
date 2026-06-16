@@ -6,6 +6,7 @@ import {
     getConnections,
     ignore,
     index,
+    edit,
     update,
 } from "../../../app/controllers/users/community/profileController.js";
 import { authorize } from "../../../app/middlewares/authorize.js";
@@ -26,6 +27,8 @@ profileRoutes.put(
 );
 
 profileRoutes.post("/connect/:userId", validateId("userId"), connect);
+profileRoutes.put("/edit", edit);
+
 profileRoutes.put(
     "/accept/:connectionId",
     validateId("connectionId"),
