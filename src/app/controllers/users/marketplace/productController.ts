@@ -2,13 +2,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import Product from "../../../models/Product.js";
-
 import {
     createProductService,
     deleteProductService,
     showProductService,
     updateProductService,
 } from "../../../services/users/marketplace/productService.js";
+import { resolveFiles } from "../../../utils/resolveFiles.js";
 
 export const index = async (req: Request, res: Response) => {
     try {
@@ -95,16 +95,24 @@ export const index = async (req: Request, res: Response) => {
                 .populate("vendorId")
                 .sort(sortQuery)
                 .limit(limitNum)
-                .skip((pageNum - 1) * limitNum),
+                .skip((pageNum - 1) * limitNum)
+                .lean(),
             Product.countDocuments(query),
         ]);
+
+        const productsWithImages = await Promise.all(
+            products.map(async (product) => ({
+                ...product,
+                images: await resolveFiles(product.images || [], "public"),
+            })),
+        );
 
         // 5. Pagination data
         const totalPages = Math.ceil(total / limitNum);
 
         return res.status(200).json({
             success: true,
-            data: products,
+            data: productsWithImages,
             pagination: {
                 total,
                 page: pageNum,
@@ -133,9 +141,11 @@ export const show = async (req: Request, res: Response) => {
             });
         }
 
+        const images = await resolveFiles(product.images || [], "public");
+        
         return res.status(200).json({
             success: true,
-            data: product,
+            data: { ...product, images },
         });
     } catch (error: any) {
         return res.status(500).json({

@@ -12,7 +12,12 @@ import { UserInterface } from "../interfaces/models/UserInterface.js";
 export const initSocket = (httpServer: HttpServer): Server => {
     const io = new Server(httpServer, {
         cors: {
-            origin: ["http://localhost:5173", "http://ec2-16-112-217-167.ap-south-2.compute.amazonaws.com"],
+            origin: [
+                "http://localhost:5173",
+                "http://ec2-16-112-217-167.ap-south-2.compute.amazonaws.com",
+                "http://localhost:4000",
+                "doo5n7tiet2x7.cloudfront.net",
+            ],
             methods: ["GET", "POST"],
             credentials: true,
         },

@@ -1,5 +1,4 @@
 import { Request } from "express";
-import { ProductInterface } from "../../../../interfaces/models/ProductInterface.js";
 import NotFoundError from "../../../errors/NotFoundError.js";
 import Product from "../../../models/Product.js";
 import Vendor from "../../../models/Vendor.js";
@@ -7,14 +6,7 @@ import { handleS3Files } from "../../../utils/handleS3Files.js";
 import { resolveFiles } from "../../../utils/resolveFiles.js";
 
 export const indexProductsService = async (req: Request) => {
-    const products = await Product.find().populate("vendorId").populate("categoryId").lean();
-
-    return Promise.all(
-        products.map(async (product) => ({
-            ...product,
-            images: await resolveFiles(product.images, "public"),
-        })),
-    );
+    await Product.find().populate("vendorId").populate("categoryId").lean();
 };
 
 export const createProductService = async (req: Request) => {
@@ -28,21 +20,30 @@ export const createProductService = async (req: Request) => {
 
     const productData = {
         ...req.body,
+        images:updatedFiles,
         vendorId: vendor._id,
     };
 
-    const product = await Product.create(productData);
+    let product = await Product.create(productData);
+
+    await product.populate([{ path: "vendorId" }, { path: "categoryId" }]);
+
+    const productObject = product.toObject();
 
     if (updatedFiles.length > 0) {
         const resolvedFiles = await resolveFiles(updatedFiles, "public");
-        return { ...product, files: resolvedFiles } as ProductInterface;
+
+        return {
+            ...productObject,
+            files: resolvedFiles,
+        };
     }
 
-    return await Product.findById(product._id).populate("vendorId").populate("categoryId");
+    return productObject;
 };
 
 export const showProductService = async (req: Request) => {
-    const populated = await Product.findById(req.params.id).populate("vendorId").populate("categoryId");
+    const populated = await Product.findById(req.params.id).populate("vendorId").populate("categoryId").lean();
 
     return populated;
 };

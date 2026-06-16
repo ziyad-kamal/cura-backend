@@ -1,8 +1,11 @@
 import cors from "cors";
 
-const allowedOrigins = ["http://localhost:5173", "http://localhost:3000", process.env.CLIENT_URL].filter(
-    Boolean,
-) as string[];
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "doo5n7tiet2x7.cloudfront.net",
+    process.env.CLIENT_URL,
+].filter(Boolean) as string[];
 
 // export const applyCors = cors({
 //     origin: (origin, callback) => {
