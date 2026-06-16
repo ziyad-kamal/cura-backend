@@ -1,13 +1,13 @@
 import { Request } from "express";
 
-import Order from "../../models/Order.js";
-import OrderItem from "../../models/OrderItem.js";
-import Cart from "../../models/Cart.js";
-import Product from "../../models/Product.js";
+import Cart from "../../../models/Cart.js";
+import Order from "../../../models/Order.js";
+import OrderItem from "../../../models/OrderItem.js";
+import Product from "../../../models/Product.js";
 
 export const mapOrderForFrontend = async (order: any) => {
     const orderObj = order.toObject ? order.toObject() : order;
-    
+
     // Fetch associated OrderItems and populate their product details
     const items = await OrderItem.find({ orderId: orderObj._id }).populate({
         path: "productId",
@@ -18,7 +18,7 @@ export const mapOrderForFrontend = async (order: any) => {
     const mappedItems = items.map((item: any) => {
         const itemObj = item.toObject ? item.toObject() : item;
         const p = itemObj.productId || {};
-        
+
         // Provide standard fields expected by the frontend
         return {
             ...itemObj,
@@ -46,7 +46,7 @@ export const indexOrdersService = async (req: Request) => {
         userId: req.user?.id || req.user?._id,
     }).sort({ createdAt: -1 });
 
-    return await Promise.all(orders.map(order => mapOrderForFrontend(order)));
+    return await Promise.all(orders.map((order) => mapOrderForFrontend(order)));
 };
 
 export const createOrderService = async (req: Request) => {
@@ -67,7 +67,7 @@ export const createOrderService = async (req: Request) => {
                 const product = await Product.findByIdAndUpdate(
                     item.productId,
                     { $inc: { stock: -item.quantity } },
-                    { new: true }
+                    { new: true },
                 );
 
                 if (!product) {
@@ -76,10 +76,7 @@ export const createOrderService = async (req: Request) => {
 
                 if (product.stock < 0) {
                     // Restore stock if something went wrong
-                    await Product.findByIdAndUpdate(
-                        item.productId,
-                        { $inc: { stock: item.quantity } }
-                    );
+                    await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
                     throw new Error(`Insufficient stock for product: ${product.title}`);
                 }
 
@@ -91,7 +88,7 @@ export const createOrderService = async (req: Request) => {
                     quantity: item.quantity,
                     price: item.price,
                 });
-            })
+            }),
         );
 
         // Clear the cart in database after successfully creating order
@@ -114,7 +111,7 @@ export const showOrderService = async (req: Request) => {
 export const cancelOrderService = async (req: Request) => {
     const userId = req.user?.id || req.user?._id;
     const order = await Order.findById(req.params.id);
-    
+
     if (!order) {
         throw new Error("Order not found");
     }
@@ -132,15 +129,11 @@ export const cancelOrderService = async (req: Request) => {
 
     // Restore stock for all order items
     const orderItems = await OrderItem.find({ orderId: req.params.id });
-    
+
     await Promise.all(
         orderItems.map(async (item) => {
-            await Product.findByIdAndUpdate(
-                item.productId,
-                { $inc: { stock: item.quantity } },
-                { new: true }
-            );
-        })
+            await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } }, { new: true });
+        }),
     );
 
     return await mapOrderForFrontend(order);
@@ -157,7 +150,7 @@ export const updateOrderStatusService = async (req: Request) => {
         },
         {
             new: true,
-        }
+        },
     );
 
     if (!updatedOrder) {
@@ -171,11 +164,7 @@ export const updateOrderItemStatusService = async (req: Request) => {
     const { itemId } = req.params;
     const { status } = req.body;
 
-    const orderItem = await OrderItem.findByIdAndUpdate(
-        itemId,
-        { status },
-        { new: true }
-    ).populate({
+    const orderItem = await OrderItem.findByIdAndUpdate(itemId, { status }, { new: true }).populate({
         path: "productId",
         select: "title name price images image category vendorId description",
     });

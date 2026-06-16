@@ -1,12 +1,7 @@
 import express from "express";
-
-import {
-    createPaymentIntent,
-    confirmOrder,
-    handleWebhook,
-} from "../../../app/controllers/payments/paymentController.js";
 import { jwtVerify } from "../../../app/middlewares/index.js";
-import { createConsultationPaymentIntent } from '../../../app/controllers/payments/createConsultationPaymentIntent.js';
+import { confirmOrder, createPaymentIntent, handleWebhook } from "../../../app/controllers/users/marketplace/paymentController.js";
+import { createConsultationPaymentIntent } from "../../../app/controllers/users/marketplace/createConsultationPaymentIntent.js";
 
 const router = express.Router();
 

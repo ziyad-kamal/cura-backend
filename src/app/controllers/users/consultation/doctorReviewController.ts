@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
-import * as doctorReviewService from "../../services/consultation/doctorReviewService.js";
-import { returnSuccess, returnError } from "../../utils/returnJson.js";
+import { returnError, returnSuccess } from "../../../utils/returnJson.js";
+import * as doctorReviewService from "../../../services/users/consultation/doctorReviewService.js";
 
 export const store = async (req: Request, res: Response) => {
     try {

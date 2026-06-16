@@ -2,7 +2,6 @@ import { Server as HttpServer } from "http";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Server, Socket } from "socket.io";
 import { jwtConfig } from "./jwt.js";
-import "dotenv/config";
 import { getChatroomRepo } from "../app/repositories/users/consultation/chatroomRepo.js";
 import { markMessageAsReadRepo, storeMessageRepo } from "../app/repositories/users/consultation/messageRepo.js";
 import { RedisService } from "../app/services/users/consultation/onlineUserService.js";
@@ -10,19 +9,19 @@ import { handleS3Files } from "../app/utils/handleS3Files.js";
 import { resolveFiles } from "../app/utils/resolveFiles.js";
 import { UserInterface } from "../interfaces/models/UserInterface.js";
 
-let ioInstance: Server | null = null;
-
-export const getIO = (): Server | null => ioInstance;
-
 export const initSocket = (httpServer: HttpServer): Server => {
     const io = new Server(httpServer, {
         cors: {
-            origin: ["http://localhost:5173", "http://ec2-16-112-217-167.ap-south-2.compute.amazonaws.com"],
+            origin: [
+                "http://localhost:5173",
+                "http://ec2-16-112-217-167.ap-south-2.compute.amazonaws.com",
+                "http://localhost:4000",
+                "doo5n7tiet2x7.cloudfront.net",
+            ],
             methods: ["GET", "POST"],
             credentials: true,
         },
     });
-    ioInstance = io;
 
     // authenticate socket connection
     io.use((socket: Socket, next) => {

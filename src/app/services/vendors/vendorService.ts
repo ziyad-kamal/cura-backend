@@ -7,22 +7,23 @@ import OrderItem from "../../models/OrderItem.js";
 import { UserRoles } from "../../../enums/UserRoles.js";
 import NotFoundError from "../../errors/NotFoundError.js";
 import RecordExistError from "../../errors/RecordExistError.js";
+import { resolveFiles } from "../../utils/resolveFiles.js";
 
 const generateUniqueSlug = async (storeName: string): Promise<string> => {
     let slug = storeName
         .toLowerCase()
         .replace(/[^\p{L}\p{N}]+/gu, "-")
         .replace(/(^-|-$)+/g, "");
-    
+
     if (!slug) {
         slug = "store-" + Math.random().toString(36).substring(2, 9);
     }
-    
+
     let slugExists = await Vendor.findOne({ storeSlug: slug });
     if (!slugExists) {
         return slug;
     }
-    
+
     let count = 1;
     while (true) {
         const testSlug = `${slug}-${count}`;
@@ -43,7 +44,7 @@ export const createVendorService = async (req: Request) => {
     if (!userId) {
         throw new Error("Unauthorized");
     }
-    
+
     const existingVendor = await Vendor.findOne({ userId });
     if (existingVendor) {
         throw new RecordExistError("User is already registered as a vendor");
@@ -64,7 +65,7 @@ export const createVendorService = async (req: Request) => {
         logo,
         banner,
         bankAccount,
-        socialLinks
+        socialLinks,
     });
 
     await User.findByIdAndUpdate(userId, { role: UserRoles.VENDOR });
@@ -91,7 +92,7 @@ export const updateVendorService = async (req: Request) => {
     if (!vendor) {
         throw new NotFoundError("Vendor profile not found");
     }
-    
+
     const updates = { ...req.body };
     if (updates.storeName && updates.storeName !== vendor.storeName) {
         updates.storeSlug = await generateUniqueSlug(updates.storeName);
@@ -149,17 +150,29 @@ export const getVendorDashboardStatsService = async (req: Request) => {
         totalProducts,
         totalOrders,
         totalRevenue,
-        pendingOrdersCount
+        pendingOrdersCount,
     };
 };
 
 export const getVendorProductsService = async (req: Request) => {
     const userId = req.user?._id;
+
     const vendor = await Vendor.findOne({ userId });
+
     if (!vendor) {
         throw new NotFoundError("Vendor profile not found");
     }
-    return await Product.find({ vendorId: vendor._id }).populate("categoryId");
+
+    const products = await Product.find({ vendorId: vendor._id }).populate("categoryId").lean();
+
+    const productsWithImages = await Promise.all(
+        products.map(async (product) => ({
+            ...product,
+            images: await resolveFiles(product.images || [], "public"),
+        })),
+    );
+
+    return productsWithImages;
 };
 
 export const getVendorOrdersService = async (req: Request) => {
@@ -196,7 +209,7 @@ export const updateVendorOrderItemStatusService = async (req: Request) => {
     const orderItem = await OrderItem.findOne({
         _id: itemId,
         orderId,
-        vendorId: vendor._id
+        vendorId: vendor._id,
     });
 
     if (!orderItem) {
@@ -207,19 +220,19 @@ export const updateVendorOrderItemStatusService = async (req: Request) => {
     await orderItem.save();
 
     const allItems = await OrderItem.find({ orderId });
-    
-    let newOrderStatus = "confirmed";
-    const statuses = allItems.map(item => item.status);
 
-    if (statuses.every(s => s === "delivered")) {
+    let newOrderStatus = "confirmed";
+    const statuses = allItems.map((item) => item.status);
+
+    if (statuses.every((s) => s === "delivered")) {
         newOrderStatus = "delivered";
-    } else if (statuses.every(s => s === "cancelled")) {
+    } else if (statuses.every((s) => s === "cancelled")) {
         newOrderStatus = "cancelled";
-    } else if (statuses.some(s => s === "shipped") && !statuses.some(s => s === "pending" || s === "confirmed")) {
+    } else if (statuses.some((s) => s === "shipped") && !statuses.some((s) => s === "pending" || s === "confirmed")) {
         newOrderStatus = "shipped";
-    } else if (statuses.some(s => s === "confirmed") && !statuses.some(s => s === "pending")) {
+    } else if (statuses.some((s) => s === "confirmed") && !statuses.some((s) => s === "pending")) {
         newOrderStatus = "confirmed";
-    } else if (statuses.some(s => s === "pending")) {
+    } else if (statuses.some((s) => s === "pending")) {
         newOrderStatus = "pending";
     }
 

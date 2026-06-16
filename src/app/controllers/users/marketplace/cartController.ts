@@ -1,12 +1,12 @@
 import { Response } from "express";
-import { returnSuccess, returnError } from "../../utils/returnJson.js";
 import {
-    getCartService,
     addToCartService,
-    removeFromCartService,
     clearCartService,
+    getCartService,
+    removeFromCartService,
     syncCartService,
-} from "../../services/carts/cartService.js";
+} from "../../../services/users/marketplace/cartService.js";
+import { returnError, returnSuccess } from "../../../utils/returnJson.js";
 
 export const index = async (req: any, res: Response) => {
     try {
@@ -28,7 +28,7 @@ export const sync = async (req: any, res: Response) => {
 
 export const store = async (req: any, res: Response) => {
     try {
-        const updatedCart = await addToCartService(req); 
+        const updatedCart = await addToCartService(req);
         return returnSuccess(res, "Item added to cart successfully", 200, updatedCart);
     } catch (error: any) {
         return returnError(res, error.message || "Error adding item to cart", 500);

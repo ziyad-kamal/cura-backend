@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request } from "express";
 import mongoose from "mongoose";
-import Review from "../../models/Review.js";
-import Product from "../../models/Product.js";
+import Product from "../../../models/Product.js";
+import Review from "../../../models/Review.js";
 
 // Helper function to recalculate and update a product's ratingAverage and totalReviews
 const updateProductRating = async (productId: string) => {
@@ -35,6 +36,7 @@ const updateProductRating = async (productId: string) => {
             });
         }
     } catch (err) {
+        // eslint-disable-next-line no-console
         console.error(`Failed to update product rating for ${productId}:`, err);
     }
 };
@@ -43,10 +45,7 @@ export const indexReviewsService = async (req: Request) => {
     const productId = typeof req.query.productId === "string" ? req.query.productId : undefined;
     const filter = productId ? { productId } : {};
 
-    return await Review.find(filter)
-        .populate("userId", "name image")
-        .populate("productId")
-        .sort({ createdAt: -1 });
+    return await Review.find(filter).populate("userId", "name image").populate("productId").sort({ createdAt: -1 });
 };
 
 // Check if user already has a rating for this product
@@ -82,7 +81,7 @@ export const createReviewService = async (req: Request) => {
     }
 
     // Check if the user is a vendor and owns the product
-    const { default: Vendor } = await import("../../models/Vendor.js");
+    const { default: Vendor } = await import("../../../models/Vendor.js");
     const vendor = await Vendor.findOne({ userId });
     if (vendor && product.vendorId.toString() === vendor._id.toString()) {
         const error: any = new Error("You cannot review your own product");
@@ -116,9 +115,7 @@ export const createReviewService = async (req: Request) => {
     // Recalculate average rating for the product
     await updateProductRating(review.productId.toString());
 
-    return await Review.findById(review._id)
-        .populate("userId", "name image")
-        .populate("productId");
+    return await Review.findById(review._id).populate("userId", "name image").populate("productId");
 };
 
 export const updateReviewService = async (req: Request) => {
@@ -146,9 +143,7 @@ export const updateReviewService = async (req: Request) => {
         await updateProductRating(updatedReview.productId.toString());
     }
 
-    return await Review.findById(updatedReview?._id)
-        .populate("userId", "name image")
-        .populate("productId");
+    return await Review.findById(updatedReview?._id).populate("userId", "name image").populate("productId");
 };
 
 export const deleteReviewService = async (req: Request) => {

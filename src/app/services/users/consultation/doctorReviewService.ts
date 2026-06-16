@@ -1,14 +1,17 @@
 import mongoose from "mongoose";
-import DoctorReview from "../../models/DoctorReview.js";
-import User from "../../models/User.js";
-import Consultation from "../../models/Consultation.js";
+import Consultation from "../../../models/Consultation.js";
+import DoctorReview from "../../../models/DoctorReview.js";
+import User from "../../../models/User.js";
 
-export const createDoctorReview = async (userId: string, data: {
-    doctorId: string;
-    rating: number;
-    comment?: string;
-    consultationId?: string;
-}) => {
+export const createDoctorReview = async (
+    userId: string,
+    data: {
+        doctorId: string;
+        rating: number;
+        comment?: string;
+        consultationId?: string;
+    },
+) => {
     const { doctorId, rating, comment, consultationId } = data;
 
     // Check if user has an existing consultation with this doctor
@@ -23,7 +26,7 @@ export const createDoctorReview = async (userId: string, data: {
     // Attempt to find if user already reviewed this doctor (since we have a unique index on userId + doctorId)
     const existingReview = await DoctorReview.findOne({
         userId: new mongoose.Types.ObjectId(userId),
-        doctorId: new mongoose.Types.ObjectId(doctorId)
+        doctorId: new mongoose.Types.ObjectId(doctorId),
     });
     if (existingReview) {
         throw new Error("You have already reviewed this doctor.");

@@ -10,7 +10,6 @@ import Like from "../../../models/Like.js";
 import Post from "../../../models/Post.js";
 import Repost from "../../../models/Repost.js";
 import { findRecord } from "../../../utils/findRecord.js";
-import { resolveFiles } from "../../../utils/resolveFiles.js";
 
 export const indexPostsRepo = async (authId: string, cursor?: string) => {
     const authObjectId = new mongoose.Types.ObjectId(authId);
@@ -663,21 +662,6 @@ export const indexPostsRepo = async (authId: string, cursor?: string) => {
     const lastItem = feed[feed.length - 1];
 
     const nextCursor = hasMore && lastItem ? new Date(lastItem.createdAt).toISOString() : null;
-
-    feed = await Promise.all(
-        feed.map(async (item) => ({
-            ...item,
-            files: await resolveFiles(item.files, item.visibility),
-            ...(item.post
-                ? {
-                      post: {
-                          ...item.post,
-                          files: await resolveFiles(item.post.files, item.post.visibility),
-                      },
-                  }
-                : {}),
-        })),
-    );
 
     return {
         feed,

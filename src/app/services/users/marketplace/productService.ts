@@ -1,12 +1,12 @@
 import { Request } from "express";
-import Product from "../../models/Product.js";
-import Vendor from "../../models/Vendor.js";
-import NotFoundError from "../../errors/NotFoundError.js";
+import NotFoundError from "../../../errors/NotFoundError.js";
+import Product from "../../../models/Product.js";
+import Vendor from "../../../models/Vendor.js";
+import { handleS3Files } from "../../../utils/handleS3Files.js";
+import { resolveFiles } from "../../../utils/resolveFiles.js";
 
 export const indexProductsService = async (req: Request) => {
-    return await Product.find()
-        .populate("vendorId")
-        .populate("categoryId");
+    await Product.find().populate("vendorId").populate("categoryId").lean();
 };
 
 export const createProductService = async (req: Request) => {
@@ -16,22 +16,34 @@ export const createProductService = async (req: Request) => {
         throw new NotFoundError("Vendor profile not found. Please register as a vendor first.");
     }
 
+    let updatedFiles = await handleS3Files(req.body.images, "public/products/");
+
     const productData = {
         ...req.body,
-        vendorId: vendor._id
+        images:updatedFiles,
+        vendorId: vendor._id,
     };
 
-    const product = await Product.create(productData);
-    
-    return await Product.findById(product._id)
-        .populate("vendorId")
-        .populate("categoryId");
+    let product = await Product.create(productData);
+
+    await product.populate([{ path: "vendorId" }, { path: "categoryId" }]);
+
+    const productObject = product.toObject();
+
+    if (updatedFiles.length > 0) {
+        const resolvedFiles = await resolveFiles(updatedFiles, "public");
+
+        return {
+            ...productObject,
+            files: resolvedFiles,
+        };
+    }
+
+    return productObject;
 };
 
 export const showProductService = async (req: Request) => {
-    const populated = await Product.findById(req.params.id)
-        .populate("vendorId")
-        .populate("categoryId");
+    const populated = await Product.findById(req.params.id).populate("vendorId").populate("categoryId").lean();
 
     return populated;
 };
@@ -56,9 +68,7 @@ export const updateProductService = async (req: Request) => {
         returnDocument: "after",
     });
 
-    return await Product.findById(updatedProduct?._id)
-        .populate("vendorId")
-        .populate("categoryId");
+    return await Product.findById(updatedProduct?._id).populate("vendorId").populate("categoryId");
 };
 
 export const deleteProductService = async (req: Request) => {

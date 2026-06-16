@@ -1,14 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import dotenv from "dotenv";
 import { Request, Response } from "express";
 import Stripe from "stripe";
-import dotenv from "dotenv";
-
-import Order from "../../models/Order.js";
-import OrderItem from "../../models/OrderItem.js";
-import Cart from "../../models/Cart.js";
-import Product from "../../models/Product.js";
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { returnSuccess } from "../../utils/returnJson.js";
-import { mapOrderForFrontend } from "../../services/orders/orderService.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import Cart from "../../../models/Cart.js";
+import { returnSuccess } from "../../../utils/returnJson.js";
+import Order from "../../../models/Order.js";
+import Product from "../../../models/Product.js";
+import OrderItem from "../../../models/OrderItem.js";
+import { mapOrderForFrontend } from "../../../services/users/marketplace/orderService.js";
 
 dotenv.config();
 
@@ -116,7 +116,7 @@ export const confirmOrder = asyncHandler(async (req: Request, res: Response): Pr
             const product = await Product.findByIdAndUpdate(
                 item.productId,
                 { $inc: { stock: -item.quantity } },
-                { new: true }
+                { new: true },
             );
 
             if (!product) {
@@ -124,10 +124,7 @@ export const confirmOrder = asyncHandler(async (req: Request, res: Response): Pr
             }
 
             if (product.stock < 0) {
-                await Product.findByIdAndUpdate(
-                    item.productId,
-                    { $inc: { stock: item.quantity } }
-                );
+                await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
                 throw new Error(`Insufficient stock for product: ${product.title}`);
             }
 
@@ -138,7 +135,7 @@ export const confirmOrder = asyncHandler(async (req: Request, res: Response): Pr
                 quantity: item.quantity,
                 price: item.price,
             });
-        })
+        }),
     );
 
     // Clear the cart
@@ -168,14 +165,12 @@ export const handleWebhook = async (req: Request, res: Response): Promise<Respon
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret as string);
     } catch (err: any) {
-        console.error("Webhook signature verification failed:", err.message);
         return res.status(400).json({ error: `Webhook Error: ${err.message}` });
     }
 
     switch (event.type) {
         case "payment_intent.succeeded": {
             const paymentIntent = event.data.object as Stripe.PaymentIntent;
-            console.log(`✅ PaymentIntent ${paymentIntent.id} succeeded`);
 
             // Update order payment status if order exists
             const order = await Order.findOne({ stripePaymentIntentId: paymentIntent.id });
@@ -188,7 +183,6 @@ export const handleWebhook = async (req: Request, res: Response): Promise<Respon
 
         case "payment_intent.payment_failed": {
             const paymentIntent = event.data.object as Stripe.PaymentIntent;
-            console.log(`❌ PaymentIntent ${paymentIntent.id} failed`);
 
             const order = await Order.findOne({ stripePaymentIntentId: paymentIntent.id });
             if (order) {
@@ -197,9 +191,6 @@ export const handleWebhook = async (req: Request, res: Response): Promise<Respon
             }
             break;
         }
-
-        default:
-            console.log(`Unhandled event type: ${event.type}`);
     }
 
     return res.status(200).json({ received: true });

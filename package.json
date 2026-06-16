@@ -10,7 +10,8 @@
         "lint": "eslint . --ext .ts",
         "format": "prettier --write .",
         "seed": "tsx src/seeders/seed.ts",
-        "go": "start start.bat"
+        "go": "start start.bat",
+        "worker": "tsx  src/app/workers/emailWorker.ts"
     },
     "keywords": [],
     "author": "",

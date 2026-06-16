@@ -22,11 +22,13 @@ const seedConnections = async (
             if (userId.toString() === authUserId.toString()) {
                 continue;
             }
-            
+
+            const authIsSender = faker.datatype.boolean();
+
             connections.push({
-                status: "accepted",
-                sender: authUserId,
-                receiver: userId,
+                status: faker.helpers.arrayElement(['accepted','ignored','pending']),
+                sender: authIsSender ? authUserId : userId,
+                receiver: authIsSender ? userId : authUserId,
                 createdAt: randomDate,
                 updatedAt: randomDate,
             });

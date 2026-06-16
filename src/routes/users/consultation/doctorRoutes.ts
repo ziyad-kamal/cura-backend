@@ -1,6 +1,6 @@
 import express from "express";
 import { jwtVerify } from "../../../app/middlewares/jwtVerify.js";
-import { index, show, store, update, destroy } from "../../../app/controllers/consultation/doctorController.js";
+import { index, show, store, update, destroy } from "../../../app/controllers/users/consultation/doctorController.js";
 
 const doctorRoutes = express.Router();
 

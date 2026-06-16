@@ -1,14 +1,8 @@
 import express from "express";
 
-import {
-    clear,
-    destroy,
-    index,
-    store,
-    sync,
-} from "../../../app/controllers/carts/cartController.js";
+import { clear, destroy, index, store, sync } from "../../../app/controllers/users/marketplace/cartController.js";
 import { jwtVerify } from "../../../app/middlewares/index.js";
-import { syncCartValidator, storeCartValidator } from "../../../app/validators/cartValidator.js";
+import { storeCartValidator, syncCartValidator } from "../../../app/validators/cartValidator.js";
 
 const router = express.Router();
 

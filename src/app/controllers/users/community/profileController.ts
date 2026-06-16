@@ -3,6 +3,7 @@ import {
     acceptProfileService,
     cancelProfileService,
     connectProfileService,
+    getConnectionsProfileService,
     ignoreProfileService,
     indexProfileService,
     updateProfileService,
@@ -13,6 +14,12 @@ import { returnSuccess } from "../../../utils/returnJson.js";
 export const index = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     const profile = await indexProfileService(req);
     return returnSuccess(res, "", 200, profile);
+});
+
+export const getConnections = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
+    const connections = await getConnectionsProfileService(req);
+
+    return returnSuccess(res, "", 200, {connections});
 });
 
 export const update = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
@@ -37,5 +44,5 @@ export const ignore = asyncHandler(async (req: Request, res: Response): Promise<
 
 export const cancel = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
     await cancelProfileService(req);
-    return returnSuccess(res, "you cancel request successfully", 200);
+    return returnSuccess(res, "you canceled request successfully", 200);
 });

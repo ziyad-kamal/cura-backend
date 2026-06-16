@@ -30,6 +30,7 @@ const httpServer = createServer(app);
 
 async function bootstrap() {
     EventEmitter.defaultMaxListeners = 15;
+    
 
     await connectDB();
     await connectRedis();

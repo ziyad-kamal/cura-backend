@@ -8,7 +8,7 @@ export interface ProductInterface {
     price: number;
     discountPrice?: number;
     stock: number;
-    images: string[];
+    images: { s3Key: string; type?: string }[];
     categoryId?: mongoose.Types.ObjectId;
     brand?: string;
     ratingAverage: number;
