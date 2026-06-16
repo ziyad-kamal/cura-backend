@@ -25,6 +25,7 @@ export const uploadFileService = async (req: Request): Promise<object> => {
     let tmpUploadUrl = await getSignedUrl(s3Client, command, {
         expiresIn: 900,
         signableHeaders: new Set(["content-type"]),
+        unhoistableHeaders: new Set(["x-amz-checksum-crc32"]),
     });
 
     const url = await getSignedFileUrl(s3Key);
