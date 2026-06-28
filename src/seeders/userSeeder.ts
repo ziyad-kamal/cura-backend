@@ -7,36 +7,40 @@ import { HydratedDocument } from "mongoose";
 import { PostTag } from "../enums/PostTag.js";
 import bcrypt from "bcryptjs";
 
-const EGYPTIAN_CITIES = ["Cairo", "Alexandria", "Giza", "Luxor", "Aswan", "Hurghada", "Sharm El Sheikh", "Mansoura", "Tanta", "Port Said"];
-const EGYPTIAN_STREETS = ["Tahrir Square", "El-Galaa St", "Salah Salem", "El-Haram St", "Mohandessin", "Zamalek", "Maadi", "Heliopolis", "Nasr City", "New Cairo"];
+const EGYPTIAN_CITIES = [
+    "Cairo",
+    "Alexandria",
+    "Giza",
+    "Luxor",
+    "Aswan",
+    "Tanta",
+    "Port Said",
+];
+const EGYPTIAN_STREETS = [
+    "Heliopolis",
+    "New Cairo",
+];
 const NUTRITION_SPECIALIZATIONS = [
-  "General Nutritionist",
-  "Sports Nutritionist",
-  "Pediatric Dietitian",
-  "Clinical Dietitian",
-  "Weight Management Specialist",
-  "Ketogenic Diet Specialist",
-  "Diabetes Care Dietitian",
+    "General Nutritionist",
+    "Sports Nutritionist",
+    "Pediatric Dietitian",
+    "Clinical Dietitian",
+    "Weight Management Specialist",
+    "Ketogenic Diet Specialist",
+    "Diabetes Care Dietitian",
 ];
 const DISEASES = [
-  "Type 2 Diabetes",
-  "Hypertension",
-  "Obesity",
-  "High Cholesterol",
-  "None",
-  "IBS (Irritable Bowel Syndrome)",
-  "Thyroid Disorder",
+    "Type 2 Diabetes",
+    "Hypertension",
+    "Obesity",
+    "High Cholesterol",
+    "None",
+    "IBS (Irritable Bowel Syndrome)",
+    "Thyroid Disorder",
 ];
-const MEDICATIONS = [
-  "Metformin 500mg",
-  "Amlodipine 5mg",
-  "None",
-  "Atorvastatin 20mg",
-  "Levothyroxine 50mcg",
-  "Omeprazole 20mg",
-];
+const MEDICATIONS = ["Metformin 500mg", "Metformin 250mg"];
 
-const DEFAULT_IMAGE = "public/posts/86381e92c4a401687272bdd2ddd157f5.png";
+const DEFAULT_IMAGE = "profile/c1061faa750196d4e319f930e72215b5.jpeg";
 const HASHED_PASSWORD = bcrypt.hashSync("12121212", 10);
 
 const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterface> => {
@@ -73,7 +77,7 @@ const generateFakeUser = (role: UserRoles = UserRoles.USER): Partial<UserInterfa
                 experienceYears: faker.number.int({ min: 1, max: 20 }),
                 workingDays: faker.helpers.arrayElements(
                     ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
-                    { min: 3, max: 6 }
+                    { min: 3, max: 6 },
                 ),
                 workingHoursStart: faker.helpers.arrayElement(["08:00", "09:00", "10:00"]),
                 workingHoursEnd: faker.helpers.arrayElement(["16:00", "17:00", "18:00"]),
@@ -130,14 +134,19 @@ export const seedUsers = async (
             users.push(generateFakeUser(UserRoles.DOCTOR));
         }
 
+        const firstName = faker.person.firstName();
+        const lastName = faker.person.lastName();
         // ─── Test Accounts ──────────────────────────────────────────────
         // Test Doctor Account
         await User.create({
-            name: { first: "Ahmed", last: "Hassan" },
+            name: { first: firstName, last: lastName },
             contact: {
                 email: "doctor@gmail.com",
                 phone: "01012345678",
-                address: { city: "Cairo", street: "Nasr City, Abbas El-Akkad St" },
+                address: {
+                    city: faker.helpers.arrayElement(EGYPTIAN_CITIES),
+                    street: faker.helpers.arrayElement(EGYPTIAN_STREETS),
+                },
             },
             password: "12121212",
             isVerified: true,
@@ -175,63 +184,11 @@ export const seedUsers = async (
             },
             cardPayment: {
                 number: "4111111111111111",
-                name: "Ahmed Hassan",
+                name: "Ahmed ali",
                 cvv: "123",
                 expDate: "12/27",
             },
         });
-        console.log("✅ Test Doctor created: doctor@gmail.com / 12121212");
-
-        // Test Doctor 2
-        await User.create({
-            name: { first: "Sara", last: "Mostafa" },
-            contact: {
-                email: "doctor2@gmail.com",
-                phone: "01098765432",
-                address: { city: "Alexandria", street: "Stanley Beach St" },
-            },
-            password: "12121212",
-            isVerified: true,
-            isActive: true,
-            role: UserRoles.DOCTOR,
-            image: DEFAULT_IMAGE,
-            coverImage: DEFAULT_IMAGE,
-            provider: "local",
-            doctorInfo: {
-                shortConsultPrice: 180,
-                normalConsultPrice: 450,
-                LongConsultPrice: 850,
-                isCertified: true,
-                frontIdImage: DEFAULT_IMAGE,
-                backIdImage: DEFAULT_IMAGE,
-                certImage: DEFAULT_IMAGE,
-                specialization: "Sports Nutritionist",
-                experienceYears: 5,
-                workingDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                workingHoursStart: "10:00",
-                workingHoursEnd: "18:00",
-                ratingAverage: 4.6,
-                totalReviews: 87,
-            },
-            userInfo: {
-                bio: "Sports nutritionist specializing in athletic performance, body composition, and recovery nutrition.",
-                job: "Sports Nutritionist",
-                age: 30,
-                weight: 60,
-                height: 165,
-                gender: "female",
-                diseases: "None",
-                medications: "None",
-                tags: ["Muscle Gain", "Weight Loss"],
-            },
-            cardPayment: {
-                number: "4111111111111111",
-                name: "Sara Mostafa",
-                cvv: "456",
-                expDate: "08/28",
-            },
-        });
-        console.log("✅ Test Doctor 2 created: doctor2@gmail.com / 12121212");
 
         // Test User (Seeker) — Primary auth user
         const authUser = await User.create({
@@ -239,7 +196,7 @@ export const seedUsers = async (
             contact: {
                 email: "user@gmail.com",
                 phone: "01155667788",
-                address: { city: "Cairo", street: "Maadi, Road 9" },
+                address: { city: "Cairo", street: "el tahr street" },
             },
             password: "12121212",
             isVerified: true,
@@ -267,41 +224,6 @@ export const seedUsers = async (
             },
         });
         console.log("✅ Test User created: user@gmail.com / 12121212");
-
-        // Test User 2
-        await User.create({
-            name: { first: "Nour", last: "Ibrahim" },
-            contact: {
-                email: "user2@gmail.com",
-                phone: "01222334455",
-                address: { city: "Giza", street: "Mohandessin, Gameat El Dowal St" },
-            },
-            password: "12121212",
-            isVerified: true,
-            isActive: true,
-            role: UserRoles.USER,
-            image: DEFAULT_IMAGE,
-            coverImage: DEFAULT_IMAGE,
-            provider: "local",
-            userInfo: {
-                bio: "Passionate about healthy eating and sustainable lifestyle changes. Working with my nutritionist to reach my goals.",
-                job: "Marketing Manager",
-                age: 25,
-                weight: 65,
-                height: 162,
-                gender: "female",
-                diseases: "None",
-                medications: "None",
-                tags: ["Weight Loss", "Muscle Gain"],
-            },
-            cardPayment: {
-                number: "4111111111111111",
-                name: "Nour Ibrahim",
-                cvv: "321",
-                expDate: "03/30",
-            },
-        });
-        console.log("✅ Test User 2 created: user2@gmail.com / 12121212");
 
         // Bulk insert faker users
         const createdUsers = (await User.insertMany(users)) as UserInterface[];

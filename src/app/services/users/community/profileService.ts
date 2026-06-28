@@ -24,28 +24,10 @@ export const indexProfileService = async (req: Request) => {
     const { hasMore, nextCursor, results } = getNextCursor(profile.posts, limit, sortField);
 
     const resolvedPosts = await Promise.all(
-        results.map(async (post: PostInterface) => {
-            const user = post.user as unknown as UserInterface;
-
-            const userImageUrl =
-                user?.image && !user.image.startsWith("http")
-                    ? await resolveFiles([{ s3Key: user.image }], "public").then((res) => res[0]?.url)
-                    : user?.image;
-
-            return {
-                ...post,
-                files: await resolveFiles(post.files, post.visibility),
-
-                user: user
-                    ? {
-                          ...user,
-                          ...(userImageUrl && {
-                              image: userImageUrl,
-                          }),
-                      }
-                    : user,
-            };
-        }),
+        results.map(async (post: PostInterface) => ({
+            ...post,
+            files: await resolveFiles(post.files, post.visibility),
+        })),
     );
 
     const user = profile.user as UserInterface;
@@ -69,24 +51,6 @@ export const indexProfileService = async (req: Request) => {
         metadata: { hasMore, nextCursor },
         posts: resolvedPosts,
     };
-};
-
-export const getConnectionsProfileService = async (req: Request): Promise<ConnectionInterface[]> => {
-    const connections = await getConnectionsProfileRepo(req.user!._id);
-
-    await Promise.all(
-        connections.map(async (connection) => {
-            const sender = connection.sender as unknown as UserInterface;
-
-            if (sender?.image) {
-                const [image] = await resolveFiles([{ s3Key: sender.image }], "public");
-
-                sender.image = image.url;
-            }
-        }),
-    );
-
-    return connections;
 };
 
 export const updateProfileService = async (req: Request): Promise<UserInterface | null> => {
@@ -120,6 +84,24 @@ export const updateProfileService = async (req: Request): Promise<UserInterface 
         ...(resolvedImage && { image: resolvedImage }),
         ...(resolvedCoverImage && { coverImage: resolvedCoverImage }),
     } as UserInterface;
+};
+
+export const getConnectionsProfileService = async (req: Request): Promise<ConnectionInterface[]> => {
+    const connections = await getConnectionsProfileRepo(req.user!._id);
+
+    await Promise.all(
+        connections.map(async (connection) => {
+            const sender = connection.sender as unknown as UserInterface;
+
+            if (sender?.image) {
+                const [image] = await resolveFiles([{ s3Key: sender.image }], "public");
+
+                sender.image = image.url;
+            }
+        }),
+    );
+
+    return connections;
 };
 
 export const connectProfileService = async (req: Request): Promise<void> => {
