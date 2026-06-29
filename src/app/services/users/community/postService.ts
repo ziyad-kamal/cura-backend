@@ -97,31 +97,49 @@ export const storePostService = async (req: Request): Promise<PostInterface> => 
 
     const post = await storePostRepo({ ...req.body, files: updatedFiles, user: req.user?._id });
 
+    let finalPost = { ...post };
+
     if (updatedFiles.length > 0) {
         const resolvedFiles = await resolveFiles(updatedFiles, visibility);
-        return { ...post, files: resolvedFiles } as PostInterface;
+        finalPost = { ...post, files: resolvedFiles };
     }
 
-    return post;
+    const user = finalPost.user;
+    if (user?.image) {
+        const resolvedImage = await resolveFiles([{ s3Key: user.image }], "public");
+
+        user.image = resolvedImage[0].url;
+    }
+
+    return finalPost;
 };
 
 export const repostPostService = async (req: Request): Promise<boolean> => {
     return await repostPostRepo({ ...req.body }, req.user?._id);
 };
 
-export const updatePostService = async (req: Request): Promise<PostInterface | null> => {
+export const updatePostService = async (req: Request): Promise<PostInterface> => {
     const { files, visibility } = req.body;
 
     let updatedFiles = await handleS3Files(files, "public/posts/");
 
     const post = await updatePostRepo({ ...req.body, files: updatedFiles, ...req.params });
 
+    let finalPost = { ...post };
+
     if (updatedFiles.length > 0) {
         const resolvedFiles = await resolveFiles(updatedFiles, visibility);
-        return { ...post, files: resolvedFiles } as PostInterface;
+        finalPost = { ...post, files: resolvedFiles };
     }
 
-    return post;
+    const user = finalPost.user;
+    if (user?.image) {
+        const resolvedImage = await resolveFiles([{ s3Key: user.image }], "public");
+
+        user.image = resolvedImage[0].url;
+    }
+
+    return finalPost;
 };
 
 export const likePostService = async (req: Request): Promise<boolean> => {

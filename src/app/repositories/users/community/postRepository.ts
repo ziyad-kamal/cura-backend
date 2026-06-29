@@ -10,6 +10,7 @@ import Like from "../../../models/Like.js";
 import Post from "../../../models/Post.js";
 import Repost from "../../../models/Repost.js";
 import { findRecord } from "../../../utils/findRecord.js";
+import { UserInterface } from "../../../../interfaces/models/UserInterface.js";
 
 export const indexPostsRepo = async (authId: string, cursor?: string) => {
     const authObjectId = new mongoose.Types.ObjectId(authId);
@@ -676,12 +677,14 @@ export const storePostRepo = async ({
     user,
     tags,
     visibility,
-}: PostDataInterface): Promise<PostInterface> => {
+}: PostDataInterface): Promise<PostInterface & { user: UserInterface }> => {
     const post = await (
         await Post.create({ user, content, files, tags, visibility })
     ).populate("user", "name.first name.last image userInfo.job");
 
-    return post.toJSON();
+    return post.toJSON() as unknown as PostInterface & {
+        user: UserInterface;
+    };
 };
 
 export const repostPostRepo = async ({ content, post }: RepostDataInterface, authId: string): Promise<boolean> => {
@@ -703,10 +706,10 @@ export const updatePostRepo = async ({
     visibility,
     tags,
     _id,
-}: PostDataInterface): Promise<PostInterface | null> => {
+}: PostDataInterface): Promise<(PostInterface & { user: UserInterface }) > => {
     await findRecord(Post, { _id });
 
-    return await Post.findByIdAndUpdate(
+    return (await Post.findByIdAndUpdate(
         _id,
         { content, files, visibility, tags },
         {
@@ -715,7 +718,9 @@ export const updatePostRepo = async ({
         },
     )
         .populate("user", "name.first name.last image userInfo.job")
-        .lean();
+        .lean()) as unknown as PostInterface & {
+        user: UserInterface;
+    };
 };
 
 export const likePostRepo = async (_id: string, authId: string): Promise<boolean> => {
