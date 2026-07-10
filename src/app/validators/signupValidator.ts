@@ -1,7 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { body, ValidationChain, validationResult } from "express-validator";
 import { returnError } from '../utils/returnJson.js';
-import { UserRoles } from '../../enums/UserRoles.js';
 
 export const signupValidator: (ValidationChain | RequestHandler)[] = [
     body("firstName")
@@ -17,13 +16,6 @@ export const signupValidator: (ValidationChain | RequestHandler)[] = [
         .withMessage("lastName is required")
         .isLength({ min: 2, max: 30 })
         .withMessage("lastName must be between 2 and 30 characters"),
-
-    body("role")
-        .trim()
-        .notEmpty()
-        .withMessage("role is required")
-        .isIn(Object.values(UserRoles))
-        .withMessage("role is user or doctor"),
 
     body("email")
         .trim()
