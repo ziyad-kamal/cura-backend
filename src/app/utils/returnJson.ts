@@ -17,10 +17,10 @@ const returnSuccess = <T>(
 };
 
 const returnError = (res: Response, msg: string = "", code: number, errors?: Result<ValidationError>): Response => {
-    let errorArray: Record<string, string[]>[] = [];
+    let errorObject: Record<string, string[]> = {};
 
     if (errors) {
-        const groupedErrors = errors.array().reduce<Record<string, string[]>>((acc, err) => {
+        errorObject = errors.array().reduce<Record<string, string[]>>((acc, err) => {
             if (err.type === "field") {
                 if (!acc[err.path]) {
                     acc[err.path] = [];
@@ -29,16 +29,12 @@ const returnError = (res: Response, msg: string = "", code: number, errors?: Res
             }
             return acc;
         }, {});
-
-        errorArray = Object.entries(groupedErrors).map(([path, messages]) => ({
-            [path]: messages,
-        }));
     }
 
     const resObject: Record<string, unknown> = {
         success: false,
         ...(msg !== "" && { msg }),
-        ...(errorArray.length > 0 && { errors: errorArray }),
+        ...(Object.keys(errorObject).length > 0 && { errors: errorObject }),
     };
 
     return res.status(code).json(resObject);
