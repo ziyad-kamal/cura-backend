@@ -43,9 +43,7 @@ export const signupRepo = async (
     role: UserRoles,
 ): Promise<UserInterface> => {
     const user = await User.findOne({
-        contact: {
-            email,
-        },
+        'contact.email': email,
     });
 
     if (user) {
