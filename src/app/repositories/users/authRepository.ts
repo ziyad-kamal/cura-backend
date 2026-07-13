@@ -1,6 +1,5 @@
 import { UserRoles } from "../../../enums/UserRoles.js";
 import { UserInterface } from "../../../interfaces/models/UserInterface.js";
-import RecordExistError from "../../errors/RecordExistError.js";
 import User from "../../models/User.js";
 
 export const loginRepo = (email: string): Promise<UserInterface | null> => {
@@ -42,14 +41,6 @@ export const signupRepo = async (
     password: string,
     role: UserRoles,
 ): Promise<UserInterface> => {
-    const user = await User.findOne({
-        'contact.email': email,
-    });
-
-    if (user) {
-        throw new RecordExistError("this email is used");
-    }
-
     return await User.create({
         name: {
             first: firstName,

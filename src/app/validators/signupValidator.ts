@@ -1,6 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { body, ValidationChain, validationResult } from "express-validator";
-import { returnError } from '../utils/returnJson.js';
+import { returnError } from "../utils/returnJson.js";
+import User from "../models/User.js";
 
 export const signupValidator: (ValidationChain | RequestHandler)[] = [
     body("firstName")
@@ -24,7 +25,13 @@ export const signupValidator: (ValidationChain | RequestHandler)[] = [
         .isEmail()
         .withMessage("invalid email")
         .isLength({ min: 10, max: 150 })
-        .withMessage("email must be between 10 and 150 characters"),
+        .withMessage("email must be between 10 and 150 characters")
+        .custom(async (value) => {
+            const existingUser = await User.findOne({ "contact.email": value });
+            if (existingUser) {
+                throw new Error("email already in use");
+            }
+        }),
 
     body("password")
         .trim()
