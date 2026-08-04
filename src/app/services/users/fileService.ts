@@ -19,13 +19,10 @@ export const uploadFileService = async (req: Request): Promise<object> => {
         Bucket: awsConfig.s3_bucket_name,
         Key: s3Key,
         ContentType: fileType,
-        ChecksumAlgorithm: undefined,
     });
 
     let tmpUploadUrl = await getSignedUrl(s3Client, command, {
         expiresIn: 900,
-        signableHeaders: new Set(["content-type"]),
-        unhoistableHeaders: new Set(["x-amz-checksum-crc32"]),
     });
 
     const url = await getSignedFileUrl(s3Key);

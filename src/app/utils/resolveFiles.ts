@@ -7,12 +7,12 @@ export const resolveFiles = async <T extends { s3Key: string }>(
     if (!files?.length) return [];
 
     if (visibility === "public") {
-        return files
-            .filter((file) => file.s3Key)
-            .map((file) => ({
-                ...file,
-                url: `http://d25j70azqw5p5x.cloudfront.net/${file.s3Key.replace("public/", "")}`,
-            }));
+        // return files
+        //     .filter((file) => file.s3Key)
+        //     .map((file) => ({
+        //         ...file,
+        //         url: `http://d25j70azqw5p5x.cloudfront.net/${file.s3Key.replace("public/", "")}`,
+        //     }));
     }
 
     return Promise.all(

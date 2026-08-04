@@ -27,6 +27,7 @@ export const googleLogin = asyncHandler(async (req: LoginRequestInterface, res: 
 
 export const signup = asyncHandler(async (req: SignupRequestInterface, res: Response): Promise<Response> => {
     const data = await signupService(req, res);
+    
     return returnSuccess(res, "Your account has been created successfully", 200, data);
 });
 
