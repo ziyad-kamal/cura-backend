@@ -6,7 +6,6 @@ export const resolveFiles = async <T extends { s3Key: string }>(
 ): Promise<(T & { url: string })[]> => {
     if (!files?.length) return [];
 
-    
     if (visibility === "public") {
         // return files
         //     .filter((file) => file.s3Key)
