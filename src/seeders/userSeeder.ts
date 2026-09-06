@@ -128,12 +128,13 @@ export const seedUsers = async (
         for (let i = 0; i < count; i++) {
             users.push(generateFakeUser(UserRoles.USER));
         }
+        
 
         // Doctor users
         for (let i = 0; i < 15; i++) {
             users.push(generateFakeUser(UserRoles.DOCTOR));
         }
-        
+
 
         const firstName = faker.person.firstName();
         const lastName = faker.person.lastName();
