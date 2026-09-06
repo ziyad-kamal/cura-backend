@@ -119,7 +119,7 @@ export const seedUsers = async (
     authUser: HydratedDocument<UserInterface>;
 }> => {
     try {
-        await User.deleteMany({});
+        // await User.deleteMany({});
         console.log("🗑️  Cleared existing users");
 
         const users: Partial<UserInterface>[] = [];
@@ -141,7 +141,7 @@ export const seedUsers = async (
         await User.create({
             name: { first: firstName, last: lastName },
             contact: {
-                email: "doctor@gmail.com",
+                email: "doctor1@gmail.com",
                 phone: "01012345678",
                 address: {
                     city: faker.helpers.arrayElement(EGYPTIAN_CITIES),
@@ -194,7 +194,7 @@ export const seedUsers = async (
         const authUser = await User.create({
             name: { first: "Mohamed", last: "Ali" },
             contact: {
-                email: "user@gmail.com",
+                email: "user1@gmail.com",
                 phone: "01155667788",
                 address: { city: "Cairo", street: "el tahr street" },
             },

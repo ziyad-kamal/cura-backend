@@ -14,8 +14,8 @@ const NUTRITION_SPECIALIZATIONS = [
     "Diabetes Care Dietitian",
 ];
 
-const DEFAULT_IMAGE = "public/posts/86381e92c4a401687272bdd2ddd157f5.png";
-
+const DEFAULT_IMAGE =
+    "public/profile/edf244e9118f2073098513fb3cbf4613.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAUJDJ4NI64QF6PT63%2F20260906%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260906T094911Z&X-Amz-Expires=3600&X-Amz-Signature=3702954871950f82f238ad97a3dfdb3d4d33ddd6a4874fe95d3c22708332349d&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject";
 const seedDoctors = async (userIds: Types.ObjectId[]): Promise<Types.ObjectId[]> => {
     try {
         console.log("👨‍⚕️ Converting selected users to doctors...");
